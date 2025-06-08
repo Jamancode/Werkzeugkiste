@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Angel Kalender - PWA</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple-specific meta tags (required for iOS PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Angel Kalender">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Apple Icons (override manifest icons on iOS) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-touch-icon-120x120.png">
+
+    <!-- Standard Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#2196F3">
+    <meta name="msapplication-TileImage" content="icons/ms-icon-144x144.png">
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="msapplication-navbutton-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .app-header {
+            margin-bottom: 40px;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .install-section {
+            background: rgba(255,255,255,0.1);
+            padding: 30px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .install-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 10px 5px;
+            min-width: 200px;
+        }
+
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .install-button:disabled {
+            background: rgba(255,255,255,0.2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .browser-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .ios-instruction {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ios-share-icon {
+            font-size: 32px;
+            margin: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .shortcut-button {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-installed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-installable {
+            background: #FF9800;
+            color: white;
+        }
+
+        .pwa-only {
+            display: none;
+        }
+
+        /* PWA specific styles */
+        body.pwa-mode .pwa-only {
+            display: block;
+        }
+
+        body.pwa-mode .install-section {
+            display: none;
+        }
+
+        .firefox-extension {
+            background: #FF6B35;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .animation-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (display-mode: standalone) {
+            .status-indicator {
+                background: #4CAF50;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .install-button {
+                min-width: 150px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">Checking...</div>
+
+    <div class="container">
+        <div class="app-header">
+            <div class="app-icon">🎣</div>
+            <h1>Angel Kalender</h1>
+            <p class="subtitle">Ihr persönlicher Angelassistent</p>
+        </div>
+
+        <!-- PWA-only content -->
+        <div class="pwa-only">
+            <div class="install-section">
+                <h2>🎉 App erfolgreich installiert!</h2>
+                <p>Sie nutzen jetzt die App-Version des Angel Kalenders.</p>
+            </div>
+        </div>
+
+        <!-- Installation Section -->
+        <div class="install-section" id="installSection">
+            <h2>📱 App installieren</h2>
+            <p style="margin-bottom: 20px;">Installieren Sie den Angel Kalender als App für das beste Erlebnis.</p>
+
+            <!-- Chrome/Edge Install Button -->
+            <button id="installButton" class="install-button hidden">
+                📱 Jetzt installieren
+            </button>
+
+            <!-- Manual Installation Instructions -->
+            <div id="manualInstructions" class="hidden">
+                <div class="browser-info" id="browserSpecificInfo">
+                    <!-- Dynamic content based on browser -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser Detection Info -->
+        <div class="browser-info">
+            <h3>🔍 Browser-Info</h3>
+            <p><strong>Browser:</strong> <span id="browserName">Wird erkannt...</span></p>
+            <p><strong>PWA-Support:</strong> <span id="pwaSupport">Wird geprüft...</span></p>
+            <p><strong>Status:</strong> <span id="installStatus">Wird ermittelt...</span></p>
+        </div>
+
+        <!-- Demo Features -->
+        <div class="install-section">
+            <h3>🎯 Features</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                Kalender mit Angelterminen
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                Wetter & Bisswahrscheinlichkeit
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                Fangdokumentation mit Fotos
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PWAInstaller {
+            constructor() {
+                this.deferredPrompt = null;
+                this.browserInfo = this.detectBrowser();
+                this.init();
+            }
+
+            init() {
+                this.updateUI();
+                this.setupEventListeners();
+                this.registerServiceWorker();
+                this.checkInstallationStatus();
+            }
+
+            detectBrowser() {
+                const ua = navigator.userAgent;
+                const isChrome = /Chrome/.test(ua) && /Google Inc/.test(navigator.vendor);
+                const isEdge = /Edg/.test(ua);
+                const isFirefox = /Firefox/.test(ua);
+                const isSafari = /Safari/.test(ua) && /Apple Computer/.test(navigator.vendor);
+                const isSamsung = /SamsungBrowser/.test(ua);
+                const isOpera = /OPR/.test(ua) || /Opera/.test(ua);
+                const isIOS = /iPad|iPhone|iPod/.test(ua);
+                const isAndroid = /Android/.test(ua);
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+                let browserName = 'Unbekannt';
+                let installSupport = 'none';
+
+                if (isIOS && isSafari) {
+                    browserName = 'Safari (iOS)';
+                    installSupport = 'manual';
+                } else if (isSafari) {
+                    browserName = 'Safari (macOS)';
+                    installSupport = 'manual';
+                } else if (isChrome && !isEdge) {
+                    browserName = 'Chrome';
+                    installSupport = 'automatic';
+                } else if (isEdge) {
+                    browserName = 'Microsoft Edge';
+                    installSupport = 'automatic';
+                } else if (isFirefox) {
+                    browserName = isAndroid ? 'Firefox (Android)' : 'Firefox (Desktop)';
+                    installSupport = isAndroid ? 'automatic' : 'extension';
+                } else if (isSamsung) {
+                    browserName = 'Samsung Internet';
+                    installSupport = 'automatic';
+                } else if (isOpera) {
+                    browserName = 'Opera';
+                    installSupport = 'limited';
+                }
+
+                return {
+                    name: browserName,
+                    isIOS,
+                    isAndroid,
+                    isSafari,
+                    isChrome,
+                    isEdge,
+                    isFirefox,
+                    isSamsung,
+                    isOpera,
+                    isStandalone,
+                    installSupport,
+                    hasBeforeInstallPrompt: 'BeforeInstallPromptEvent' in window
+                };
+            }
+
+            updateUI() {
+                const browserNameEl = document.getElementById('browserName');
+                const pwaSupportEl = document.getElementById('pwaSupport');
+                const installStatusEl = document.getElementById('installStatus');
+                const statusIndicator = document.getElementById('statusIndicator');
+
+                browserNameEl.textContent = this.browserInfo.name;
+
+                // PWA Support Status
+                let supportText = '';
+                switch(this.browserInfo.installSupport) {
+                    case 'automatic':
+                        supportText = '✅ Vollständig unterstützt';
+                        break;
+                    case 'manual':
+                        supportText = '⚠️ Manuelle Installation';
+                        break;
+                    case 'extension':
+                        supportText = '🔧 Erweiterung erforderlich';
+                        break;
+                    case 'limited':
+                        supportText = '⚠️ Eingeschränkt';
+                        break;
+                    default:
+                        supportText = '❌ Nicht unterstützt';
+                }
+                pwaSupportEl.textContent = supportText;
+
+                // Installation Status
+                if (this.browserInfo.isStandalone) {
+                    installStatusEl.textContent = '✅ Als App installiert';
+                    statusIndicator.textContent = 'App Modus';
+                    statusIndicator.className = 'status-indicator status-installed';
+                    document.body.classList.add('pwa-mode');
+                } else {
+                    installStatusEl.textContent = '📱 Installation verfügbar';
+                    statusIndicator.textContent = 'Installierbar';
+                    statusIndicator.className = 'status-indicator status-installable';
+                }
+
+                this.showBrowserSpecificInstructions();
+            }
+
+            showBrowserSpecificInstructions() {
+                const instructionsEl = document.getElementById('browserSpecificInfo');
+                const manualInstructionsEl = document.getElementById('manualInstructions');
+
+                if (this.browserInfo.installSupport === 'automatic') {
+                    // Chrome, Edge, Samsung, Firefox Android - automatic installation
+                    manualInstructionsEl.classList.add('hidden');
+                } else {
+                    manualInstructionsEl.classList.remove('hidden');
+
+                    if (this.browserInfo.isIOS && this.browserInfo.isSafari) {
+                        instructionsEl.innerHTML = this.getIOSInstructions();
+                    } else if (this.browserInfo.isFirefox && !this.browserInfo.isAndroid) {
+                        instructionsEl.innerHTML = this.getFirefoxDesktopInstructions();
+                    } else if (this.browserInfo.isSafari && !this.browserInfo.isIOS) {
+                        instructionsEl.innerHTML = this.getSafariMacInstructions();
+                    } else {
+                        instructionsEl.innerHTML = this.getGenericInstructions();
+                    }
+                }
+            }
+
+            getIOSInstructions() {
+                return `
+                    <h3>📱 Installation auf iOS</h3>
+                    <div class="ios-instruction">
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            Tippen Sie auf das <span class="ios-share-icon">📤</span> Teilen-Symbol unten
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            Scrollen Sie nach unten und wählen Sie "Zum Home-Bildschirm"
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            Tippen Sie auf "Hinzufügen" oben rechts
+                        </div>
+                        <p style="margin-top: 15px;"><strong>💡 Tipp:</strong> Nach der Installation finden Sie die App auf Ihrem Home-Bildschirm!</p>
+
+                        <div style="margin-top: 20px;">
+                            <a href="shortcuts://run-shortcut?name=Install%20PWA" class="shortcut-button">
+                                🔗 iOS Shortcut erstellen
+                            </a>
+                            <p style="font-size: 12px; margin-top: 10px; opacity: 0.8;">
+                                Erstellt einen Shortcut für einfachere Installation
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getFirefoxDesktopInstructions() {
+                return `
+                    <h3>🦊 Firefox Desktop Installation</h3>
+                    <div class="firefox-extension">
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            Installieren Sie die Erweiterung "PWAsForFirefox"
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            Besuchen Sie diese Seite erneut
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            Nutzen Sie den Installations-Button der Erweiterung
+                        </div>
+                        <p style="margin-top: 15px;">
+                            <a href="https://addons.mozilla.org/en-US/firefox/addon/pwas-for-firefox/"
+                               target="_blank" class="shortcut-button">
+                                🔧 Erweiterung installieren
+                            </a>
+                        </p>
+                        <p style="font-size: 12px; margin-top: 10px;">
+                            <strong>Alternative:</strong> Erstellen Sie ein Desktop-Lesezeichen für schnellen Zugriff
+                        </p>
+                    </div>
+                `;
+            }
+
+            getSafariMacInstructions() {
+                return `
+                    <h3>🖥️ Safari macOS Installation</h3>
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        Öffnen Sie das "Datei" Menü in Safari
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        Wählen Sie "Zum Dock hinzufügen" (falls verfügbar)
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        Oder erstellen Sie ein Lesezeichen im Dock
+                    </div>
+                `;
+            }
+
+            getGenericInstructions() {
+                return `
+                    <h3>🌐 Manuelle Installation</h3>
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        Öffnen Sie das Browser-Menü (⋮ oder ☰)
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        Suchen Sie nach "Installieren", "Zum Startbildschirm hinzufügen" oder "App erstellen"
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        Folgen Sie den Anweisungen Ihres Browsers
+                    </div>
+                `;
+            }
+
+            setupEventListeners() {
+                const installButton = document.getElementById('installButton');
+
+                // Listen for beforeinstallprompt event
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    console.log('beforeinstallprompt fired');
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    installButton.classList.remove('hidden');
+                    installButton.classList.add('animation-pulse');
+                });
+
+                // Install button click handler
+                installButton.addEventListener('click', async () => {
+                    if (!this.deferredPrompt) {
+                        console.log('No deferred prompt available');
+                        return;
+                    }
+
+                    installButton.textContent = '⏳ Installiere...';
+                    installButton.disabled = true;
+
+                    this.deferredPrompt.prompt();
+                    const { outcome } = await this.deferredPrompt.userChoice;
+
+                    if (outcome === 'accepted') {
+                        console.log('PWA installation accepted');
+                        this.hideInstallPromotion();
+                    } else {
+                        console.log('PWA installation declined');
+                        installButton.textContent = '📱 Jetzt installieren';
+                        installButton.disabled = false;
+                    }
+
+                    this.deferredPrompt = null;
+                });
+
+                // Listen for successful installation
+                window.addEventListener('appinstalled', () => {
+                    console.log('PWA was installed');
+                    this.hideInstallPromotion();
+                    this.showSuccessMessage();
+                });
+
+                // Listen for display mode changes
+                window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+                    if (e.matches) {
+                        document.body.classList.add('pwa-mode');
+                        this.updateUI();
+                    }
+                });
+            }
+
+            hideInstallPromotion() {
+                const installSection = document.getElementById('installSection');
+                installSection.style.display = 'none';
+            }
+
+            showSuccessMessage() {
+                const container = document.querySelector('.container');
+                const successDiv = document.createElement('div');
+                successDiv.className = 'install-section';
+                successDiv.innerHTML = `
+                    <h2>🎉 Installation erfolgreich!</h2>
+                    <p>Die Angel Kalender App wurde erfolgreich installiert.</p>
+                    <p>Sie können die App jetzt von Ihrem Startbildschirm aus nutzen.</p>
+                `;
+                container.insertBefore(successDiv, container.firstChild);
+            }
+
+            async registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/service-worker.js', {
+                            scope: '/'
+                        });
+
+                        console.log('ServiceWorker registration successful:', registration.scope);
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    this.showUpdateAvailable();
+                                }
+                            });
+                        });
+
+                    } catch (err) {
+                        console.log('ServiceWorker registration failed:', err);
+                    }
+                }
+            }
+
+            showUpdateAvailable() {
+                const updateBanner = document.createElement('div');
+                updateBanner.className = 'install-section';
+                updateBanner.innerHTML = `
+                    <h3>🔄 Update verfügbar</h3>
+                    <p>Eine neue Version der App ist verfügbar.</p>
+                    <button onclick="window.location.reload()" class="install-button">
+                        ♻️ Jetzt aktualisieren
+                    </button>
+                `;
+                document.querySelector('.container').insertBefore(updateBanner, document.querySelector('.container').firstChild);
+            }
+
+            checkInstallationStatus() {
+                // Additional check for various installation methods
+                setTimeout(() => {
+                    if (this.browserInfo.isStandalone) {
+                        this.hideInstallPromotion();
+                    }
+                }, 1000);
+            }
+        }
+
+        // Initialize PWA Installer when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new PWAInstaller();
+        });
+
+        // Handle navigation in PWA mode (especially for iOS)
+        if (window.navigator.standalone) {
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('a');
+                if (target && target.href.startsWith(window.location.origin)) {
+                    e.preventDefault();
+                    window.location.href = target.href;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
