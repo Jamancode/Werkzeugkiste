@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwerker Manager Deluxe</title>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Chart.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons (optional, aber macht es schöner) -->
+    <script src="https://unpkg.com/lucide-react@0.292.0/dist/umd/lucide-react.min.js"></script>
+
+
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --secondary-color: #2ecc71;
+            --secondary-hover: #27ae60;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --light-gray: #ecf0f1;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #7f8c8d;
+            --text-color: #34495e;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        header h1 .icon {
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: var(--light-gray);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        nav button {
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        nav button:hover, nav button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        nav button .icon {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .view {
+            display: none; /* Hidden by default */
+        }
+        .view.active {
+            display: block;
+        }
+
+        /* --- General Form Styles --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group input[type="time"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 1em;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        button.btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button.btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        button.btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        button.btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        button.btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+        button.btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        button.btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+        button.btn-light {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            border: 1px solid var(--medium-gray);
+        }
+        button.btn-light:hover {
+            background-color: var(--medium-gray);
+        }
+        button.btn .icon {
+             vertical-align: middle;
+        }
+
+
+        /* --- Modal Styles --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid var(--medium-gray);
+            width: 80%;
+            max-width: 700px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--light-gray);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .close-button {
+            color: var(--dark-gray);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--danger-color);
+        }
+
+        /* --- Calendar Styles --- */
+        #calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+        }
+        #calendar-controls button {
+            margin: 0 5px;
+        }
+        #current-month-year {
+            font-size: 1.5em;
+            font-weight: bold;
+            min-width: 200px;
+            text-align: center;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            overflow: hidden; /* For rounded corners on children */
+        }
+        .calendar-header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
+            padding: 8px;
+            border: 1px solid var(--light-gray);
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .calendar-day:hover {
+            background-color: #f0f8ff; /* AliceBlue */
+        }
+        .calendar-day.other-month {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        .calendar-day.today {
+            background-color: #e6f3ff;
+            border: 2px solid var(--primary-color);
+        }
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .day-appointments {
+            font-size: 0.8em;
+        }
+        .day-appointments .appointment-item {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 3px 5px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+         .appointment-item:hover {
+            opacity: 0.8;
+        }
+
+        /* --- List Styles (Kunden, Equipment, Aufträge) --- */
+        .list-container {
+            margin-top: 20px;
+        }
+        .list-item {
+            background-color: white;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s;
+        }
+        .list-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .list-item h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .list-item p {
+            margin-bottom: 5px;
+        }
+        .list-item-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        .list-item-actions button {
+            margin-left: 5px;
+        }
+        .search-filter-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-filter-bar input[type="text"],
+        .search-filter-bar select {
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--medium-gray);
+        }
+
+        /* --- Leaflet Map --- */
+        #map-container {
+            height: 300px;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+        }
+
+        /* --- Statistics --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .chart-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+
+        /* --- Helper classes --- */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .d-flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+        .icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; } /* For SVG icons */
+
+        .sub-item-list {
+            margin-left: 20px;
+            padding-left: 10px;
+            border-left: 2px solid var(--light-gray);
+        }
+        .sub-item {
+            background-color: #f9f9f9;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- Category Tag --- */
+        .category-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            color: white;
+            margin-right: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            color: white;
+        }
+        .status-geplant { background-color: #3498db; } /* Blue */
+        .status-in_arbeit { background-color: #f39c12; } /* Orange */
+        .status-abgeschlossen { background-color: #2ecc71; } /* Green */
+        .status-storniert { background-color: #e74c3c; } /* Red */
+
+        /* Tooltip for icons */
+        [data-tooltip] {
+            position: relative;
+            cursor: pointer;
+        }
+        [data-tooltip]::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%; /* Position above the element */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 1001; /* Above modals */
+        }
+        [data-tooltip]:hover::before {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* For Lucide Icons */
+        svg.lucide {
+            width: 1em;
+            height: 1em;
+            stroke-width: 2;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>
+            <span id="header-icon-wrench"></span> Handwerker Manager Deluxe
+        </h1>
+    </header>
+
+    <nav>
+        <button id="nav-kalender" data-view="kalender" class="active">
+            <span id="nav-icon-calendar"></span> Kalender
+        </button>
+        <button id="nav-auftraege" data-view="auftraege">
+            <span id="nav-icon-briefcase"></span> Aufträge
+        </button>
+        <button id="nav-kunden" data-view="kunden">
+            <span id="nav-icon-users"></span> Kunden
+        </button>
+        <button id="nav-equipment" data-view="equipment">
+            <span id="nav-icon-tool"></span> Equipment & Material
+        </button>
+        <button id="nav-kategorien" data-view="kategorien">
+            <span id="nav-icon-tag"></span> Auftragskategorien
+        </button>
+        <button id="nav-finanzen" data-view="finanzen">
+            <span id="nav-icon-bar-chart"></span> Finanzen & Statistiken
+        </button>
+        <button id="nav-daten" data-view="daten">
+             <span id="nav-icon-database"></span> Daten Import/Export
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Kalender Ansicht -->
+        <section id="kalender-view" class="view active">
+            <h2>Kalender</h2>
+            <div id="calendar-controls">
+                <button id="prev-month-btn" class="btn btn-light"><span id="icon-chevron-left-cal"></span></button>
+                <span id="current-month-year"></span>
+                <button id="next-month-btn" class="btn btn-light"><span id="icon-chevron-right-cal"></span></button>
+                <button id="today-btn" class="btn btn-primary"><span id="icon-home-cal"></span> Heute</button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-header">Mo</div>
+                <div class="calendar-header">Di</div>
+                <div class="calendar-header">Mi</div>
+                <div class="calendar-header">Do</div>
+                <div class="calendar-header">Fr</div>
+                <div class="calendar-header">Sa</div>
+                <div class="calendar-header">So</div>
+            </div>
+            <div id="calendar-days" class="calendar-grid">
+                <!-- Kalendertage werden hier per JS eingefügt -->
+            </div>
+        </section>
+
+        <!-- Aufträge Ansicht -->
+        <section id="auftraege-view" class="view">
+            <div class="d-flex justify-between align-center mb-2">
+                <h2>Aufträge</h2>
+                <button id="open-auftrag-modal-btn" class="btn btn-primary"><span id="icon-plus-auftrag"></span> Neuer Auftrag</button>
+            </div>
+            <div class="search-filter-bar">
+                <input type="text" id="auftrag-search" placeholder="Auftrag suchen...">
+                <select id="auftrag-filter-status">
+                    <option value="">Alle Status</option>
+                    <option value="geplant">Geplant</option>
+                    <option value="in_arbeit">In Arbeit</option>
+                    <option value="abgeschlossen">Abgeschlossen</option>
+                    <option value="storniert">Storniert</option>
+                </select>
+                <select id="auftrag-filter-kategorie">
+                    <option value="">Alle Kategorien</option>
+                    <!-- Kategorien Optionen werden hier per JS eingefügt -->
+                </select>
+            </div>
+            <div id="auftraege-liste" class="list-container">
+                <!-- Aufträge werden hier per JS eingefügt -->
+            </div>
+        </section>
+
+        <!-- Kunden Ansicht -->
+        <section id="kunden-view" class="view">
+             <div class="d-flex justify-between align-center mb-2">
+                <h2>Kunden</h2>
+                <button id="open-kunde-modal-btn" class="btn btn-primary"><span id="icon-plus-kunde"></span> Neuer Kunde</button>
+            </div>
+            <div class="search-filter-bar">
+                <input type="text" id="kunde-search" placeholder="Kunde suchen...">
+            </div>
+            <div id="kunden-liste" class="list-container">
+                <!-- Kunden werden hier per JS eingefügt -->
+            </div>
+        </section>
+
+        <!-- Equipment Ansicht -->
+        <section id="equipment-view" class="view">
+            <div class="d-flex justify-between align-center mb-2">
+                <h2>Equipment & Material</h2>
+                <button id="open-equipment-modal-btn" class="btn btn-primary"><span id="icon-plus-equipment"></span> Neues Item</button>
+            </div>
+            <div class="search-filter-bar">
+                <input type="text" id="equipment-search" placeholder="Item suchen...">
+                <select id="equipment-filter-typ">
+                    <option value="">Alle Typen</option>
+                    <option value="Gerät">Gerät</option>
+                    <option value="Material">Material</option>
+                </select>
+            </div>
+            <div id="equipment-liste" class="list-container">
+                <!-- Equipment wird hier per JS eingefügt -->
+            </div>
+        </section>
+
+        <!-- Auftragskategorien Ansicht -->
+        <section id="kategorien-view" class="view">
+             <div class="d-flex justify-between align-center mb-2">
+                <h2>Auftragskategorien Verwalten</h2>
+                <button id="open-kategorie-modal-btn" class="btn btn-primary"><span id="icon-plus-kategorie"></span> Neue Kategorie</button>
+            </div>
+            <div id="kategorien-liste" class="list-container">
+                <!-- Kategorien werden hier per JS eingefügt -->
+            </div>
+        </section>
+
+        <!-- Finanzen & Statistiken Ansicht -->
+        <section id="finanzen-view" class="view">
+            <h2>Finanzen & Statistiken</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Gesamte Aufträge</h3>
+                    <p class="value" id="stat-total-auftraege">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Gesamtumsatz (Netto)</h3>
+                    <p class="value" id="stat-total-umsatz">0,00 €</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Durchschn. Auftragswert</h3>
+                    <p class="value" id="stat-avg-auftragswert">0,00 €</p>
+                </div>
+                 <div class="stat-card">
+                    <h3>Gesamte Materialkosten</h3>
+                    <p class="value" id="stat-total-materialkosten">0,00 €</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="stats-year-filter">Jahr für Statistiken:</label>
+                <select id="stats-year-filter">
+                    <!-- Jahre werden dynamisch gefüllt -->
+                </select>
+            </div>
+            <div class="chart-container">
+                <h3>Umsatz pro Monat</h3>
+                <canvas id="umsatz-pro-monat-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Aufträge pro Kategorie</h3>
+                <canvas id="auftraege-pro-kategorie-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Daten Import/Export Ansicht -->
+        <section id="daten-view" class="view">
+            <h2>Daten Import & Export</h2>
+            <p>Hier kannst du deine Daten als CSV exportieren oder aus einer CSV-Datei importieren.</p>
+
+            <div class="form-group mt-2">
+                <h3>Export</h3>
+                <button id="export-all-btn" class="btn btn-secondary"><span id="icon-download-daten"></span> Alle Daten exportieren (ZIP)</button>
+                <small>Exportiert Kunden, Equipment, Kategorien und Aufträge in separaten CSV-Dateien, gebündelt in einer ZIP.</small>
+            </div>
+
+            <div class="form-group mt-2">
+                <h3>Import</h3>
+                <p><strong>Achtung:</strong> Importierte Daten überschreiben bestehende Daten mit der gleichen ID oder fügen neue hinzu. Erstelle vorher ein Backup!</p>
+
+                <label for="import-file-kunden">Kunden CSV Import:</label>
+                <input type="file" id="import-file-kunden" accept=".csv">
+                <button id="import-kunden-btn" class="btn btn-primary mt-1"><span id="icon-upload-kunden"></span> Kunden importieren</button>
+                <br><br>
+                <label for="import-file-equipment">Equipment CSV Import:</label>
+                <input type="file" id="import-file-equipment" accept=".csv">
+                <button id="import-equipment-btn" class="btn btn-primary mt-1"><span id="icon-upload-equipment"></span> Equipment importieren</button>
+                <br><br>
+                <label for="import-file-kategorien">Kategorien CSV Import:</label>
+                <input type="file" id="import-file-kategorien" accept=".csv">
+                <button id="import-kategorien-btn" class="btn btn-primary mt-1"><span id="icon-upload-kategorien"></span> Kategorien importieren</button>
+                <br><br>
+                <label for="import-file-auftraege">Aufträge CSV Import:</label>
+                <input type="file" id="import-file-auftraege" accept=".csv">
+                <button id="import-auftraege-btn" class="btn btn-primary mt-1"><span id="icon-upload-auftraege"></span> Aufträge importieren</button>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- Modals -->
+    <!-- Auftrag Modal -->
+    <div id="auftrag-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="auftrag-modal-title">Neuer Auftrag</h2>
+                <button class="close-button" data-modal-id="auftrag-modal">&times;</button>
+            </div>
+            <form id="auftrag-form">
+                <input type="hidden" id="auftrag-id">
+                <div class="form-group">
+                    <label for="auftrag-title">Titel</label>
+                    <input type="text" id="auftrag-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="auftrag-kunde">Kunde</label>
+                    <select id="auftrag-kunde" required>
+                        <option value="">Wähle einen Kunden</option>
+                        <!-- Kunden Optionen werden hier per JS eingefügt -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="auftrag-kategorie">Kategorie</label>
+                    <select id="auftrag-kategorie" required>
+                        <option value="">Wähle eine Kategorie</option>
+                        <!-- Kategorien Optionen werden hier per JS eingefügt -->
+                    </select>
+                </div>
+                <div class="d-flex" style="gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="auftrag-datum">Datum</label>
+                        <input type="date" id="auftrag-datum" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="auftrag-zeit">Uhrzeit</label>
+                        <input type="time" id="auftrag-zeit">
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label for="auftrag-status">Status</label>
+                    <select id="auftrag-status">
+                        <option value="geplant">Geplant</option>
+                        <option value="in_arbeit">In Arbeit</option>
+                        <option value="abgeschlossen">Abgeschlossen</option>
+                        <option value="storniert">Storniert</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <h4>Material & Equipment</h4>
+                    <div id="auftrag-material-equipment-liste" class="sub-item-list mb-1">
+                        <!-- Dynamisch hinzugefügte Items -->
+                    </div>
+                    <select id="select-material-equipment">
+                        <option value="">Item auswählen...</option>
+                        <!-- Equipment/Material Optionen -->
+                    </select>
+                    <input type="number" id="input-material-equipment-menge" placeholder="Menge" min="1" style="width:80px; margin: 0 5px;">
+                    <button type="button" id="add-material-equipment-btn" class="btn btn-light"><span id="icon-plus-mat-equip"></span> Hinzufügen</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="auftrag-aufwand">Geschätzter Zeitaufwand (Stunden)</label>
+                    <input type="number" id="auftrag-aufwand" step="0.1" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="auftrag-kosten-kalkulation">Kostenkalkulation (€)</label>
+                    <input type="number" id="auftrag-kosten-kalkulation" step="0.01" min="0">
+                </div>
+                 <div class="form-group">
+                    <label for="auftrag-tatsaechliche-stunden">Tatsächliche Stunden</label>
+                    <input type="number" id="auftrag-tatsaechliche-stunden" step="0.1" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="auftrag-tatsaechliche-kosten">Tatsächliche Kosten (Netto)</label>
+                    <input type="number" id="auftrag-tatsaechliche-kosten" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="auftrag-notizen">Notizen</label>
+                    <textarea id="auftrag-notizen"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-light close-button" data-modal-id="auftrag-modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary"><span id="icon-save-auftrag"></span> Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kunde Modal -->
+    <div id="kunde-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="kunde-modal-title">Neuer Kunde</h2>
+                <button class="close-button" data-modal-id="kunde-modal">&times;</button>
+            </div>
+            <form id="kunde-form">
+                <input type="hidden" id="kunde-id">
+                <div class="form-group">
+                    <label for="kunde-name">Name</label>
+                    <input type="text" id="kunde-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="kunde-adresse">Adresse (Straße, Nr, PLZ, Ort)</label>
+                    <input type="text" id="kunde-adresse">
+                </div>
+                <div id="map-container"></div>
+                <input type="hidden" id="kunde-lat">
+                <input type="hidden" id="kunde-lng">
+
+                <div class="form-group">
+                    <label for="kunde-telefon">Telefon</label>
+                    <input type="tel" id="kunde-telefon">
+                </div>
+                <div class="form-group">
+                    <label for="kunde-email">E-Mail</label>
+                    <input type="email" id="kunde-email">
+                </div>
+                <div class="form-group">
+                    <label for="kunde-notizen">Notizen</label>
+                    <textarea id="kunde-notizen"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="kunde-zufriedenheit">Zufriedenheit (1-5)</label>
+                    <select id="kunde-zufriedenheit">
+                        <option value="">Nicht bewertet</option>
+                        <option value="1">1 (Sehr unzufrieden)</option>
+                        <option value="2">2 (Unzufrieden)</option>
+                        <option value="3">3 (Neutral)</option>
+                        <option value="4">4 (Zufrieden)</option>
+                        <option value="5">5 (Sehr zufrieden)</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                     <button type="button" class="btn btn-light close-button" data-modal-id="kunde-modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary"><span id="icon-save-kunde"></span> Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Modal -->
+    <div id="equipment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="equipment-modal-title">Neues Equipment/Material</h2>
+                <button class="close-button" data-modal-id="equipment-modal">&times;</button>
+            </div>
+            <form id="equipment-form">
+                <input type="hidden" id="equipment-id">
+                <div class="form-group">
+                    <label for="equipment-name">Name</label>
+                    <input type="text" id="equipment-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="equipment-typ">Typ</label>
+                    <select id="equipment-typ" required>
+                        <option value="Gerät">Gerät</option>
+                        <option value="Material">Material</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="equipment-verwendung">Verwendung</label>
+                    <input type="text" id="equipment-verwendung">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-anzahl">Anzahl/Menge</label>
+                    <input type="number" id="equipment-anzahl" min="0" step="any" required>
+                </div>
+                 <div class="form-group">
+                    <label for="equipment-einheit">Einheit (z.B. Stück, m, kg)</label>
+                    <input type="text" id="equipment-einheit" placeholder="Stück">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-lagerort">Lagerort</label>
+                    <input type="text" id="equipment-lagerort">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-verbrauchsmittel">Verbrauchsmittel (Komma-getrennt)</label>
+                    <input type="text" id="equipment-verbrauchsmittel" placeholder="z.B. Batterien, Schrauben">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-bedingung">Bedingung/Zustand</label>
+                    <input type="text" id="equipment-bedingung">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-kosten">Kosten pro Einheit (€)</label>
+                    <input type="number" id="equipment-kosten" step="0.01" min="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-light close-button" data-modal-id="equipment-modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary"><span id="icon-save-equipment"></span> Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kategorie Modal -->
+    <div id="kategorie-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="kategorie-modal-title">Neue Kategorie</h2>
+                <button class="close-button" data-modal-id="kategorie-modal">&times;</button>
+            </div>
+            <form id="kategorie-form">
+                <input type="hidden" id="kategorie-id">
+                <div class="form-group">
+                    <label for="kategorie-name">Name der Kategorie</label>
+                    <input type="text" id="kategorie-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="kategorie-farbe">Farbe</label>
+                    <input type="color" id="kategorie-farbe" value="#3498db">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-light close-button" data-modal-id="kategorie-modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary"><span id="icon-save-kategorie"></span> Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JSZip for CSV export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        // --- Lucide Icons Setup ---
+        // Helper to create an icon
+        const createIcon = (name, className = '') => {
+            if (lucide && lucide[name]) {
+                const iconSVG = lucide.createElement(lucide[name]);
+                iconSVG.classList.add('lucide', `lucide-${name.toLowerCase().replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+                if (className) iconSVG.classList.add(className);
+                return iconSVG.outerHTML;
+            }
+            return `<span>${name.substring(0,1)}</span>`; // Fallback
+        };
+
+        // Replace placeholder spans with icons
+        document.addEventListener('DOMContentLoaded', () => {
+            const iconMappings = {
+                'header-icon-wrench': 'Wrench',
+                'nav-icon-calendar': 'CalendarDays',
+                'nav-icon-briefcase': 'Briefcase',
+                'nav-icon-users': 'Users',
+                'nav-icon-tool': ' construcción', // Construction (alternative for Tool/Wrench if not found)
+                'nav-icon-tag': 'Tag',
+                'nav-icon-bar-chart': 'BarChart3',
+                'nav-icon-database': 'Database',
+                'icon-chevron-left-cal': 'ChevronLeft',
+                'icon-chevron-right-cal': 'ChevronRight',
+                'icon-home-cal': 'Home',
+                'icon-plus-auftrag': 'PlusCircle',
+                'icon-plus-kunde': 'UserPlus',
+                'icon-plus-equipment': 'ArchiveRestore', // or PackagePlus
+                'icon-plus-kategorie': 'PlusSquare',
+                'icon-edit': 'FileEdit',
+                'icon-delete': 'Trash2',
+                'icon-save-auftrag': 'Save',
+                'icon-save-kunde': 'Save',
+                'icon-save-equipment': 'Save',
+                'icon-save-kategorie': 'Save',
+                'icon-plus-mat-equip': 'Plus',
+                'icon-download-daten': 'DownloadCloud',
+                'icon-upload-kunden': 'UploadCloud',
+                'icon-upload-equipment': 'UploadCloud',
+                'icon-upload-kategorien': 'UploadCloud',
+                'icon-upload-auftraege': 'UploadCloud',
+            };
+            for (const id in iconMappings) {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = createIcon(iconMappings[id]);
+            }
+        });
+
+
+        // --- Global State & Data Management ---
+        let DB = {
+            kunden: [],
+            equipment: [],
+            auftraege: [],
+            kategorien: []
+        };
+
+        const LS_KEY = 'handwerkerManagerData';
+
+        function saveData() {
+            localStorage.setItem(LS_KEY, JSON.stringify(DB));
+        }
+
+        function loadData() {
+            const data = localStorage.getItem(LS_KEY);
+            if (data) {
+                DB = JSON.parse(data);
+                // Ensure all arrays exist, even if old data didn't have them
+                DB.kunden = DB.kunden || [];
+                DB.equipment = DB.equipment || [];
+                DB.auftraege = DB.auftraege || [];
+                DB.kategorien = DB.kategorien || [];
+            } else {
+                // Initialize with default categories if empty
+                DB.kategorien = [
+                    { id: generateId(), name: 'Wartung', color: '#3498db' },
+                    { id: generateId(), name: 'Reparatur', color: '#e74c3c' },
+                    { id: generateId(), name: 'Installation', color: '#2ecc71' },
+                    { id: generateId(), name: 'Beratung', color: '#f1c40f' }
+                ];
+                saveData();
+            }
+        }
+
+        function generateId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // --- UI Navigation ---
+        const navButtons = document.querySelectorAll('nav button');
+        const views = document.querySelectorAll('.view');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const viewId = button.dataset.view + '-view';
+                views.forEach(view => view.classList.remove('active'));
+                document.getElementById(viewId).classList.add('active');
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Specific actions when view changes
+                if (viewId === 'kalender-view') renderCalendar();
+                if (viewId === 'auftraege-view') { populateAuftragKategorieFilter(); renderAuftraegeListe(); }
+                if (viewId === 'kunden-view') renderKundenListe();
+                if (viewId === 'equipment-view') renderEquipmentListe();
+                if (viewId === 'kategorien-view') renderKategorienListe();
+                if (viewId === 'finanzen-view') renderFinanzen();
+            });
+        });
+
+        // --- Modal Handling ---
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close-button');
+
+        function openModal(modalId, data = null) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                 // Reset forms before opening
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+
+                // Specific modal setup
+                if (modalId === 'kunde-modal') setupKundeModal(data);
+                else if (modalId === 'equipment-modal') setupEquipmentModal(data);
+                else if (modalId === 'auftrag-modal') setupAuftragModal(data);
+                else if (modalId === 'kategorie-modal') setupKategorieModal(data);
+
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                if (map && modalId === 'kunde-modal') { // Reset map specific things
+                    currentMarker = null;
+                }
+            }
+        }
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => closeModal(button.dataset.modalId));
+        });
+
+        window.addEventListener('click', (event) => {
+            modals.forEach(modal => {
+                if (event.target == modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+
+        // --- Helper: Create Icon Element for Buttons etc. ---
+        function createIconElement(iconName, classes = []) {
+            const span = document.createElement('span');
+            span.innerHTML = createIcon(iconName);
+            classes.forEach(c => span.classList.add(c));
+            return span;
+        }
+
+
+        // --- Calendar ---
+        const calendarDaysContainer = document.getElementById('calendar-days');
+        const currentMonthYearEl = document.getElementById('current-month-year');
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            calendarDaysContainer.innerHTML = '';
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            currentMonthYearEl.textContent = `${currentDate.toLocaleDateString('de-DE', { month: 'long' })} ${year}`;
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const lastDayOfPrevMonth = new Date(year, month, 0);
+
+            let startingDay = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
+            startingDay = startingDay === 0 ? 6 : startingDay - 1; // Adjust to Monday start (0=Mon, 6=Sun)
+
+            // Days from previous month
+            for (let i = 0; i < startingDay; i++) {
+                const day = lastDayOfPrevMonth.getDate() - startingDay + 1 + i;
+                const date = new Date(year, month - 1, day);
+                calendarDaysContainer.appendChild(createCalendarDayElement(day, date, true));
+            }
+
+            // Days of current month
+            for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                const date = new Date(year, month, i);
+                calendarDaysContainer.appendChild(createCalendarDayElement(i, date, false));
+            }
+
+            // Days from next month
+            const remainingCells = 42 - (startingDay + lastDayOfMonth.getDate()); // 6 weeks * 7 days
+            for (let i = 1; i <= remainingCells; i++) {
+                const date = new Date(year, month + 1, i);
+                calendarDaysContainer.appendChild(createCalendarDayElement(i, date, true));
+            }
+        }
+
+        function createCalendarDayElement(dayNumber, date, isOtherMonth) {
+            const dayEl = document.createElement('div');
+            dayEl.classList.add('calendar-day');
+            if (isOtherMonth) dayEl.classList.add('other-month');
+
+            const today = new Date();
+            if (date.toDateString() === today.toDateString() && !isOtherMonth) {
+                dayEl.classList.add('today');
+            }
+
+            const dayNumberEl = document.createElement('div');
+            dayNumberEl.classList.add('day-number');
+            dayNumberEl.textContent = dayNumber;
+            dayEl.appendChild(dayNumberEl);
+
+            const appointmentsEl = document.createElement('div');
+            appointmentsEl.classList.add('day-appointments');
+
+            const dateString = date.toISOString().split('T')[0];
+            const appointmentsForDay = DB.auftraege.filter(a => a.datum === dateString && a.status !== 'storniert');
+
+            appointmentsForDay.forEach(apt => {
+                const aptEl = document.createElement('div');
+                aptEl.classList.add('appointment-item');
+                const kategorie = DB.kategorien.find(k => k.id === apt.kategorieId);
+                if (kategorie) {
+                    aptEl.style.backgroundColor = kategorie.color;
+                }
+                aptEl.textContent = apt.title;
+                aptEl.title = `${apt.title} (${apt.zeit || 'Ganztägig'})`;
+                aptEl.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent day click
+                    openModal('auftrag-modal', apt);
+                });
+                appointmentsEl.appendChild(aptEl);
+            });
+            dayEl.appendChild(appointmentsEl);
+
+            dayEl.addEventListener('click', () => {
+                // Open new appointment modal for this day
+                const defaultAuftragData = {
+                    datum: date.toISOString().split('T')[0] // Pre-fill date
+                };
+                openModal('auftrag-modal', defaultAuftragData);
+            });
+            return dayEl;
+        }
+
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+        document.getElementById('today-btn').addEventListener('click', () => {
+            currentDate = new Date();
+            renderCalendar();
+        });
+
+        // --- Kunden Management ---
+        const kundenListeContainer = document.getElementById('kunden-liste');
+        const kundeForm = document.getElementById('kunde-form');
+        const kundeModalTitle = document.getElementById('kunde-modal-title');
+        let map, currentMarker; // Leaflet map variables
+
+        function initMap(lat = 51.1657, lng = 10.4515) { // Default to Germany center
+             if (map) { // If map already initialized, just set view
+                map.setView([lat, lng], 13);
+             } else {
+                map = L.map('map-container').setView([lat, lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+            }
+
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+            if (lat !== 51.1657 || lng !== 10.4515) { // Only add marker if not default
+                 currentMarker = L.marker([lat, lng]).addTo(map);
+            }
+
+            map.off('click').on('click', function(e) {
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                }
+                currentMarker = L.marker(e.latlng).addTo(map);
+                document.getElementById('kunde-lat').value = e.latlng.lat;
+                document.getElementById('kunde-lng').value = e.latlng.lng;
+                // Optional: Reverse geocode to get address
+                // fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                // .then(response => response.json())
+                // .then(data => {
+                //     if (data && data.display_name) {
+                //         document.getElementById('kunde-adresse').value = data.display_name;
+                //     }
+                // });
+            });
+        }
+
+        document.getElementById('kunde-adresse').addEventListener('change', async function() {
+            const address = this.value;
+            if (address.length > 3) { // Simple check
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        document.getElementById('kunde-lat').value = lat;
+                        document.getElementById('kunde-lng').value = lon;
+                        if (map) {
+                             map.setView([lat, lon], 15);
+                             if (currentMarker) map.removeLayer(currentMarker);
+                             currentMarker = L.marker([lat, lon]).addTo(map);
+                        } else {
+                            initMap(lat, lon);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Fehler bei der Adresssuche:", error);
+                }
+            }
+        });
+
+
+        function setupKundeModal(kunde = null) {
+            kundeForm.reset();
+            document.getElementById('kunde-id').value = '';
+            document.getElementById('kunde-lat').value = '';
+            document.getElementById('kunde-lng').value = '';
+
+            if (kunde) {
+                kundeModalTitle.textContent = 'Kunde bearbeiten';
+                document.getElementById('kunde-id').value = kunde.id;
+                document.getElementById('kunde-name').value = kunde.name;
+                document.getElementById('kunde-adresse').value = kunde.adresse || '';
+                document.getElementById('kunde-telefon').value = kunde.telefon || '';
+                document.getElementById('kunde-email').value = kunde.email || '';
+                document.getElementById('kunde-notizen').value = kunde.notizen || '';
+                document.getElementById('kunde-zufriedenheit').value = kunde.zufriedenheit || '';
+                document.getElementById('kunde-lat').value = kunde.lat || '';
+                document.getElementById('kunde-lng').value = kunde.lng || '';
+                initMap(parseFloat(kunde.lat) || 51.1657, parseFloat(kunde.lng) || 10.4515);
+            } else {
+                kundeModalTitle.textContent = 'Neuer Kunde';
+                initMap(); // Initialize with default view
+            }
+        }
+
+        document.getElementById('open-kunde-modal-btn').addEventListener('click', () => openModal('kunde-modal'));
+
+        kundeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('kunde-id').value;
+            const kundeData = {
+                id: id || generateId(),
+                name: document.getElementById('kunde-name').value,
+                adresse: document.getElementById('kunde-adresse').value,
+                lat: document.getElementById('kunde-lat').value,
+                lng: document.getElementById('kunde-lng').value,
+                telefon: document.getElementById('kunde-telefon').value,
+                email: document.getElementById('kunde-email').value,
+                notizen: document.getElementById('kunde-notizen').value,
+                zufriedenheit: document.getElementById('kunde-zufriedenheit').value,
+            };
+
+            if (id) { // Edit
+                DB.kunden = DB.kunden.map(k => k.id === id ? kundeData : k);
+            } else { // New
+                DB.kunden.push(kundeData);
+            }
+            saveData();
+            renderKundenListe();
+            populateAuftragKundenDropdown(); // Update dropdown in Auftrag modal
+            closeModal('kunde-modal');
+        });
+
+        function renderKundenListe() {
+            kundenListeContainer.innerHTML = '';
+            const searchTerm = document.getElementById('kunde-search').value.toLowerCase();
+            const filteredKunden = DB.kunden.filter(k =>
+                k.name.toLowerCase().includes(searchTerm) ||
+                (k.adresse && k.adresse.toLowerCase().includes(searchTerm)) ||
+                (k.email && k.email.toLowerCase().includes(searchTerm))
+            );
+
+            if (filteredKunden.length === 0) {
+                kundenListeContainer.innerHTML = '<p>Keine Kunden gefunden.</p>';
+                return;
+            }
+            filteredKunden.forEach(kunde => {
+                const item = document.createElement('div');
+                item.classList.add('list-item');
+                item.innerHTML = `
+                    <h3>${kunde.name}</h3>
+                    <p><strong>Adresse:</strong> ${kunde.adresse || 'N/A'}</p>
+                    <p><strong>Telefon:</strong> ${kunde.telefon || 'N/A'} | <strong>E-Mail:</strong> ${kunde.email || 'N/A'}</p>
+                    <p><strong>Zufriedenheit:</strong> ${kunde.zufriedenheit ? `${kunde.zufriedenheit}/5` : 'N/A'}</p>
+                    <div class="list-item-actions">
+                        <button class="btn btn-light btn-edit-kunde" data-id="${kunde.id}" data-tooltip="Bearbeiten">${createIcon('FileEdit')}</button>
+                        <button class="btn btn-danger btn-delete-kunde" data-id="${kunde.id}" data-tooltip="Löschen">${createIcon('Trash2')}</button>
+                    </div>
+                `;
+                kundenListeContainer.appendChild(item);
+            });
+
+            document.querySelectorAll('.btn-edit-kunde').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const kundeId = e.currentTarget.dataset.id;
+                    const kunde = DB.kunden.find(k => k.id === kundeId);
+                    openModal('kunde-modal', kunde);
+                });
+            });
+            document.querySelectorAll('.btn-delete-kunde').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Diesen Kunden wirklich löschen? Zugehörige Aufträge bleiben bestehen, verlieren aber die Kundenzuordnung.')) {
+                        const kundeId = e.currentTarget.dataset.id;
+                        DB.kunden = DB.kunden.filter(k => k.id !== kundeId);
+                        // Optional: Aufträge anpassen, die diesen Kunden hatten
+                        DB.auftraege.forEach(auftrag => {
+                            if (auftrag.kundeId === kundeId) {
+                                auftrag.kundeId = null; // oder eine andere Logik
+                            }
+                        });
+                        saveData();
+                        renderKundenListe();
+                        renderAuftraegeListe(); // Update Aufträge, falls Kundenzuordnung geändert wurde
+                        populateAuftragKundenDropdown();
+                    }
+                });
+            });
+        }
+        document.getElementById('kunde-search').addEventListener('input', renderKundenListe);
+
+
+        // --- Equipment Management ---
+        const equipmentListeContainer = document.getElementById('equipment-liste');
+        const equipmentForm = document.getElementById('equipment-form');
+        const equipmentModalTitle = document.getElementById('equipment-modal-title');
+
+        function setupEquipmentModal(item = null) {
+            equipmentForm.reset();
+            document.getElementById('equipment-id').value = '';
+            if (item) {
+                equipmentModalTitle.textContent = 'Equipment/Material bearbeiten';
+                document.getElementById('equipment-id').value = item.id;
+                document.getElementById('equipment-name').value = item.name;
+                document.getElementById('equipment-typ').value = item.typ;
+                document.getElementById('equipment-verwendung').value = item.verwendung || '';
+                document.getElementById('equipment-anzahl').value = item.anzahl;
+                document.getElementById('equipment-einheit').value = item.einheit || 'Stück';
+                document.getElementById('equipment-lagerort').value = item.lagerort || '';
+                document.getElementById('equipment-verbrauchsmittel').value = item.verbrauchsmittel ? item.verbrauchsmittel.join(', ') : '';
+                document.getElementById('equipment-bedingung').value = item.bedingung || '';
+                document.getElementById('equipment-kosten').value = item.kosten || 0;
+            } else {
+                equipmentModalTitle.textContent = 'Neues Equipment/Material';
+                 document.getElementById('equipment-einheit').value = 'Stück'; // Default
+            }
+        }
+
+        document.getElementById('open-equipment-modal-btn').addEventListener('click', () => openModal('equipment-modal'));
+
+        equipmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('equipment-id').value;
+            const verbrauchsmittelString = document.getElementById('equipment-verbrauchsmittel').value;
+            const equipmentData = {
+                id: id || generateId(),
+                name: document.getElementById('equipment-name').value,
+                typ: document.getElementById('equipment-typ').value,
+                verwendung: document.getElementById('equipment-verwendung').value,
+                anzahl: parseFloat(document.getElementById('equipment-anzahl').value),
+                einheit: document.getElementById('equipment-einheit').value || 'Stück',
+                lagerort: document.getElementById('equipment-lagerort').value,
+                verbrauchsmittel: verbrauchsmittelString ? verbrauchsmittelString.split(',').map(s => s.trim()) : [],
+                bedingung: document.getElementById('equipment-bedingung').value,
+                kosten: parseFloat(document.getElementById('equipment-kosten').value) || 0
+            };
+
+            if (id) {
+                DB.equipment = DB.equipment.map(eq => eq.id === id ? equipmentData : eq);
+            } else {
+                DB.equipment.push(equipmentData);
+            }
+            saveData();
+            renderEquipmentListe();
+            populateAuftragMaterialEquipmentDropdown(); // Update dropdown in Auftrag modal
+            closeModal('equipment-modal');
+        });
+
+        function renderEquipmentListe() {
+            equipmentListeContainer.innerHTML = '';
+            const searchTerm = document.getElementById('equipment-search').value.toLowerCase();
+            const filterTyp = document.getElementById('equipment-filter-typ').value;
+
+            const filteredEquipment = DB.equipment.filter(item =>
+                (item.name.toLowerCase().includes(searchTerm) ||
+                 (item.verwendung && item.verwendung.toLowerCase().includes(searchTerm))) &&
+                (filterTyp === '' || item.typ === filterTyp)
+            );
+
+            if (filteredEquipment.length === 0) {
+                equipmentListeContainer.innerHTML = '<p>Kein Equipment/Material gefunden.</p>';
+                return;
+            }
+            filteredEquipment.forEach(item => {
+                const el = document.createElement('div');
+                el.classList.add('list-item');
+                el.innerHTML = `
+                    <h3>${item.name} <small>(${item.typ})</small></h3>
+                    <p><strong>Verwendung:</strong> ${item.verwendung || 'N/A'}</p>
+                    <p><strong>Anzahl/Menge:</strong> ${item.anzahl} ${item.einheit} | <strong>Lagerort:</strong> ${item.lagerort || 'N/A'}</p>
+                    <p><strong>Kosten/Einheit:</strong> ${item.kosten.toFixed(2)} €</p>
+                    <p><strong>Zustand:</strong> ${item.bedingung || 'N/A'}</p>
+                    ${item.verbrauchsmittel && item.verbrauchsmittel.length > 0 ? `<p><strong>Verbrauchsmittel:</strong> ${item.verbrauchsmittel.join(', ')}</p>` : ''}
+                    <div class="list-item-actions">
+                        <button class="btn btn-light btn-edit-equipment" data-id="${item.id}" data-tooltip="Bearbeiten">${createIcon('FileEdit')}</button>
+                        <button class="btn btn-danger btn-delete-equipment" data-id="${item.id}" data-tooltip="Löschen">${createIcon('Trash2')}</button>
+                    </div>
+                `;
+                equipmentListeContainer.appendChild(el);
+            });
+
+            document.querySelectorAll('.btn-edit-equipment').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const itemId = e.currentTarget.dataset.id;
+                    const item = DB.equipment.find(eq => eq.id === itemId);
+                    openModal('equipment-modal', item);
+                });
+            });
+            document.querySelectorAll('.btn-delete-equipment').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Dieses Item wirklich löschen? Es wird auch aus allen Aufträgen entfernt.')) {
+                        const itemId = e.currentTarget.dataset.id;
+                        DB.equipment = DB.equipment.filter(eq => eq.id !== itemId);
+                        // Entferne das Item aus allen Aufträgen
+                        DB.auftraege.forEach(auftrag => {
+                            if (auftrag.materialEquipment) {
+                                auftrag.materialEquipment = auftrag.materialEquipment.filter(me => me.itemId !== itemId);
+                            }
+                        });
+                        saveData();
+                        renderEquipmentListe();
+                        renderAuftraegeListe(); // Aktualisiere Auftragsliste, falls Items entfernt wurden
+                        populateAuftragMaterialEquipmentDropdown();
+                    }
+                });
+            });
+        }
+        document.getElementById('equipment-search').addEventListener('input', renderEquipmentListe);
+        document.getElementById('equipment-filter-typ').addEventListener('change', renderEquipmentListe);
+
+        // --- Auftragskategorien Management ---
+        const kategorienListeContainer = document.getElementById('kategorien-liste');
+        const kategorieForm = document.getElementById('kategorie-form');
+        const kategorieModalTitle = document.getElementById('kategorie-modal-title');
+
+        function setupKategorieModal(kategorie = null) {
+            kategorieForm.reset();
+            document.getElementById('kategorie-id').value = '';
+            document.getElementById('kategorie-farbe').value = '#3498db'; // Default color
+
+            if (kategorie) {
+                kategorieModalTitle.textContent = 'Kategorie bearbeiten';
+                document.getElementById('kategorie-id').value = kategorie.id;
+                document.getElementById('kategorie-name').value = kategorie.name;
+                document.getElementById('kategorie-farbe').value = kategorie.color;
+            } else {
+                kategorieModalTitle.textContent = 'Neue Kategorie';
+            }
+        }
+
+        document.getElementById('open-kategorie-modal-btn').addEventListener('click', () => openModal('kategorie-modal'));
+
+        kategorieForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('kategorie-id').value;
+            const kategorieData = {
+                id: id || generateId(),
+                name: document.getElementById('kategorie-name').value,
+                color: document.getElementById('kategorie-farbe').value
+            };
+
+            if (id) {
+                DB.kategorien = DB.kategorien.map(k => k.id === id ? kategorieData : k);
+            } else {
+                DB.kategorien.push(kategorieData);
+            }
+            saveData();
+            renderKategorienListe();
+            populateAuftragKategorienDropdown(); // Update dropdown in Auftrag modal
+            populateAuftragKategorieFilter();   // Update filter dropdown
+            closeModal('kategorie-modal');
+        });
+
+        function renderKategorienListe() {
+            kategorienListeContainer.innerHTML = '';
+            if (DB.kategorien.length === 0) {
+                kategorienListeContainer.innerHTML = '<p>Keine Kategorien definiert.</p>';
+                return;
+            }
+            DB.kategorien.forEach(kategorie => {
+                const item = document.createElement('div');
+                item.classList.add('list-item');
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <span style="display: inline-block; width: 20px; height: 20px; background-color: ${kategorie.color}; border-radius: 4px; margin-right: 10px; vertical-align: middle;"></span>
+                            <h3 style="display: inline; vertical-align: middle;">${kategorie.name}</h3>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn btn-light btn-edit-kategorie" data-id="${kategorie.id}" data-tooltip="Bearbeiten">${createIcon('FileEdit')}</button>
+                            <button class="btn btn-danger btn-delete-kategorie" data-id="${kategorie.id}" data-tooltip="Löschen">${createIcon('Trash2')}</button>
+                        </div>
+                    </div>
+                `;
+                kategorienListeContainer.appendChild(item);
+            });
+
+            document.querySelectorAll('.btn-edit-kategorie').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const kategorieId = e.currentTarget.dataset.id;
+                    const kategorie = DB.kategorien.find(k => k.id === kategorieId);
+                    openModal('kategorie-modal', kategorie);
+                });
+            });
+             document.querySelectorAll('.btn-delete-kategorie').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                     if (confirm('Diese Kategorie wirklich löschen? Zugehörige Aufträge verlieren diese Kategoriezuordnung.')) {
+                        const kategorieId = e.currentTarget.dataset.id;
+                        const isUsed = DB.auftraege.some(a => a.kategorieId === kategorieId);
+                        if (isUsed && !confirm('Diese Kategorie wird in Aufträgen verwendet. Trotzdem löschen? Die betroffenen Aufträge haben dann keine Kategorie mehr.')) {
+                            return;
+                        }
+                        DB.kategorien = DB.kategorien.filter(k => k.id !== kategorieId);
+                        DB.auftraege.forEach(auftrag => {
+                            if (auftrag.kategorieId === kategorieId) {
+                                auftrag.kategorieId = null; // oder eine andere Logik
+                            }
+                        });
+                        saveData();
+                        renderKategorienListe();
+                        renderAuftraegeListe();
+                        populateAuftragKategorienDropdown();
+                        populateAuftragKategorieFilter();
+                    }
+                });
+            });
+        }
+
+
+        // --- Aufträge Management ---
+        const auftraegeListeContainer = document.getElementById('auftraege-liste');
+        const auftragForm = document.getElementById('auftrag-form');
+        const auftragModalTitle = document.getElementById('auftrag-modal-title');
+        let currentAuftragMaterialEquipment = []; // Temp storage for modal
+
+        function populateAuftragKundenDropdown() {
+            const select = document.getElementById('auftrag-kunde');
+            select.innerHTML = '<option value="">Wähle einen Kunden</option>';
+            DB.kunden.forEach(kunde => {
+                const option = document.createElement('option');
+                option.value = kunde.id;
+                option.textContent = kunde.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populateAuftragKategorienDropdown() {
+            const select = document.getElementById('auftrag-kategorie');
+            select.innerHTML = '<option value="">Wähle eine Kategorie</option>';
+            DB.kategorien.forEach(kategorie => {
+                const option = document.createElement('option');
+                option.value = kategorie.id;
+                option.textContent = kategorie.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populateAuftragMaterialEquipmentDropdown() {
+            const select = document.getElementById('select-material-equipment');
+            select.innerHTML = '<option value="">Item auswählen...</option>';
+            DB.equipment.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.name} (${item.typ}) - ${item.anzahl} ${item.einheit} verfügbar`;
+                select.appendChild(option);
+            });
+        }
+
+        function renderAuftragMaterialEquipmentList() {
+            const listContainer = document.getElementById('auftrag-material-equipment-liste');
+            listContainer.innerHTML = '';
+            currentAuftragMaterialEquipment.forEach((item, index) => {
+                const eqDetails = DB.equipment.find(e => e.id === item.itemId);
+                const div = document.createElement('div');
+                div.classList.add('sub-item');
+                div.innerHTML = `
+                    <span>${eqDetails ? eqDetails.name : 'Unbekanntes Item'} - Menge: ${item.menge} ${eqDetails ? eqDetails.einheit : ''}</span>
+                    <button type="button" class="btn btn-danger btn-remove-mat-equip" data-index="${index}" style="padding: 2px 5px; font-size: 0.8em;">${createIcon('X')}</button>
+                `;
+                listContainer.appendChild(div);
+            });
+            document.querySelectorAll('.btn-remove-mat-equip').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const indexToRemove = parseInt(e.currentTarget.dataset.index);
+                    currentAuftragMaterialEquipment.splice(indexToRemove, 1);
+                    renderAuftragMaterialEquipmentList(); // Re-render
+                });
+            });
+        }
+
+        document.getElementById('add-material-equipment-btn').addEventListener('click', () => {
+            const itemId = document.getElementById('select-material-equipment').value;
+            const menge = parseFloat(document.getElementById('input-material-equipment-menge').value);
+            const itemDetails = DB.equipment.find(e => e.id === itemId);
+
+            if (itemId && menge > 0 && itemDetails) {
+                 // Check if item already added to prevent duplicates, sum quantities instead
+                const existingItem = currentAuftragMaterialEquipment.find(i => i.itemId === itemId);
+                if (existingItem) {
+                    existingItem.menge += menge;
+                } else {
+                    currentAuftragMaterialEquipment.push({ itemId, menge });
+                }
+                renderAuftragMaterialEquipmentList();
+                // Reset input fields
+                document.getElementById('select-material-equipment').value = '';
+                document.getElementById('input-material-equipment-menge').value = '';
+            } else {
+                alert('Bitte wähle ein Item und gib eine gültige Menge ein.');
+            }
+        });
+
+
+        function setupAuftragModal(auftrag = null) {
+            auftragForm.reset();
+            document.getElementById('auftrag-id').value = '';
+            populateAuftragKundenDropdown();
+            populateAuftragKategorienDropdown();
+            populateAuftragMaterialEquipmentDropdown();
+            currentAuftragMaterialEquipment = []; // Reset
+
+            if (auftrag) {
+                auftragModalTitle.textContent = 'Auftrag bearbeiten';
+                document.getElementById('auftrag-id').value = auftrag.id;
+                document.getElementById('auftrag-title').value = auftrag.title;
+                document.getElementById('auftrag-kunde').value = auftrag.kundeId || '';
+                document.getElementById('auftrag-kategorie').value = auftrag.kategorieId || '';
+                document.getElementById('auftrag-datum').value = auftrag.datum;
+                document.getElementById('auftrag-zeit').value = auftrag.zeit || '';
+                document.getElementById('auftrag-status').value = auftrag.status || 'geplant';
+                currentAuftragMaterialEquipment = auftrag.materialEquipment ? [...auftrag.materialEquipment] : [];
+                document.getElementById('auftrag-aufwand').value = auftrag.aufwand || '';
+                document.getElementById('auftrag-kosten-kalkulation').value = auftrag.kostenKalkulation || '';
+                document.getElementById('auftrag-tatsaechliche-stunden').value = auftrag.tatsaechlicheStunden || '';
+                document.getElementById('auftrag-tatsaechliche-kosten').value = auftrag.tatsaechlicheKosten || '';
+                document.getElementById('auftrag-notizen').value = auftrag.notizen || '';
+            } else { // New Auftrag
+                auftragModalTitle.textContent = 'Neuer Auftrag';
+                // If 'auftrag' object has a prefilled date (e.g. from calendar click)
+                if (auftrag && auftrag.datum) {
+                     document.getElementById('auftrag-datum').value = auftrag.datum;
+                } else {
+                     document.getElementById('auftrag-datum').value = new Date().toISOString().split('T')[0]; // Default to today
+                }
+                document.getElementById('auftrag-status').value = 'geplant';
+            }
+            renderAuftragMaterialEquipmentList();
+        }
+
+        document.getElementById('open-auftrag-modal-btn').addEventListener('click', () => openModal('auftrag-modal'));
+
+        auftragForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('auftrag-id').value;
+
+            // Basic validation: Check if material/equipment quantities exceed available stock IF creating/editing and status is not "abgeschlossen"
+            // This is a simplified check. A real app might need more complex inventory management.
+            let stockSufficient = true;
+            if (id ? DB.auftraege.find(a => a.id === id)?.status !== 'abgeschlossen' : true) { // Only check if not already completed or new
+                for (const item of currentAuftragMaterialEquipment) {
+                    const eqDetails = DB.equipment.find(e => e.id === item.itemId);
+                    if (eqDetails) {
+                        let originalQuantityInAuftrag = 0;
+                        if (id) { // If editing, find original quantity for this item in this auftrag
+                            const existingAuftrag = DB.auftraege.find(a => a.id === id);
+                            const existingItemInAuftrag = existingAuftrag?.materialEquipment?.find(me => me.itemId === item.itemId);
+                            if (existingItemInAuftrag) {
+                                originalQuantityInAuftrag = existingItemInAuftrag.menge;
+                            }
+                        }
+                        // Available stock = current stock + original quantity in this auftrag (if editing)
+                        const effectiveAvailableStock = eqDetails.anzahl + originalQuantityInAuftrag;
+                        if (item.menge > effectiveAvailableStock) {
+                            alert(`Nicht genügend "${eqDetails.name}" vorhanden. Benötigt: ${item.menge}, Verfügbar (inkl. ursprünglicher Menge in diesem Auftrag): ${effectiveAvailableStock}.`);
+                            stockSufficient = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!stockSufficient) return;
+
+
+            const auftragData = {
+                id: id || generateId(),
+                title: document.getElementById('auftrag-title').value,
+                kundeId: document.getElementById('auftrag-kunde').value,
+                kategorieId: document.getElementById('auftrag-kategorie').value,
+                datum: document.getElementById('auftrag-datum').value,
+                zeit: document.getElementById('auftrag-zeit').value,
+                status: document.getElementById('auftrag-status').value,
+                materialEquipment: [...currentAuftragMaterialEquipment], // Deep copy
+                aufwand: parseFloat(document.getElementById('auftrag-aufwand').value) || 0,
+                kostenKalkulation: parseFloat(document.getElementById('auftrag-kosten-kalkulation').value) || 0,
+                tatsaechlicheStunden: parseFloat(document.getElementById('auftrag-tatsaechliche-stunden').value) || 0,
+                tatsaechlicheKosten: parseFloat(document.getElementById('auftrag-tatsaechliche-kosten').value) || 0,
+                notizen: document.getElementById('auftrag-notizen').value
+            };
+
+            // Update equipment stock if auftrag is marked "abgeschlossen"
+            // This is simplified: assumes items are "consumed" once.
+            // Also, if status changes FROM "abgeschlossen", items should be "returned" to stock.
+            const oldAuftrag = id ? DB.auftraege.find(a => a.id === id) : null;
+            const statusChangedToAbgeschlossen = auftragData.status === 'abgeschlossen' && (!oldAuftrag || oldAuftrag.status !== 'abgeschlossen');
+            const statusChangedFromAbgeschlossen = oldAuftrag && oldAuftrag.status === 'abgeschlossen' && auftragData.status !== 'abgeschlossen';
+
+            if (statusChangedToAbgeschlossen) {
+                auftragData.materialEquipment.forEach(item => {
+                    const eq = DB.equipment.find(e => e.id === item.itemId);
+                    if (eq) {
+                        // Calculate the difference if editing and item was already there
+                        let quantityChange = item.menge;
+                        if (oldAuftrag && oldAuftrag.materialEquipment) {
+                            const oldItem = oldAuftrag.materialEquipment.find(oi => oi.itemId === item.itemId);
+                            if (oldItem) {
+                                quantityChange = item.menge - oldItem.menge; // only subtract the difference
+                            }
+                        }
+                        eq.anzahl -= quantityChange;
+                        if (eq.anzahl < 0) eq.anzahl = 0; // Don't go negative
+                    }
+                });
+            } else if (statusChangedFromAbgeschlossen) {
+                 oldAuftrag.materialEquipment.forEach(item => { // Use oldAuftrag items for reversal
+                    const eq = DB.equipment.find(e => e.id === item.itemId);
+                    if (eq) eq.anzahl += item.menge;
+                });
+            } else if (id && auftragData.status !== 'abgeschlossen' && oldAuftrag && oldAuftrag.status !== 'abgeschlossen') {
+                // Handle quantity changes for non-completed orders (adjust stock based on diff)
+                auftragData.materialEquipment.forEach(newItem => {
+                    const eq = DB.equipment.find(e => e.id === newItem.itemId);
+                    if(eq) {
+                        const oldItem = oldAuftrag.materialEquipment ? oldAuftrag.materialEquipment.find(oi => oi.itemId === newItem.itemId) : null;
+                        const oldQuantity = oldItem ? oldItem.menge : 0;
+                        const quantityDifference = newItem.menge - oldQuantity; // if new > old, diff is positive (more taken from stock)
+                        eq.anzahl -= quantityDifference;
+                         if (eq.anzahl < 0) eq.anzahl = 0;
+                    }
+                });
+                // Check for items removed from auftrag
+                if(oldAuftrag.materialEquipment) {
+                    oldAuftrag.materialEquipment.forEach(oldItem => {
+                        const stillExists = auftragData.materialEquipment.some(ni => ni.itemId === oldItem.itemId);
+                        if(!stillExists) { // item was removed
+                            const eq = DB.equipment.find(e => e.id === oldItem.itemId);
+                            if(eq) eq.anzahl += oldItem.menge; // return to stock
+                        }
+                    });
+                }
+            }
+
+
+            if (id) {
+                DB.auftraege = DB.auftraege.map(a => a.id === id ? auftragData : a);
+            } else {
+                DB.auftraege.push(auftragData);
+            }
+
+            saveData();
+            renderAuftraegeListe();
+            renderCalendar(); // Update calendar view
+            renderEquipmentListe(); // Update stock display in equipment list
+            populateAuftragMaterialEquipmentDropdown(); // Refresh stock in dropdown
+            closeModal('auftrag-modal');
+        });
+
+        function populateAuftragKategorieFilter() {
+            const select = document.getElementById('auftrag-filter-kategorie');
+            // Keep "Alle Kategorien"
+            const firstOption = select.options[0];
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+
+            DB.kategorien.forEach(kategorie => {
+                const option = document.createElement('option');
+                option.value = kategorie.id;
+                option.textContent = kategorie.name;
+                select.appendChild(option);
+            });
+        }
+
+
+        function renderAuftraegeListe() {
+            auftraegeListeContainer.innerHTML = '';
+            const searchTerm = document.getElementById('auftrag-search').value.toLowerCase();
+            const filterStatus = document.getElementById('auftrag-filter-status').value;
+            const filterKategorie = document.getElementById('auftrag-filter-kategorie').value;
+
+            let filteredAuftraege = DB.auftraege.filter(auftrag => {
+                const kunde = DB.kunden.find(k => k.id === auftrag.kundeId);
+                const kundeName = kunde ? kunde.name.toLowerCase() : '';
+
+                const matchesSearch = auftrag.title.toLowerCase().includes(searchTerm) ||
+                                      kundeName.includes(searchTerm) ||
+                                      (auftrag.notizen && auftrag.notizen.toLowerCase().includes(searchTerm));
+                const matchesStatus = filterStatus === '' || auftrag.status === filterStatus;
+                const matchesKategorie = filterKategorie === '' || auftrag.kategorieId === filterKategorie;
+
+                return matchesSearch && matchesStatus && matchesKategorie;
+            });
+
+            // Sort by date descending
+            filteredAuftraege.sort((a, b) => new Date(b.datum) - new Date(a.datum));
+
+
+            if (filteredAuftraege.length === 0) {
+                auftraegeListeContainer.innerHTML = '<p>Keine Aufträge gefunden.</p>';
+                return;
+            }
+            filteredAuftraege.forEach(auftrag => {
+                const kunde = DB.kunden.find(k => k.id === auftrag.kundeId);
+                const kategorie = DB.kategorien.find(kat => kat.id === auftrag.kategorieId);
+
+                const item = document.createElement('div');
+                item.classList.add('list-item');
+                let materialHtml = 'Kein Material/Equipment';
+                if (auftrag.materialEquipment && auftrag.materialEquipment.length > 0) {
+                    materialHtml = '<ul>';
+                    auftrag.materialEquipment.forEach(me => {
+                        const eq = DB.equipment.find(e => e.id === me.itemId);
+                        materialHtml += `<li>${eq ? eq.name : 'Unbekannt'} - ${me.menge} ${eq ? eq.einheit : ''}</li>`;
+                    });
+                    materialHtml += '</ul>';
+                }
+
+                item.innerHTML = `
+                    <div class="d-flex justify-between align-center">
+                        <h3>${auftrag.title}</h3>
+                        <span class="status-badge status-${auftrag.status.replace('_','')}">${auftrag.status.replace('_',' ')}</span>
+                    </div>
+                    <p>
+                        ${kategorie ? `<span class="category-tag" style="background-color:${kategorie.color};">${kategorie.name}</span>` : ''}
+                        <strong>Kunde:</strong> ${kunde ? kunde.name : 'N/A'}
+                    </p>
+                    <p><strong>Datum:</strong> ${new Date(auftrag.datum).toLocaleDateString('de-DE')} ${auftrag.zeit || ''}</p>
+                    <p><strong>Material/Equipment:</strong></p>
+                    <div class="sub-item-list">${materialHtml}</div>
+                    <p><strong>Kosten (Netto):</strong> Kalk. ${auftrag.kostenKalkulation.toFixed(2)} € / Tats. ${auftrag.tatsaechlicheKosten.toFixed(2)} €</p>
+                    <p><strong>Notizen:</strong> ${auftrag.notizen || 'Keine'}</p>
+                    <div class="list-item-actions">
+                        <button class="btn btn-light btn-edit-auftrag" data-id="${auftrag.id}" data-tooltip="Bearbeiten">${createIcon('FileEdit')}</button>
+                        <button class="btn btn-danger btn-delete-auftrag" data-id="${auftrag.id}" data-tooltip="Löschen">${createIcon('Trash2')}</button>
+                    </div>
+                `;
+                auftraegeListeContainer.appendChild(item);
+            });
+
+            document.querySelectorAll('.btn-edit-auftrag').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const auftragId = e.currentTarget.dataset.id;
+                    const auftrag = DB.auftraege.find(a => a.id === auftragId);
+                    openModal('auftrag-modal', auftrag);
+                });
+            });
+            document.querySelectorAll('.btn-delete-auftrag').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Diesen Auftrag wirklich löschen? Verwendetes Material wird NICHT automatisch zum Bestand zurückgebucht.')) {
+                        const auftragId = e.currentTarget.dataset.id;
+                        const auftragToDelete = DB.auftraege.find(a => a.id === auftragId);
+
+                        // Optional: Stock adjustment if deleting a completed order
+                        // This can get complex depending on rules, for now, just delete
+                        // if (auftragToDelete && auftragToDelete.status === 'abgeschlossen' && auftragToDelete.materialEquipment) {
+                        //    auftragToDelete.materialEquipment.forEach(item => {
+                        //        const eq = DB.equipment.find(e => e.id === item.itemId);
+                        //        if (eq) eq.anzahl += item.menge; // Return to stock
+                        //    });
+                        // }
+
+                        DB.auftraege = DB.auftraege.filter(a => a.id !== auftragId);
+                        saveData();
+                        renderAuftraegeListe();
+                        renderCalendar();
+                        // renderEquipmentListe(); // if stock was adjusted
+                    }
+                });
+            });
+        }
+        document.getElementById('auftrag-search').addEventListener('input', renderAuftraegeListe);
+        document.getElementById('auftrag-filter-status').addEventListener('change', renderAuftraegeListe);
+        document.getElementById('auftrag-filter-kategorie').addEventListener('change', renderAuftraegeListe);
+
+
+        // --- Finanzen & Statistiken ---
+        let umsatzChart = null;
+        let kategorieChart = null;
+
+        function renderFinanzen() {
+            const abgeschlosseneAuftraege = DB.auftraege.filter(a => a.status === 'abgeschlossen');
+
+            document.getElementById('stat-total-auftraege').textContent = DB.auftraege.length;
+
+            const gesamtUmsatz = abgeschlosseneAuftraege.reduce((sum, a) => sum + (a.tatsaechlicheKosten || 0), 0);
+            document.getElementById('stat-total-umsatz').textContent = `${gesamtUmsatz.toFixed(2)} €`;
+
+            const avgAuftragswert = abgeschlosseneAuftraege.length > 0 ? gesamtUmsatz / abgeschlosseneAuftraege.length : 0;
+            document.getElementById('stat-avg-auftragswert').textContent = `${avgAuftragswert.toFixed(2)} €`;
+
+            let gesamtMaterialkosten = 0;
+            abgeschlosseneAuftraege.forEach(auftrag => {
+                if (auftrag.materialEquipment) {
+                    auftrag.materialEquipment.forEach(me => {
+                        const equipmentItem = DB.equipment.find(eq => eq.id === me.itemId);
+                        if (equipmentItem && equipmentItem.kosten) {
+                            gesamtMaterialkosten += me.menge * equipmentItem.kosten;
+                        }
+                    });
+                }
+            });
+            document.getElementById('stat-total-materialkosten').textContent = `${gesamtMaterialkosten.toFixed(2)} €`;
+
+            populateStatsYearFilter();
+            renderCharts();
+        }
+
+        function populateStatsYearFilter() {
+            const yearSelect = document.getElementById('stats-year-filter');
+            const currentSelectedYear = yearSelect.value;
+            yearSelect.innerHTML = '';
+            const years = new Set();
+            DB.auftraege.forEach(a => years.add(new Date(a.datum).getFullYear()));
+
+            if (years.size === 0) years.add(new Date().getFullYear()); // Add current year if no data
+
+            Array.from(years).sort((a,b) => b-a).forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            });
+            // Try to re-select the previously selected year or the current year
+            yearSelect.value = currentSelectedYear && years.has(parseInt(currentSelectedYear)) ? currentSelectedYear : new Date().getFullYear();
+            yearSelect.removeEventListener('change', renderCharts); // Remove old listener
+            yearSelect.addEventListener('change', renderCharts); // Add new one
+        }
+
+        function renderCharts() {
+            const selectedYear = parseInt(document.getElementById('stats-year-filter').value);
+            const abgeschlosseneImJahr = DB.auftraege.filter(a =>
+                a.status === 'abgeschlossen' &&
+                new Date(a.datum).getFullYear() === selectedYear
+            );
+
+            // Umsatz pro Monat
+            const monate = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+            const umsatzProMonat = Array(12).fill(0);
+            abgeschlosseneImJahr.forEach(a => {
+                const monatIndex = new Date(a.datum).getMonth();
+                umsatzProMonat[monatIndex] += (a.tatsaechlicheKosten || 0);
+            });
+
+            if (umsatzChart) umsatzChart.destroy();
+            umsatzChart = new Chart(document.getElementById('umsatz-pro-monat-chart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: monate,
+                    datasets: [{
+                        label: `Umsatz in ${selectedYear} (€)`,
+                        data: umsatzProMonat,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            // Aufträge pro Kategorie
+            const auftraegeProKategorie = {};
+            DB.kategorien.forEach(k => auftraegeProKategorie[k.name] = { count: 0, color: k.color });
+
+            abgeschlosseneImJahr.forEach(a => {
+                const kategorie = DB.kategorien.find(k => k.id === a.kategorieId);
+                if (kategorie && auftraegeProKategorie[kategorie.name]) {
+                    auftraegeProKategorie[kategorie.name].count++;
+                } else if (!kategorie && !auftraegeProKategorie['Ohne Kategorie']) { // Handle uncategorized
+                     auftraegeProKategorie['Ohne Kategorie'] = { count: 1, color: '#bdc3c7'};
+                } else if (!kategorie) {
+                    auftraegeProKategorie['Ohne Kategorie'].count++;
+                }
+            });
+
+            const kategorieLabels = Object.keys(auftraegeProKategorie);
+            const kategorieData = kategorieLabels.map(label => auftraegeProKategorie[label].count);
+            const kategorieColors = kategorieLabels.map(label => auftraegeProKategorie[label].color);
+
+
+            if (kategorieChart) kategorieChart.destroy();
+            kategorieChart = new Chart(document.getElementById('auftraege-pro-kategorie-chart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: kategorieLabels,
+                    datasets: [{
+                        label: `Aufträge in ${selectedYear}`,
+                        data: kategorieData,
+                        backgroundColor: kategorieColors,
+                        hoverOffset: 4
+                    }]
+                }
+            });
+        }
+
+
+        // --- Daten Import/Export ---
+        function arrayToCsv(data, columns) {
+            if (!data || data.length === 0) return '';
+            const header = columns.join(',') + '\n';
+            const rows = data.map(row => {
+                return columns.map(col => {
+                    let val = row[col] === null || typeof row[col] === 'undefined' ? '' : row[col];
+                    if (typeof val === 'string') {
+                        // Escape double quotes and handle commas within fields
+                        val = '"' + val.replace(/"/g, '""') + '"';
+                    } else if (Array.isArray(val)) {
+                         val = '"' + val.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(';') + '"'; // serialize arrays, use ; as inner separator
+                    } else if (typeof val === 'object' && val !== null) {
+                        val = '"' + JSON.stringify(val).replace(/"/g, '""') + '"'; // serialize objects
+                    }
+                    return val;
+                }).join(',');
+            }).join('\n');
+            return header + rows;
+        }
+
+        function csvToArray(csvString, columns) {
+            const rows = csvString.trim().split('\n');
+            const header = rows.shift().split(',');
+
+            // Basic validation: check if header matches expected columns
+            if (header.length !== columns.length || !columns.every((col, i) => col === header[i])) {
+                // More sophisticated check:
+                const expectedColsSet = new Set(columns);
+                const actualColsSet = new Set(header);
+                if (expectedColsSet.size !== actualColsSet.size || !columns.every(col => actualColsSet.has(col))) {
+                    alert(`CSV-Header stimmt nicht mit erwarteten Spalten überein. Erwartet: ${columns.join(', ')}. Gefunden: ${header.join(', ')}`);
+                    return null; // Indicate error
+                }
+                // If order is different but all columns present, re-map, but this is complex. For now, strict order.
+            }
+
+
+            return rows.map(rowString => {
+                // This is a simplified CSV parser. Real CSV can be more complex (escaped quotes, newlines in fields).
+                // For robust parsing, a library would be better.
+                const values = [];
+                let currentVal = '';
+                let inQuotes = false;
+                for (let i = 0; i < rowString.length; i++) {
+                    const char = rowString[i];
+                    if (char === '"') {
+                        if (inQuotes && i + 1 < rowString.length && rowString[i+1] === '"') { // Escaped quote
+                            currentVal += '"';
+                            i++; // Skip next quote
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(currentVal);
+                        currentVal = '';
+                    } else {
+                        currentVal += char;
+                    }
+                }
+                values.push(currentVal); // Add last value
+
+                const obj = {};
+                header.forEach((colName, index) => {
+                    let val = values[index];
+                    if (typeof val === 'string') {
+                        // Try to parse numbers, booleans, arrays, objects
+                        if (!isNaN(parseFloat(val)) && isFinite(val) && val.trim() !== "") obj[colName] = parseFloat(val);
+                        else if (val.toLowerCase() === 'true') obj[colName] = true;
+                        else if (val.toLowerCase() === 'false') obj[colName] = false;
+                        else if (val.startsWith('[') && val.endsWith(']')) { // Array (simple JSON array)
+                            try { obj[colName] = JSON.parse(val); } catch (e) { obj[colName] = val.slice(1,-1).split(';'); } // fallback for non-JSON arrays
+                        }
+                        else if (val.startsWith('{') && val.endsWith('}')) { // Object (simple JSON object)
+                             try { obj[colName] = JSON.parse(val); } catch (e) { obj[colName] = val; }
+                        }
+                        else obj[colName] = val;
+                    } else {
+                         obj[colName] = val;
+                    }
+                });
+                return obj;
+            });
+        }
+
+        const KUNDEN_COLS = ['id', 'name', 'adresse', 'lat', 'lng', 'telefon', 'email', 'notizen', 'zufriedenheit'];
+        const EQUIPMENT_COLS = ['id', 'name', 'typ', 'verwendung', 'anzahl', 'einheit', 'lagerort', 'verbrauchsmittel', 'bedingung', 'kosten'];
+        const KATEGORIEN_COLS = ['id', 'name', 'color'];
+        const AUFTRAEGE_COLS = ['id', 'title', 'kundeId', 'kategorieId', 'datum', 'zeit', 'status', 'materialEquipment', 'aufwand', 'kostenKalkulation', 'tatsaechlicheStunden', 'tatsaechlicheKosten', 'notizen'];
+
+
+        document.getElementById('export-all-btn').addEventListener('click', () => {
+            const zip = new JSZip();
+            zip.file("kunden.csv", arrayToCsv(DB.kunden, KUNDEN_COLS));
+            zip.file("equipment.csv", arrayToCsv(DB.equipment, EQUIPMENT_COLS));
+            zip.file("kategorien.csv", arrayToCsv(DB.kategorien, KATEGORIEN_COLS));
+            zip.file("auftraege.csv", arrayToCsv(DB.auftraege, AUFTRAEGE_COLS));
+
+            zip.generateAsync({type:"blob"})
+            .then(function(content) {
+                saveAs(content, "handwerker_manager_backup.zip");
+                alert('Daten erfolgreich exportiert!');
+            });
+        });
+
+        function handleImport(fileInputId, dbKey, columns, renderFunction, postImportCallback) {
+            const fileInput = document.getElementById(fileInputId);
+            if (fileInput.files.length === 0) {
+                alert('Bitte wähle eine CSV-Datei aus.');
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const importedData = csvToArray(event.target.result, columns);
+                    if (!importedData) return; // Error handled in csvToArray
+
+                    // Merge strategy: Update existing by ID, add new ones
+                    const existingIds = new Set(DB[dbKey].map(item => item.id));
+                    const newItems = [];
+                    importedData.forEach(item => {
+                        if (existingIds.has(item.id)) {
+                            // Update existing
+                            DB[dbKey] = DB[dbKey].map(dbItem => dbItem.id === item.id ? item : dbItem);
+                        } else {
+                            // Add new
+                            newItems.push(item);
+                        }
+                    });
+                    DB[dbKey].push(...newItems);
+
+                    saveData();
+                    if (renderFunction) renderFunction();
+                    if (postImportCallback) postImportCallback(); // e.g., update dropdowns
+                    alert(`${dbKey.charAt(0).toUpperCase() + dbKey.slice(1)} erfolgreich importiert!`);
+                    fileInput.value = ''; // Reset file input
+                } catch (error) {
+                    console.error(`Fehler beim Import von ${dbKey}:`, error);
+                    alert(`Fehler beim Import von ${dbKey}: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        document.getElementById('import-kunden-btn').addEventListener('click', () => {
+            handleImport('import-file-kunden', 'kunden', KUNDEN_COLS, renderKundenListe, populateAuftragKundenDropdown);
+        });
+        document.getElementById('import-equipment-btn').addEventListener('click', () => {
+            handleImport('import-file-equipment', 'equipment', EQUIPMENT_COLS, renderEquipmentListe, populateAuftragMaterialEquipmentDropdown);
+        });
+        document.getElementById('import-kategorien-btn').addEventListener('click', () => {
+            handleImport('import-file-kategorien', 'kategorien', KATEGORIEN_COLS, renderKategorienListe, () => {
+                populateAuftragKategorienDropdown();
+                populateAuftragKategorieFilter();
+            });
+        });
+        document.getElementById('import-auftraege-btn').addEventListener('click', () => {
+            handleImport('import-file-auftraege', 'auftraege', AUFTRAEGE_COLS, () => {
+                renderAuftraegeListe();
+                renderCalendar();
+            });
+        });
+
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            renderCalendar();
+            renderKundenListe();
+            renderEquipmentListe();
+            renderKategorienListe();
+            renderAuftraegeListe();
+            populateAuftragKategorieFilter(); // Init filter after categories are loaded
+            renderFinanzen(); // For initial stats view (if active)
+
+            // Set default view to Kalender
+            document.getElementById('nav-kalender').click();
+        });
+
+    </script>
+</body>
+</html>
