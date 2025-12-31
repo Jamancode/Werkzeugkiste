@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 19 (Native Fix)</title>
+    <title>Stream Command 20 (Restored)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
             --bg: #000; --panel: #111; --primary: #9146FF; --active: #00ffcc;
-            --danger: #ff4444; --edit: #ffaa00; --text: #eee; --safe-z: 10000;
+            --danger: #ff4444; --edit: #ffaa00; --text: #fff; --safe-z: 10000;
         }
 
-        /* RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -23,73 +22,71 @@
 
         /* --- HEADER --- */
         header {
-            position: fixed; top: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(10,10,10,0.95); border-bottom: 1px solid #333;
-            display: flex; align-items: center; padding: 0 10px;
-            transition: transform 0.3s ease; z-index: 500;
+            flex-shrink: 0; height: 50px; width: 100%;
+            background: rgba(10,10,10,0.98); border-bottom: 1px solid #333;
+            display: flex; align-items: center; padding: 0 15px; z-index: 500;
+            transition: transform 0.3s ease;
         }
         header.hide { transform: translateY(-100%); }
-        .brand { font-weight: 800; font-size: 0.9rem; color: var(--primary); letter-spacing: 1px; }
+        .brand { font-weight: 800; font-size: 1rem; color: var(--primary); letter-spacing: 1px; }
 
-        /* --- MENU BTN --- */
+        /* --- MENU --- */
         .float-btn {
-            position: fixed; top: 2px; right: 5px; width: 36px; height: 36px;
-            background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; z-index: var(--safe-z);
+            position: fixed; top: 7px; right: 10px; width: 38px; height: 38px;
+            background: #111; border: 1px solid #444; border-radius: 6px;
+            color: white; font-size: 1.5rem; cursor: pointer; z-index: var(--safe-z);
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* --- NAV --- */
         #nav {
-            position: fixed; top: 0; right: 0; bottom: 0; width: 320px;
-            background: #080808; border-left: 1px solid #222;
-            transform: translateX(100%); transition: transform 0.25s ease;
-            z-index: 9000; padding: 50px 0 0 0; display: flex; flex-direction: column; 
+            position: fixed; top: 0; right: 0; bottom: 0; width: 340px;
+            background: #0a0a0a; border-left: 1px solid #333;
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9000; padding: 60px 0 0 0; display: flex; flex-direction: column;
             box-shadow: -10px 0 50px rgba(0,0,0,0.9);
         }
         #nav.open { transform: translateX(0); }
         
-        .menu-tabs { display: flex; border-bottom: 1px solid #222; background: #0e0e0e; }
-        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #777; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-        .tab-btn.active { background: #151515; color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .menu-tabs { display: flex; border-bottom: 1px solid #333; background: #0e0e0e; flex-shrink: 0; }
+        .tab-btn { flex: 1; padding: 15px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        .menu-content { flex: 1; overflow-y: auto; padding: 10px; display: none; }
+        .menu-content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
         .menu-content.active { display: block; }
 
         .nav-item {
-            padding: 12px; background: #151515; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.9rem; cursor: pointer;
-            border: 1px solid transparent; margin-bottom: 6px;
+            padding: 15px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; 
+            border: 1px solid transparent; margin-bottom: 8px; cursor: pointer;
         }
         .nav-item.active { background: var(--primary); color: white; }
         .nav-item.exit { background: #300; border-color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* SETTINGS */
-        .set-row { background: #111; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #222; }
-        .set-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.75rem; color: #888; font-weight: bold; }
-        .set-input { width: 100%; background: #000; border: 1px solid #333; color: #ccc; padding: 6px; border-radius: 3px; margin-bottom: 5px; font-size: 0.85rem; }
-        .set-select { width: 100%; background: #1a1a1a; color: #ccc; border: 1px solid #333; padding: 6px; border-radius: 3px; margin-bottom: 5px; font-size: 0.8rem; }
-        .set-actions { display: flex; gap: 4px; }
-        .set-btn { flex: 1; padding: 6px; background: #222; color: #aaa; border: 1px solid #333; border-radius: 3px; cursor: pointer; font-size: 0.75rem; }
-        .set-btn.act { background: var(--primary); color: white; border-color: var(--primary); }
-        .set-btn.danger { background: #300; color: #fcc; border-color: #500; }
+        .set-row { background: #141414; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333; }
+        .set-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; font-weight: bold; color: #888; }
+        .set-input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; margin-bottom: 5px; }
+        .set-select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; margin-bottom: 5px; }
+        .set-actions { display: flex; gap: 5px; }
+        .set-btn { flex: 1; padding: 8px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .set-btn.act { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .set-btn.danger { background: #300; border-color: #500; }
 
         /* --- STAGE --- */
         #stage {
-            flex: 1; margin-top: 40px; 
-            overflow-y: auto; overflow-x: hidden; 
-            display: grid; padding: 2px; gap: 2px;
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            display: grid; padding: 4px; gap: 4px;
             grid-template-columns: 1fr; grid-auto-rows: min-content;
         }
-        body.is-fullscreen #stage { margin-top: 0; padding: 0; overflow: hidden; }
+        body.is-fullscreen #stage { padding: 0; margin: 0; overflow: hidden; }
 
-        /* Layouts */
+        /* MODES */
         @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
         @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
 
         .mode-split .slot { display: none; }
         .mode-split {
-            grid-template-columns: 1fr; grid-template-rows: 60vh 40vh 40vh;
-            grid-template-areas: "main" "side1" "side2"; height: calc(100vh - 40px);
+            grid-template-columns: 1fr; grid-template-rows: 60% 40% 40%; /* Mehr Platz für Main */
+            grid-template-areas: "main" "side1" "side2"; height: 100%;
         }
         @media (min-width: 1024px) {
             .mode-split {
@@ -97,94 +94,88 @@
                 grid-template-areas: "main side1" "main side2";
             }
         }
-        .mode-split .slot.p-main { display: flex; grid-area: main; border-bottom: 1px solid #222; z-index: 10; }
+        .mode-split .slot.p-main { display: flex; grid-area: main; border: 2px solid var(--primary); }
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* SLOT */
+        /* --- SLOT STRUCTURE --- */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
-            min-height: 250px; border-radius: 3px; overflow: hidden; contain: content;
+            min-height: 280px; border-radius: 4px; overflow: hidden;
         }
-        @media(min-width: 1100px) { .slot { min-height: 0; } }
+        .mode-split .slot, .mode-full .slot { min-height: 0; }
 
-        /* UI BAR */
         .ui-bar {
-            position: absolute; top: 0; left: 0; right: 0; height: 28px;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(2px);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
+            position: absolute; top: 0; left: 0; right: 0; height: 36px;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
             opacity: 0; transition: opacity 0.2s; z-index: 20; pointer-events: none;
         }
         .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
 
-        .lbl { font-size: 0.65rem; font-weight: bold; background: var(--primary); color: white; padding: 1px 4px; border-radius: 2px; max-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .tools { display: flex; gap: 3px; }
-        .btn { width: 24px; height: 24px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); color: #ccc; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        .btn:hover { background: var(--primary); color: #fff; }
+        .lbl { font-size: 0.75rem; font-weight: bold; background: var(--primary); padding: 2px 6px; border-radius: 3px; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tools { display: flex; gap: 4px; }
+        .btn { width: 28px; height: 28px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
-        .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
-        .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
-        
-        .pos-sel { display: none; background: #111; color: #ccc; border: 1px solid #333; font-size: 0.6rem; padding: 0 4px; height: 20px; border-radius: 2px; margin-left: 5px; cursor: pointer; pointer-events: auto; }
+        .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 2px; font-size: 0.7rem; margin-left: 10px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT & CHAT (NATIVE FIX) --- */
+        /* --- STABLE CONTENT LAYOUT (CSS GRID STATT FLEXBOX) --- */
         .content { 
-            flex: 1; display: flex; flex-direction: row !important; /* Immer nebeneinander */
-            width: 100%; height: 100%; position: relative; overflow: hidden;
+            flex: 1; 
+            display: grid; /* Grid ist stabiler als Flex */
+            grid-template-columns: 1fr 0px; /* Chat start mit 0px */
+            width: 100%; height: 100%; position: relative; 
+            transition: grid-template-columns 0.3s ease;
         }
         
-        .vid { flex: 1; background: #000; min-width: 0; }
+        .vid { background: #000; min-width: 0; width: 100%; height: 100%; }
         
         .chat-wrap { 
-            width: 0; background: #0e0e0e; 
-            transition: width 0.2s ease; 
-            border-left: 1px solid #222; position: relative;
-            /* Scrollbar für Banner - WICHTIG */
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-            /* Platz unten für "Akzeptieren" Button */
-            padding-bottom: 150px; 
+            background: #111; border-left: 1px solid #333; position: relative; 
+            overflow: hidden; /* Verhindert Überlauf */
         }
-        .slot.chat-on .chat-wrap { width: 320px; }
         
-        /* Mobile Chat: Native Breite lassen */
+        /* WENN CHAT AN IST */
+        .slot.chat-on .content { 
+            grid-template-columns: 1fr 340px; /* Desktop Standard */
+        }
+        
+        /* MOBILE SIDE-BY-SIDE */
         @media (max-width: 650px) {
-            .slot.chat-on .chat-wrap { 
-                width: 45%; /* Relativ zum Video */
-                min-width: 160px; /* Mindestbreite damit Text lesbar ist */
-                border-left: 1px solid #222; 
+            .slot.chat-on .content { 
+                grid-template-columns: 1fr 40%; /* Festes Verhältnis: 60% Video / 40% Chat */
             }
         }
 
-        /* --- IFRAME (KEIN ZOOM MEHR!) --- */
-        /* Wir stellen es auf 100% ohne Hacks. Twitch macht den Rest. */
-        .chat-frame {
-            width: 100%; 
-            height: 100%; 
-            border: none;
-            display: block;
+        /* SCROLLBAR & IFRAME */
+        .chat-scroll-area {
+            width: 100%; height: 100%;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: 200px; /* Platz für Banner */
         }
+        
+        .chat-frame { width: 100%; height: 100%; border: none; display: block; }
 
-        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #333; cursor: pointer; }
-        .empty span { font-size: 2rem; transition: 0.2s; }
-        .empty:hover span { color: var(--primary); transform: scale(1.2); }
+        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; }
+        .empty span { font-size: 3rem; }
 
-        dialog { background: #18181b; color: #fff; border: 1px solid #333; width: 85%; max-width: 320px; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 20px; border-radius: 6px; box-shadow: 0 50px 100px rgba(0,0,0,1); z-index: 12000; }
+        dialog { background: #18181b; color: #fff; border: 1px solid #333; width: 90%; max-width: 350px; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 25px; border-radius: 8px; z-index: 12000; }
         dialog::backdrop { background: rgba(0,0,0,0.8); }
-        input { width: 100%; padding: 10px; margin: 15px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.9rem; }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; }
         .row-btn { display: flex; justify-content: flex-end; gap: 10px; }
-        .b-ok { background: var(--primary); border: none; padding: 8px 16px; color: #fff; border-radius: 3px; cursor: pointer; font-size: 0.9rem; }
-        .b-no { background: transparent; border: 1px solid #444; padding: 8px 16px; color: #aaa; border-radius: 3px; cursor: pointer; font-size: 0.9rem; }
+        .b-ok { background: var(--primary); border: none; padding: 10px 20px; color: #fff; border-radius: 4px; cursor: pointer; }
+        .b-no { background: transparent; border: 1px solid #444; padding: 10px 20px; color: #aaa; border-radius: 4px; cursor: pointer; }
 
     </style>
 </head>
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 19</div>
+        <div class="brand">STREAM COMMAND 20</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -192,19 +183,18 @@
     <div id="nav">
         <div class="menu-tabs">
             <button class="tab-btn active" onclick="switchTab('view')">ANSICHT</button>
-            <button class="tab-btn" onclick="switchTab('settings')">SETTINGS</button>
+            <button class="tab-btn" onclick="switchTab('settings')">EINSTELLUNGEN</button>
         </div>
-
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD VERLASSEN</div>
             <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-            <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
-                Native Chat Rendering
+            
+            <div style="margin-top:30px; border-top:1px solid #333; padding-top:20px;">
+                <button class="nav-item" style="width:100%; background:#300; border-color:#500; color:#f88;" onclick="resetApp()">⚠️ APP ZURÜCKSETZEN</button>
             </div>
         </div>
-
         <div id="tab-settings" class="menu-content">
             <div id="settings-list"></div>
         </div>
@@ -213,16 +203,15 @@
     <div id="stage" class="mode-grid"></div>
 
     <dialog id="modal">
-        <h3 id="modalTitle" style="font-size:1rem;">Stream hinzufügen</h3>
-        <input type="text" id="inp" placeholder="z.B. papaplatte">
+        <h3 id="modalTitle">Stream hinzufügen</h3>
+        <input type="text" id="inp" placeholder="Kanalname...">
         <div class="row-btn">
             <button class="b-no" onclick="modal.close()">Abbruch</button>
-            <button class="b-ok" onclick="save()">Speichern</button>
+            <button class="b-ok" onclick="save()">Laden</button>
         </div>
     </dialog>
 
     <script>
-        // DOMAIN FIX
         const HOST = window.location.hostname || "localhost";
         const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv"];
         if(HOST && !PARENTS.includes(HOST)) PARENTS.push(HOST);
@@ -277,8 +266,8 @@
             if(state.players[i]) {
                 try { state.players[i].setMuted(true); } catch(e){}
                 state.players[i] = null;
-                el.innerHTML = ''; 
             }
+            el.innerHTML = '';
 
             if(!channel) {
                 el.innerHTML = `<div class="empty" onclick="openModal(${i})"><span>+</span></div>`;
@@ -297,22 +286,24 @@
                         <span class="lbl">${channel}</span>
                         <select class="pos-sel" onchange="swapPos(${i}, this.value)">
                             <option value="main" ${isM?'selected':''}>Main</option>
-                            <option value="s1" ${isS1?'selected':''}>S1</option>
-                            <option value="s2" ${isS2?'selected':''}>S2</option>
-                            <option value="x" disabled>-</option>
+                            <option value="s1" ${isS1?'selected':''}>Side 1</option>
+                            <option value="s2" ${isS2?'selected':''}>Side 2</option>
+                            <option value="x" disabled>---</option>
                         </select>
                     </div>
                     <div class="tools">
                         <button class="btn" onclick="toggleAudio(${i}, this)">🔊</button>
                         <button class="btn" onclick="toggleChat(${i}, this)">💬</button>
-                        <button class="btn" onclick="toggleFull(${i})">${state.mode==='mode-full' && state.focus===i ? '↙' : '⛶'}</button>
-                        <button class="btn edit" onclick="editStream(${i})">✎</button>
+                        <button class="btn" onclick="toggleFull(${i})">${state.mode==='mode-full' && state.focus===i ? '↙️' : '⛶'}</button>
+                        <button class="btn" onclick="openModal(${i})">✎</button>
                         <button class="btn del" onclick="delStream(${i})">✕</button>
                     </div>
                 </div>
                 <div class="content">
                     <div class="vid" id="v-${i}"></div>
-                    <div class="chat-wrap" id="c-${i}"></div>
+                    <div class="chat-wrap" id="c-${i}">
+                        <div class="chat-scroll-area" id="c-inner-${i}"></div>
+                    </div>
                 </div>
             `;
 
@@ -329,15 +320,14 @@
                     });
                     state.players[i] = p;
 
-                    const cDiv = document.getElementById('c-'+i);
+                    const cInner = document.getElementById('c-inner-'+i);
                     const ifr = document.createElement('iframe');
-                    // Native Embed URL (Kein Zoom Hack)
                     const pParams = PARENTS.map(d => `parent=${d}`).join('&');
                     ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${pParams}&darkpopout`;
                     ifr.className = 'chat-frame';
                     ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms allow-storage-access-by-user-activation"; 
-                    cDiv.appendChild(ifr);
-                } catch(e) { console.error(e); }
+                    cInner.appendChild(ifr);
+                } catch(e) {}
             }, 50);
             
             updateSlotClasses(i);
@@ -379,11 +369,12 @@
                         <span>${isMain?'MAIN':isS1?'SIDE 1':isS2?'SIDE 2':''}</span>
                     </div>
                     <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
+                    
                     <div style="display:flex; gap:5px;">
                         <select class="set-select" onchange="swapPos(${i}, this.value)">
                             <option value="main" ${isMain?'selected':''}>Main</option>
-                            <option value="s1" ${isS1?'selected':''}>S1</option>
-                            <option value="s2" ${isS2?'selected':''}>S2</option>
+                            <option value="s1" ${isS1?'selected':''}>Side 1</option>
+                            <option value="s2" ${isS2?'selected':''}>Side 2</option>
                             <option value="x" ${isUnassigned?'selected':''}>-</option>
                         </select>
                         <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
@@ -448,7 +439,6 @@
             modal.close();
         }
 
-        function editStream(i) { openModal(i); }
         function delStream(i) {
             state.slots[i] = null;
             updateSlotHTML(i, null);
@@ -491,16 +481,19 @@
 
         function setMode(m) {
             state.mode = m;
-            stage.className = m;
+            document.getElementById('stage').className = m;
             if(m === 'mode-full') document.body.classList.add('is-fullscreen');
             else document.body.classList.remove('is-fullscreen');
+            
             const items = document.querySelectorAll('.nav-item');
             items.forEach(el => el.classList.remove('active'));
             if(m === 'mode-grid') items[1].classList.add('active');
             if(m === 'mode-split') items[2].classList.add('active');
             if(m === 'mode-full') items[3].classList.add('active');
-            nav.classList.remove('open');
+            
+            document.getElementById('nav').classList.remove('open');
             refreshAllClasses();
+            
             if(m !== 'mode-full' && state.players[state.focus]) {
                  const btn = document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);
                  if(btn) btn.innerText = '⛶';
@@ -533,7 +526,7 @@
         }
 
         function refreshAllClasses() { for(let i=0; i<6; i++) updateSlotClasses(i); }
-        function toggleNav() { nav.classList.toggle('open'); }
+        function toggleNav() { document.getElementById('nav').classList.toggle('open'); }
         
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -548,15 +541,30 @@
             }
         }
 
+        function resetApp() {
+            if(confirm("Alles zurücksetzen?")) {
+                localStorage.removeItem('sc-v20');
+                location.reload();
+            }
+        }
+
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities };
-            localStorage.setItem('sc-v19', JSON.stringify(data)); 
+            localStorage.setItem('sc-v20', JSON.stringify(data)); 
         }
         function loadStorage() {
-            const d = localStorage.getItem('sc-v19');
+            const d = localStorage.getItem('sc-v20');
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
                     if(Array.isArray(parsed)) { state.slots = parsed; } 
                     else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('360p'); }
-                    state.slots.forEach((n, i) => { if(n) { updateSlotHTML(
+                    state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
+                } catch(e) {}
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
