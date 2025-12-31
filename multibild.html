@@ -3,549 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command Ultimate</title>
-    <!-- Twitch Embed API -->
+    <title>Stream Command</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #050505;
-            --panel: #141414;
-            --border: #333;
-            --primary: #9146FF;
-            --danger: #ff4444;
-            --text: #ffffff;
-            --header-height: 60px;
+            --bg: #000; 
+            --panel: #111; 
+            --primary: #9146FF; 
+            --active: #00ffcc;
+            --danger: #ff4444; 
+            --edit: #ffaa00; 
+            --text: #fff; 
+            --safe-z: 10000;
+            --header-h: 50px;
         }
 
+        /* --- GLOBAL RESET --- */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; /* Body scrollt nicht, nur der Stage Bereich */
+            background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* 100dvh nutzt den echten sichtbaren Bereich (ignoriert URL-Bar Overlay) */
+            height: 100dvh; 
+            width: 100vw;
+            display: flex; flex-direction: column; overflow: hidden; 
         }
 
-        /* HEADER */
+        /* --- HEADER --- */
         header {
-            flex-shrink: 0;
-            height: var(--header-height);
-            background: rgba(10,10,10,0.95);
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px;
-            z-index: 100;
+            flex-shrink: 0; /* Darf nicht schrumpfen */
+            height: var(--header-h); width: 100%;
+            background: rgba(10,10,10,0.98); border-bottom: 1px solid #333;
+            display: flex; align-items: center; padding: 0 15px;
+            z-index: 500;
         }
-        .brand { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
-        .brand span { color: var(--primary); }
-        .menu-btn { font-size: 1.5rem; background: none; border: none; color: white; cursor: pointer; padding: 5px; }
+        .brand { font-weight: 800; font-size: 1rem; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; }
 
-        /* NAVIGATION MENU */
+        /* --- MENU BUTTON --- */
+        .float-btn {
+            position: fixed; top: 6px; right: 10px; width: 38px; height: 38px;
+            background: #111; border: 1px solid #444; border-radius: 6px;
+            color: white; font-size: 1.5rem; cursor: pointer; z-index: var(--safe-z);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .float-btn:active { background: var(--primary); }
+
+        /* --- NAVIGATION --- */
         #nav {
-            position: fixed; top: var(--header-height); right: 0; bottom: 0;
-            width: 260px; background: #0e0e0e; border-left: 1px solid var(--border);
-            transform: translateX(100%); transition: transform 0.3s ease;
-            z-index: 99; padding: 20px; display: flex; flex-direction: column; gap: 10px;
+            position: fixed; top: 0; right: 0; bottom: 0; width: 340px;
+            background: #0a0a0a; border-left: 1px solid #333;
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9000; padding: 60px 0 0 0;
+            display: flex; flex-direction: column; 
+            box-shadow: -10px 0 50px rgba(0,0,0,0.9);
         }
-        #nav.open { transform: translateX(0); box-shadow: -5px 0 20px rgba(0,0,0,0.5); }
+        #nav.open { transform: translateX(0); }
         
+        .menu-tabs { display: flex; border-bottom: 1px solid #333; background: #0e0e0e; flex-shrink: 0; }
+        .tab-btn { flex: 1; padding: 15px; background: transparent; border: none; color: #888; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
+
+        .menu-content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
+        .menu-content.active { display: block; }
+
         .nav-item {
-            padding: 15px; background: #1a1a1a; border-radius: 8px; cursor: pointer;
-            text-align: center; font-weight: 600; border: 1px solid transparent; transition: 0.2s;
+            padding: 15px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer;
+            border: 1px solid transparent; margin-bottom: 8px; transition: 0.2s;
         }
-        .nav-item:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-item:hover { border-color: #555; }
         .nav-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-item.exit { background: #300; border: 1px solid var(--danger); color: var(--danger); display: none; }
+        body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* MAIN STAGE (SCROLLABLE AREA) */
+        /* Settings CSS */
+        .set-row { background: #141414; padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #333; }
+        .set-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #888; font-weight: bold; }
+        .set-input { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; margin-bottom: 8px; font-family: monospace; }
+        .set-select { width: 100%; background: #222; color: white; border: 1px solid #444; padding: 8px; border-radius: 4px; margin-bottom: 8px; cursor: pointer; }
+        .set-actions { display: flex; gap: 5px; margin-top: 5px; }
+        .set-btn { flex: 1; padding: 8px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .set-btn.act { background: var(--primary); color: white; border-color: var(--primary); }
+        .set-btn.danger { background: #300; color: #fcc; border-color: #500; }
+
+        /* --- STAGE (HAUPTBEREICH) --- */
         #stage {
-            flex: 1;
-            overflow-y: auto; /* HIER IST DER SCROLL FIX */
-            overflow-x: hidden;
-            padding: 5px;
-            display: grid;
-            gap: 5px;
-            /* Standard Grid Verhalten */
-            grid-template-columns: 1fr;
-            grid-auto-rows: min-content; /* Passt sich dem Inhalt an */
+            flex: 1; /* Nimmt den restlichen Platz ein */
+            position: relative;
+            overflow: hidden;
+            background: #000;
         }
+        
+        /* Im Vollbild: Header weg, Stage 100% */
+        body.is-fullscreen header { display: none; }
+        body.is-fullscreen #stage { height: 100dvh; }
 
-        /* --- LAYOUT MODI --- */
+        /* --- LAYOUT LOGIK --- */
 
-        /* 1. GRID MODE (Responsiv) */
+        /* 1. GRID MODE (Scrollbar) */
         .mode-grid {
-            /* Mobile: 1 Spalte, Höhe automatisch anhand Aspect Ratio */
-            grid-template-columns: 1fr; 
+            display: grid;
+            padding: 2px; gap: 2px;
+            overflow-y: auto; /* Hier darf man scrollen */
+            grid-template-columns: 1fr; /* Mobile: 1 Spalte */
+            grid-auto-rows: min-content;
         }
-        @media (min-width: 768px) {
-            .mode-grid {
-                /* Tablet: 2 Spalten */
-                grid-template-columns: repeat(2, 1fr);
-                /* Desktop Slots sollen nicht zu riesig werden, aber füllen */
-                grid-auto-rows: 1fr; 
-            }
-        }
-        @media (min-width: 1200px) {
-            .mode-grid {
-                /* Desktop: 3 Spalten */
-                grid-template-columns: repeat(3, 1fr);
-                /* Fixiere auf 2 Zeilen wenn möglich, sonst scrollen */
-                grid-template-rows: repeat(2, 50vh); 
-                grid-auto-rows: 50vh; 
-            }
-            /* Scroll Fix Desktop: Wenn Fenster zu klein, dann scrollen statt abschneiden */
-            #stage.mode-grid { height: calc(100vh - var(--header-height)); }
-        }
+        /* Tablet/Desktop Grid */
+        @media (min-width: 700px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1100px) { .mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50%; } }
 
-        /* 2. SPLIT MODE */
-        .mode-split .slot { display: none; } /* Verstecke ungenutzte */
+
+        /* 2. SPLIT MODE (Der spezielle Wunsch) */
+        .mode-split .slot { display: none; } /* Alle ausblenden */
         .mode-split {
-            grid-template-columns: 1fr;
-            grid-template-rows: 50vh 30vh 30vh; /* Mobile Höhen festlegen */
+            display: grid;
+            gap: 2px;
+            width: 100%; height: 100%;
+            overflow: hidden; /* Fixiert auf Screen */
+            
+            /* LAYOUT: 2 Spalten. */
+            grid-template-columns: 1fr 1fr; 
+            
+            /* LAYOUT: 2 Reihen. Oben viel Platz, unten weniger. */
+            grid-template-rows: 1.8fr 1fr; 
+            
+            /* BEREICHE DEFINIEREN */
             grid-template-areas: 
-                "main"
-                "side1"
-                "side2";
+                "main main"   /* Oben über beide Spalten */
+                "side1 side2"; /* Unten nebeneinander */
         }
-        @media (min-width: 1024px) {
-            .mode-split {
-                grid-template-columns: 3fr 1fr; 
-                grid-template-rows: 1fr 1fr;
-                height: 100%; /* Fülle Screen */
-                grid-template-areas: 
-                    "main side1"
-                    "main side2";
-            }
-        }
+        
         /* Zuweisung */
-        .mode-split .slot.pos-main { display: flex; grid-area: main; border: 2px solid var(--primary); }
-        .mode-split .slot.pos-side1 { display: flex; grid-area: side1; }
-        .mode-split .slot.pos-side2 { display: flex; grid-area: side2; }
+        .mode-split .slot.p-main { display: flex; grid-area: main; border-bottom: 1px solid #333; }
+        .mode-split .slot.p-side1 { display: flex; grid-area: side1; border-right: 1px solid #333; }
+        .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
+
 
         /* 3. FULLSCREEN MODE */
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { 
-            display: flex; 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; 
-            background: #000;
+            display: flex; position: absolute; inset: 0; z-index: 2000; background: #000;
         }
 
-        /* --- SLOT STYLING --- */
+        /* --- SLOT CONTAINER --- */
         .slot {
-            background: var(--panel);
-            position: relative;
-            border-radius: 6px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 250px; /* Mindesthöhe für Mobile, damit man was sieht */
+            background: var(--panel); position: relative; display: flex; flex-direction: column;
+            overflow: hidden; contain: content;
         }
-        /* Im Grid Mode Desktop kann die Höhe variieren */
-        @media(min-width: 768px) { .slot { min-height: 0; } }
+        /* Im Grid Modus brauchen wir eine Mindesthöhe, im Split Modus füllt es die Zelle */
+        .mode-grid .slot { min-height: 250px; aspect-ratio: 16/9; }
+        .mode-split .slot { min-height: 0; height: 100%; }
 
-        /* Empty State */
-        .empty-state {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #555; cursor: pointer; transition: 0.2s; min-height: 200px;
-        }
-        .empty-state:hover { background: #1f1f1f; color: var(--primary); }
-        .plus-icon { font-size: 3rem; margin-bottom: 10px; }
-
-        /* Overlay UI (Hover) */
-        .slot-ui {
-            position: absolute; top: 0; left: 0; right: 0; height: 40px;
+        /* UI Toolbar */
+        .ui-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 36px;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
-            opacity: 0; transition: opacity 0.2s; z-index: 20;
+            opacity: 0; transition: opacity 0.2s; z-index: 20; pointer-events: none;
         }
-        /* Zeige UI bei Hover oder wenn Chat offen ist oder Touch */
-        .slot:hover .slot-ui, .slot.chat-active .slot-ui { opacity: 1; }
+        .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
 
-        .tag-name { font-size: 0.75rem; font-weight: bold; background: var(--primary); padding: 2px 6px; border-radius: 3px; }
-
-        .btn-group { display: flex; gap: 5px; }
-        .c-btn {
-            width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.2); background: transparent;
-            color: #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .c-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
-        .c-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
-        .c-btn.delete:hover { background: var(--danger); border-color: var(--danger); }
-
-        /* Dropdown im Split Mode */
-        .pos-select {
-            display: none; background: #000; color: white; border: 1px solid #444; font-size: 0.7rem; padding: 2px;
-        }
-        .mode-split .pos-select { display: block; margin-left: 10px; }
-
-        /* Media Container (Video + Chat) */
-        .media-wrap { flex: 1; display: flex; position: relative; width: 100%; height: 100%; }
-        .video-container { flex: 1; background: #000; width: 100%; height: 100%; }
+        .lbl { font-size: 0.75rem; font-weight: bold; background: var(--primary); padding: 2px 6px; border-radius: 3px; max-width: 90px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .tools { display: flex; gap: 4px; }
+        .btn { width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.6); color: #ccc; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn:hover { background: var(--primary); color: #fff; }
+        .btn.act { background: var(--active); color: #000; border-color: var(--active); }
+        .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
+        .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
         
-        .chat-container {
-            width: 0; background: #0e0e0e; border-left: 1px solid #333; transition: width 0.3s ease;
+        .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
+        .mode-split .pos-sel { display: block; pointer-events: auto; }
+
+        /* --- CONTENT (VIDEO + CHAT SIDE-BY-SIDE) --- */
+        .content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: row !important; /* Zwingend nebeneinander */
+            width: 100%; height: 100%; 
             position: relative; overflow: hidden;
         }
-        /* Chat Logic */
-        .slot.chat-active .chat-container { width: 340px; }
         
-        /* Mobile Chat: Unten andocken statt daneben */
+        .vid { flex: 1; background: #000; height: 100%; min-width: 0; }
+        
+        /* CHAT CONTAINER */
+        .chat-wrap { 
+            width: 0; background: #111; 
+            transition: width 0.2s ease; 
+            border-left: 1px solid #333; position: relative;
+            /* Wichtig: Scrollbar für Cookie Banner */
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: 250px; 
+        }
+        
+        /* Breite wenn aktiv: 35% auf Desktop, auf Mobile etwas breiter */
+        .slot.chat-on .chat-wrap { width: 340px; }
+        
         @media (max-width: 650px) {
-            .slot.chat-active .media-wrap { flex-direction: column; }
-            .slot.chat-active .chat-container { 
-                width: 100% !important; 
-                height: 400px; /* Feste Höhe für Chat mobil */
-                border-left: none; border-top: 1px solid #333; 
+            .slot.chat-on .chat-wrap { 
+                width: 40%; /* Nicht zu breit, damit Video sichtbar bleibt */
+                border-left: 1px solid #333; 
             }
         }
 
-        /* MODAL */
-        dialog {
-            background: #18181b; color: white; border: 1px solid #333; border-radius: 8px;
-            padding: 20px; width: 90%; max-width: 400px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        /* Iframe */
+        .chat-frame {
+            width: 100%; height: 100%; border: none; display: block;
         }
+
+        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; transition: 0.2s; height: 100%; }
+        .empty span { font-size: 3rem; }
+        .empty:hover { background: #151515; color: var(--primary); }
+
+        dialog { background: #18181b; color: #fff; border: 1px solid #333; width: 90%; max-width: 350px; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 25px; border-radius: 8px; box-shadow: 0 50px 100px rgba(0,0,0,1); z-index: 12000; }
         dialog::backdrop { background: rgba(0,0,0,0.8); }
-        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #333; color: white; border-radius: 4px; }
-        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
-        .btn-modal { padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
-        .btn-save { background: var(--primary); color: white; }
-        .btn-cancel { background: transparent; color: #888; border: 1px solid #444; }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        .row-btn { display: flex; justify-content: flex-end; gap: 10px; }
+        .b-ok { background: var(--primary); border: none; padding: 10px 20px; color: #fff; border-radius: 4px; cursor: pointer; }
+        .b-no { background: transparent; border: 1px solid #444; padding: 10px 20px; color: #aaa; border-radius: 4px; cursor: pointer; }
 
     </style>
 </head>
-<body>
+<body id="body">
 
-    <header>
-        <div class="brand">STREAM <span>COMMAND</span></div>
-        <button class="menu-btn" onclick="toggleNav()">☰</button>
+    <header id="header">
+        <div class="brand">STREAM COMMAND</div>
     </header>
 
+    <div class="float-btn" onclick="toggleNav()">☰</div>
+
     <div id="nav">
-        <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
-        <div class="nav-item" onclick="setMode('mode-split')">SPLIT (1 + 2)</div>
-        <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-        <div style="margin-top:auto; font-size:0.75rem; color:#666; text-align:center;">
-            Status: <span id="status">Bereit</span>
+        <div class="menu-tabs">
+            <button class="tab-btn active" onclick="switchTab('view')">ANSICHT</button>
+            <button class="tab-btn" onclick="switchTab('settings')">EINSTELLUNGEN</button>
+        </div>
+
+        <div id="tab-view" class="menu-content active">
+            <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD VERLASSEN</div>
+            <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
+            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
+            <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
+            <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
+                Optimized Layout
+            </div>
+        </div>
+
+        <div id="tab-settings" class="menu-content">
+            <div id="settings-list"></div>
         </div>
     </div>
 
-    <!-- HIER FINDET DIE ACTION STATT -->
-    <div id="stage" class="mode-grid">
-        <!-- Slots werden via JS generiert -->
-    </div>
+    <div id="stage" class="mode-grid"></div>
 
     <dialog id="modal">
-        <h3>Neuen Stream laden</h3>
-        <p style="color:#aaa; font-size:0.9rem;">Twitch Link oder Name eingeben:</p>
-        <input type="text" id="streamInput" placeholder="z.B. papaplatte">
-        <div class="modal-btns">
-            <button class="btn-modal btn-cancel" onclick="closeModal()">Abbruch</button>
-            <button class="btn-modal btn-save" onclick="saveStream()">Laden</button>
+        <h3 id="modalTitle">Stream hinzufügen</h3>
+        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/elotrix">
+        <div class="row-btn">
+            <button class="b-no" onclick="modal.close()">Abbruch</button>
+            <button class="b-ok" onclick="save()">Speichern</button>
         </div>
     </dialog>
 
     <script>
-        // --- SETUP ---
-        // Liste von Domains, die den Stream einbetten dürfen (Sicherheitsregel von Twitch)
         const HOST = window.location.hostname || "localhost";
         const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv"];
 
         const state = {
             mode: 'mode-grid',
-            channels: Array(6).fill(null), // Die Namen der Streamer
-            players: Array(6).fill(null), // Die Twitch Player Objekte
-            posMap: { main: 0, side1: 1, side2: 2 }, // Wer ist wo im Split Mode
-            focusIndex: 0, // Wer ist im Vollbild
-            editingIndex: -1 // Welcher Slot wird gerade bearbeitet
+            slots: Array(6).fill(null),
+            players: Array(6).fill(null),
+            qualities: Array(6).fill('360p'),
+            pos: { main: 0, s1: 1, s2: 2 },
+            focus: 0,
+            editIndex: -1
         };
 
         const stage = document.getElementById('stage');
         const modal = document.getElementById('modal');
-        const input = document.getElementById('streamInput');
+        const inp = document.getElementById('inp');
         const nav = document.getElementById('nav');
+        const body = document.getElementById('body');
+        const settingsList = document.getElementById('settings-list');
 
-        // --- START ---
         function init() {
-            // Check ob API geladen wurde
-            if(typeof Twitch === 'undefined') {
-                document.getElementById('status').innerText = "⚠️ API Fehler (Adblock?)";
-                document.getElementById('status').style.color = "red";
-            }
-
-            // 1. Grundgerüst bauen
-            createSlots();
-            
-            // 2. Gespeicherte Daten laden (Persistence)
-            loadFromStorage();
-        }
-
-        // Baut die 6 Slot-Container (Inhalt kommt später)
-        function createSlots() {
             stage.innerHTML = '';
             for(let i=0; i<6; i++) {
-                const div = document.createElement('div');
-                div.className = 'slot';
-                div.id = `slot-${i}`;
-                div.innerHTML = getEmptyHTML(i);
-                stage.appendChild(div);
+                const el = document.createElement('div');
+                el.className = 'slot';
+                el.id = 's-'+i;
+                el.onclick = () => { el.classList.add('active-touch'); setTimeout(()=>el.classList.remove('active-touch'), 3000); };
+                stage.appendChild(el);
             }
-            updateLayoutClasses();
+            loadStorage();
+            for(let i=0; i<6; i++) {
+                if(!state.slots[i]) updateSlotHTML(i, null);
+            }
+            renderSettingsPanel();
         }
 
-        // --- SLOT MANAGEMENT (Der wichtigste Teil) ---
-        
-        function updateSlot(index) {
-            const slot = document.getElementById(`slot-${index}`);
-            const channel = state.channels[index];
+        function updateSlotHTML(i, channel) {
+            const el = document.getElementById('s-'+i);
+            
+            if(state.players[i]) {
+                try { state.players[i].setMuted(true); } catch(e){}
+                state.players[i] = null;
+                el.innerHTML = ''; 
+            }
 
-            // A) SLOT LÖSCHEN / LEEREN
             if(!channel) {
-                // Alten Player sauber entfernen um Speicherlecks zu verhindern
-                if(state.players[index]) {
-                    try { state.players[index].setMuted(true); } catch(e){}
-                    state.players[index] = null;
-                }
-                slot.innerHTML = getEmptyHTML(index);
-                slot.classList.remove('chat-active');
+                el.innerHTML = `<div class="empty" onclick="openModal(${i})"><span>+</span></div>`;
+                el.classList.remove('chat-on');
+                renderSettingsPanel();
                 return;
             }
 
-            // B) SLOT BEFÜLLEN
-            // Wir bauen das HTML für den belegten Slot
-            // Wichtig: Wir nutzen Dropdowns für die Position im Split Mode
-            const isMain = state.posMap.main === index;
-            const isSide1 = state.posMap.side1 === index;
-            const isSide2 = state.posMap.side2 === index;
+            const isM = state.pos.main === i;
+            const isS1 = state.pos.s1 === i;
+            const isS2 = state.pos.s2 === i;
 
-            slot.innerHTML = `
-                <div class="slot-ui">
+            el.innerHTML = `
+                <div class="ui-bar" onclick="event.stopPropagation()">
                     <div style="display:flex; align-items:center;">
-                        <span class="tag-name">${channel}</span>
-                        <!-- Split Mode Selektor -->
-                        <select class="pos-select" onchange="changePos(${index}, this.value)">
-                            <option value="main" ${isMain?'selected':''}>Haupt</option>
-                            <option value="side1" ${isSide1?'selected':''}>Seite 1</option>
-                            <option value="side2" ${isSide2?'selected':''}>Seite 2</option>
-                            <option value="none" disabled>---</option>
+                        <span class="lbl">${channel}</span>
+                        <select class="pos-sel" onchange="swapPos(${i}, this.value)">
+                            <option value="main" ${isM?'selected':''}>Main</option>
+                            <option value="s1" ${isS1?'selected':''}>Side 1</option>
+                            <option value="s2" ${isS2?'selected':''}>Side 2</option>
+                            <option value="x" disabled>---</option>
                         </select>
                     </div>
-                    <div class="btn-group">
-                        <button class="c-btn" onclick="toggleAudio(${index}, this)" title="Audio">🔊</button>
-                        <button class="c-btn" onclick="toggleChat(${index}, this)" title="Chat">💬</button>
-                        <button class="c-btn" onclick="goFullscreen(${index})" title="Vollbild">⛶</button>
-                        <button class="c-btn delete" onclick="deleteStream(${index})" title="Löschen">✕</button>
+                    <div class="tools">
+                        <button class="btn" onclick="toggleAudio(${i}, this)" title="Audio">🔊</button>
+                        <button class="btn" onclick="toggleChat(${i}, this)" title="Chat">💬</button>
+                        <button class="btn" onclick="toggleFull(${i})" title="Vollbild">${state.mode==='mode-full' && state.focus===i ? '↙️' : '⛶'}</button>
+                        <button class="btn edit" onclick="editStream(${i})" title="Edit">✏️</button>
+                        <button class="btn del" onclick="delStream(${i})" title="Löschen">✕</button>
                     </div>
                 </div>
-                <div class="media-wrap">
-                    <div class="video-container" id="embed-vid-${index}"></div>
-                    <div class="chat-container" id="embed-chat-${index}"></div>
+                <div class="content">
+                    <div class="vid" id="v-${i}"></div>
+                    <div class="chat-wrap" id="c-${i}"></div>
                 </div>
             `;
 
-            // Player initialisieren (mit kleinem Timeout für DOM Sicherheit)
-            setTimeout(() => initTwitchPlayer(index, channel), 50);
+            setTimeout(() => {
+                try {
+                    const p = new Twitch.Player('v-'+i, {
+                        width: '100%', height: '100%', channel: channel, parent: PARENTS,
+                        layout: 'video', autoplay: true, muted: true
+                    });
+                    
+                    p.addEventListener(Twitch.Player.READY, () => {
+                        p.setVolume(0.5);
+                        applyQuality(p, state.qualities[i]);
+                    });
+                    state.players[i] = p;
+
+                    const cDiv = document.getElementById('c-'+i);
+                    const ifr = document.createElement('iframe');
+                    ifr.src = `https://www.twitch.tv/embed/${channel}/chat?parent=${HOST}&parent=localhost&darkpopout`;
+                    ifr.className = 'chat-frame';
+                    ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms allow-storage-access-by-user-activation"; 
+                    cDiv.appendChild(ifr);
+                } catch(e) { console.error(e); }
+            }, 50);
+            
+            updateSlotClasses(i);
+            renderSettingsPanel();
         }
 
-        function initTwitchPlayer(i, channel) {
-            try {
-                // Video Embedding
-                const options = {
-                    width: '100%',
-                    height: '100%',
-                    channel: channel,
-                    parent: PARENTS,
-                    layout: 'video',
-                    autoplay: true,
-                    muted: true // Startet stumm
-                };
-                const player = new Twitch.Player(`embed-vid-${i}`, options);
-                player.setVolume(0.5);
-                state.players[i] = player;
+        function applyQuality(player, qualityName) {
+            if(!player) return;
+            setTimeout(() => {
+                const quals = player.getQualities();
+                if(!quals || quals.length === 0) return;
+                let target = null;
+                if(qualityName === 'auto') target = quals.find(q => q.group === 'auto');
+                else target = quals.find(q => q.name.includes(qualityName));
+                if(target) player.setQuality(target.group);
+            }, 1500);
+        }
 
-                // Chat Embedding (Iframe manuell)
-                const chatDiv = document.getElementById(`embed-chat-${i}`);
-                if(chatDiv) {
-                    const frame = document.createElement('iframe');
-                    frame.src = `https://www.twitch.tv/embed/${channel}/chat?parent=${HOST}&parent=localhost&darkpopout`;
-                    frame.style.width = "100%";
-                    frame.style.height = "100%";
-                    frame.style.border = "none";
-                    chatDiv.appendChild(frame);
-                }
-            } catch(e) {
-                console.error("Twitch Init Error:", e);
-                // Fehlermeldung im Slot anzeigen
-                document.getElementById(`embed-vid-${i}`).innerHTML = `<div style="color:red; padding:20px;">Ladefehler. Bitte Seite neu laden oder HTTPS nutzen.</div>`;
+        function renderSettingsPanel() {
+            settingsList.innerHTML = '';
+            for(let i=0; i<6; i++) {
+                const ch = state.slots[i] || "";
+                const row = document.createElement('div');
+                row.className = 'set-row';
+                
+                const isMain = state.pos.main === i;
+                const isS1 = state.pos.s1 === i;
+                const isS2 = state.pos.s2 === i;
+                const isUnassigned = !isMain && !isS1 && !isS2;
+                
+                const chatActive = document.getElementById('s-'+i)?.classList.contains('chat-on');
+                const player = state.players[i];
+                const audioActive = player && !player.getMuted();
+                const currQ = state.qualities[i];
+
+                row.innerHTML = `
+                    <div class="set-header">
+                        <span>SLOT ${i+1}</span>
+                        <span>${isMain?'MAIN':isS1?'SIDE 1':isS2?'SIDE 2':''}</span>
+                    </div>
+                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
+                    <select class="set-select" onchange="swapPos(${i}, this.value)">
+                        <option value="main" ${isMain?'selected':''}>Pos: Main</option>
+                        <option value="s1" ${isS1?'selected':''}>Pos: Side 1</option>
+                        <option value="s2" ${isS2?'selected':''}>Pos: Side 2</option>
+                        <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
+                    </select>
+                    <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
+                        <option value="auto" ${currQ==='auto'?'selected':''}>Q: Auto</option>
+                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Q: 1080p</option>
+                        <option value="720p" ${currQ==='720p'?'selected':''}>Q: 720p</option>
+                        <option value="480p" ${currQ==='480p'?'selected':''}>Q: 480p</option>
+                        <option value="360p" ${currQ==='360p'?'selected':''}>Q: 360p</option>
+                        <option value="160p" ${currQ==='160p'?'selected':''}>Q: 160p</option>
+                    </select>
+                    <div class="set-actions">
+                        <button class="set-btn ${audioActive?'act':''}" onclick="toggleAudio(${i}, null)">Audio</button>
+                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat</button>
+                        <button class="set-btn danger" onclick="delStream(${i})">Leeren</button>
+                    </div>
+                `;
+                settingsList.appendChild(row);
             }
         }
 
-        function getEmptyHTML(i) {
-            return `
-                <div class="empty-state" onclick="openModal(${i})">
-                    <div class="plus-icon">+</div>
-                    <div>Slot ${i+1} belegen</div>
-                </div>
-            `;
+        function settingsUpdateName(i, val) {
+            val = cleanUrl(val);
+            if(val && val !== state.slots[i]) {
+                state.slots[i] = val;
+                updateSlotHTML(i, val);
+                persist();
+            } else if (!val && state.slots[i]) {
+                delStream(i);
+            }
         }
 
-        // --- INTERAKTIONEN ---
+        function settingsUpdateQuality(i, val) {
+            state.qualities[i] = val;
+            if(state.players[i]) applyQuality(state.players[i], val);
+            persist();
+        }
+
+        function cleanUrl(v) {
+            if(!v) return "";
+            v = v.trim().replace(/.*\/\//, '');
+            if(v.includes('twitch.tv/')) v = v.split('twitch.tv/')[1];
+            v = v.split('/')[0].split('?')[0];
+            return v;
+        }
 
         function openModal(i) {
-            state.editingIndex = i;
-            input.value = '';
+            state.editIndex = i;
+            document.getElementById('modalTitle').innerText = state.slots[i] ? "Ändern" : "Hinzufügen";
+            inp.value = state.slots[i] || '';
             modal.showModal();
-            // Fokus aufs Eingabefeld (verbessert UX)
-            setTimeout(() => input.focus(), 100); 
+            setTimeout(() => inp.focus(), 100);
         }
 
-        function closeModal() { modal.close(); }
-
-        function saveStream() {
-            let val = input.value.trim();
-            if(!val) return;
-
-            // PARSER: Macht den Link "kaputt" und holt nur den Namen
-            // 1. Protokoll weg (https://)
-            val = val.replace(/.*\/\//, '');
-            // 2. Domain weg (twitch.tv/)
-            if(val.includes('twitch.tv/')) val = val.split('twitch.tv/')[1];
-            // 3. Alles nach dem Namen weg (/clip, ?referral, etc.)
-            val = val.split('/')[0].split('?')[0];
-
-            if(val.length > 0) {
-                state.channels[state.editingIndex] = val;
-                updateSlot(state.editingIndex);
-                saveToStorage();
-                closeModal();
+        function save() {
+            let v = cleanUrl(inp.value);
+            if(v) {
+                state.slots[state.editIndex] = v;
+                updateSlotHTML(state.editIndex, v);
+                persist();
             }
+            modal.close();
         }
 
-        function deleteStream(i) {
-            state.channels[i] = null;
-            updateSlot(i);
-            saveToStorage();
+        function editStream(i) { openModal(i); }
+        function delStream(i) {
+            state.slots[i] = null;
+            updateSlotHTML(i, null);
+            persist();
         }
 
-        function toggleAudio(index, btn) {
-            // Logik: Alle anderen Muten, den gewählten Unmuten
+        function toggleAudio(idx, btn) {
             state.players.forEach((p, i) => {
                 if(p) {
-                    if(i === index) {
-                        const isMuted = p.getMuted();
-                        p.setMuted(!isMuted);
-                        btn.classList.toggle('active', isMuted);
+                    if(i === idx) {
+                        const m = p.getMuted();
+                        p.setMuted(!m);
+                        if(btn) btn.classList.toggle('act', m);
                     } else {
                         p.setMuted(true);
-                        // Reset anderer Button
-                        const otherBtn = document.querySelector(`#slot-${i} .c-btn[title="Audio"]`);
-                        if(otherBtn) otherBtn.classList.remove('active');
+                        const b = document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);
+                        if(b) b.classList.remove('act');
                     }
                 }
             });
+            renderSettingsPanel();
         }
 
-        function toggleChat(index, btn) {
-            const slot = document.getElementById(`slot-${index}`);
-            slot.classList.toggle('chat-active');
-            btn.classList.toggle('active');
+        function toggleChat(i, btn) {
+            const el = document.getElementById('s-'+i);
+            if(el) {
+                el.classList.toggle('chat-on');
+                const gridBtn = el.querySelector('.btn[onclick^="toggleChat"]');
+                if(gridBtn) gridBtn.classList.toggle('act');
+                renderSettingsPanel();
+            }
         }
 
-        function goFullscreen(index) {
-            state.focusIndex = index;
-            setMode('mode-full');
+        function toggleFull(i) {
+            if(state.mode === 'mode-full' && state.focus === i) setMode('mode-grid');
+            else { state.focus = i; setMode('mode-full'); }
         }
 
-        // --- LAYOUT & LOGIK ---
+        function exitFullscreen() { setMode('mode-grid'); }
 
-        function setMode(modeName) {
-            state.mode = modeName;
-            stage.className = modeName;
-            
-            // Nav Active State
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(modeName === 'mode-grid') document.querySelectorAll('.nav-item')[0].classList.add('active');
-            if(modeName === 'mode-split') document.querySelectorAll('.nav-item')[1].classList.add('active');
-            if(modeName === 'mode-full') document.querySelectorAll('.nav-item')[2].classList.add('active');
-
-            updateLayoutClasses();
-            toggleNav();
+        function setMode(m) {
+            state.mode = m;
+            stage.className = m;
+            if(m === 'mode-full') body.classList.add('is-fullscreen');
+            else body.classList.remove('is-fullscreen');
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(el => el.classList.remove('active'));
+            if(m === 'mode-grid') items[1].classList.add('active');
+            if(m === 'mode-split') items[2].classList.add('active');
+            if(m === 'mode-full') items[3].classList.add('active');
+            nav.classList.remove('open');
+            refreshAllClasses();
+            if(m !== 'mode-full' && state.players[state.focus]) {
+                 const btn = document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);
+                 if(btn) btn.innerText = '⛶';
+            }
         }
 
-        function changePos(slotIdx, newRole) {
-            // Tausche die Rollen
-            const oldOwner = state.posMap[newRole];
-            
-            // Finde aktuelle Rolle von slotIdx
+        function swapPos(idx, role) {
+            const oldOwner = state.pos[role];
             let currentRole = null;
-            if(state.posMap.main == slotIdx) currentRole = 'main';
-            if(state.posMap.side1 == slotIdx) currentRole = 'side1';
-            if(state.posMap.side2 == slotIdx) currentRole = 'side2';
-
-            state.posMap[newRole] = slotIdx;
-            if(currentRole) state.posMap[currentRole] = oldOwner;
-
-            updateLayoutClasses();
-            
-            // UI Update für Dropdowns (ohne Reload)
-            state.channels.forEach((_, i) => {
-                const sel = document.querySelector(`#slot-${i} .pos-select`);
-                if(sel) {
-                    if(state.posMap.main == i) sel.value = 'main';
-                    else if(state.posMap.side1 == i) sel.value = 'side1';
-                    else if(state.posMap.side2 == i) sel.value = 'side2';
-                    else sel.value = 'none';
-                }
-            });
+            if(state.pos.main == idx) currentRole = 'main';
+            if(state.pos.s1 == idx) currentRole = 's1';
+            if(state.pos.s2 == idx) currentRole = 's2';
+            state.pos[role] = idx;
+            if(currentRole) state.pos[currentRole] = oldOwner;
+            refreshAllClasses();
+            renderSettingsPanel();
         }
 
-        function updateLayoutClasses() {
-            for(let i=0; i<6; i++) {
-                const el = document.getElementById(`slot-${i}`);
-                el.classList.remove('pos-main', 'pos-side1', 'pos-side2', 'is-focus');
-
-                // Split Logic
-                if(state.mode === 'mode-split') {
-                    if(state.posMap.main == i) el.classList.add('pos-main');
-                    if(state.posMap.side1 == i) el.classList.add('pos-side1');
-                    if(state.posMap.side2 == i) el.classList.add('pos-side2');
-                }
-                // Fullscreen Logic
-                if(state.mode === 'mode-full' && state.focusIndex == i) {
-                    el.classList.add('is-focus');
-                }
+        function updateSlotClasses(i) {
+            const el = document.getElementById('s-'+i);
+            el.classList.remove('p-main', 'p-side1', 'p-side2', 'is-focus');
+            if(state.mode === 'mode-split') {
+                if(state.pos.main == i) el.classList.add('p-main');
+                if(state.pos.s1 == i) el.classList.add('p-side1');
+                if(state.pos.s2 == i) el.classList.add('p-side2');
+            }
+            if(state.mode === 'mode-full' && state.focus == i) {
+                el.classList.add('is-focus');
             }
         }
 
-        function toggleNav() {
-            nav.classList.toggle('open');
+        function refreshAllClasses() { for(let i=0; i<6; i++) updateSlotClasses(i); }
+        function toggleNav() { nav.classList.toggle('open'); }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.menu-content').forEach(c => c.classList.remove('active'));
+            if(tabName === 'view') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-view').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-settings').classList.add('active');
+                renderSettingsPanel();
+            }
         }
 
-        // --- LOCAL STORAGE (Persistence) ---
-        function saveToStorage() {
-            localStorage.setItem('sc-slots', JSON.stringify(state.channels));
+        function persist() { 
+            const data = { slots: state.slots, qualities: state.qualities };
+            localStorage.setItem('sc-final', JSON.stringify(data)); 
         }
-
-        function loadFromStorage() {
-            const data = localStorage.getItem('sc-slots');
-            if(data) {
+        function loadStorage() {
+            const d = localStorage.getItem('sc-final');
+            if(d) {
                 try {
-                    const names = JSON.parse(data);
-                    names.forEach((name, i) => {
-                        if(name) {
-                            state.channels[i] = name;
-                            updateSlot(i);
-                        }
-                    });
-                } catch(e) { console.log("Storage Error", e); }
+                    const parsed = JSON.parse(d);
+                    if(Array.isArray(parsed)) { state.slots = parsed; } 
+                    else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('360p'); }
+                    state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
+                } catch(e) {}
             }
         }
 
-        // Los geht's
         init();
-
     </script>
 </body>
 </html>
