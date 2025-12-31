@@ -1,20 +1,20 @@
-<!-- START OF FILE stream_command_27_anti_banner.html -->
+<!-- START OF FILE stream_command_28_responsive_perfect.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 27 (Side-by-Side + Zoom)</title>
+    <title>Stream Command 28 (Responsive Gold)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #000; --panel: #111; --primary: #9146FF;
+            --bg: #000; --panel: #0a0a0a; --primary: #9146FF;
             --active: #00ffcc; --danger: #ff4444; --text: #fff;
             --safe-z: 10000;
         }
 
-        /* RESET */
+        /* GLOBAL RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -26,16 +26,16 @@
 
         /* HEADER */
         header {
-            flex-shrink: 0; height: 35px; background: rgba(10,10,10,0.95); border-bottom: 1px solid #333;
+            flex-shrink: 0; height: 35px; background: rgba(5,5,5,0.95); border-bottom: 1px solid #222;
             display: flex; align-items: center; padding: 0 10px; z-index: 500; transition: transform 0.3s;
         }
         header.hide { transform: translateY(-100%); }
-        .brand { font-weight: 800; font-size: 0.85rem; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; }
+        .brand { font-weight: 900; font-size: 0.85rem; color: var(--primary); letter-spacing: 0.5px; text-transform: uppercase; }
 
-        /* MENU BUTTON */
+        /* MENU BTN */
         .float-btn {
-            position: fixed; top: 2px; right: 5px; width: 30px; height: 30px;
-            background: #111; border: 1px solid #444; border-radius: 4px;
+            position: fixed; top: 3px; right: 5px; width: 28px; height: 28px;
+            background: #111; border: 1px solid #333; border-radius: 4px;
             color: white; font-size: 1.1rem; cursor: pointer; z-index: var(--safe-z);
             display: flex; align-items: center; justify-content: center;
         }
@@ -43,135 +43,154 @@
         /* NAV */
         #nav {
             position: fixed; top: 0; right: 0; bottom: 0; width: 280px;
-            background: #0a0a0a; border-left: 1px solid #333;
+            background: #080808; border-left: 1px solid #222;
             transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 9000; padding-top: 50px; display: flex; flex-direction: column;
+            z-index: 9000; padding-top: 45px; display: flex; flex-direction: column;
             box-shadow: -10px 0 50px rgba(0,0,0,0.9);
         }
         #nav.open { transform: translateX(0); }
         
-        .menu-tabs { display: flex; border-bottom: 1px solid #333; background: #0e0e0e; flex-shrink: 0; }
-        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .menu-tabs { display: flex; border-bottom: 1px solid #222; background: #0c0c0c; flex-shrink: 0; }
+        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #666; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .tab-btn.active { background: #151515; color: var(--primary); border-bottom: 2px solid var(--primary); color: #fff; }
 
         .menu-content { flex: 1; overflow-y: auto; padding: 10px; display: none; }
         .menu-content.active { display: block; }
 
         .nav-item {
-            padding: 12px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; 
-            border: 1px solid transparent; margin-bottom: 8px; cursor: pointer; font-size: 0.9rem;
+            padding: 12px; background: #151515; border-radius: 6px; text-align: center; font-weight: bold; 
+            border: 1px solid transparent; margin-bottom: 8px; cursor: pointer; font-size: 0.85rem;
         }
         .nav-item.active { background: var(--primary); color: white; }
         .nav-item.exit { background: #300; border-color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* SETTINGS ROWS */
-        .set-row { background: #141414; padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #333; }
-        .set-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.75rem; font-weight: bold; color: #888; }
-        .set-input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 6px; border-radius: 4px; margin-bottom: 4px; font-size: 0.9rem; }
-        .set-select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 4px; border-radius: 4px; margin-bottom: 4px; font-size: 0.85rem; }
+        /* SETTINGS */
+        .set-row { background: #111; padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #222; }
+        .set-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.7rem; font-weight: bold; color: #888; }
+        .set-input { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 6px; border-radius: 4px; margin-bottom: 4px; font-size: 0.9rem; }
+        .set-select { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 4px; border-radius: 4px; margin-bottom: 4px; font-size: 0.85rem; }
         .set-actions { display: flex; gap: 5px; }
-        .set-btn { flex: 1; padding: 6px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .set-btn { flex: 1; padding: 6px; background: #1a1a1a; color: #ccc; border: 1px solid #333; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
         .set-btn.act { background: var(--primary); color: #fff; border-color: var(--primary); }
         .set-btn.danger { background: #300; border-color: #500; }
+        
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #151515; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333;}
+        .toggle-lbl { font-weight: bold; font-size: 0.85rem; }
 
-        /* STAGE */
+        /* STAGE & GRID SYSTEM */
         #stage {
             flex: 1; overflow-y: auto; overflow-x: hidden;
-            display: grid; padding: 2px; gap: 2px;
-            grid-template-columns: 1fr; grid-auto-rows: min-content;
+            display: grid; padding: 0; gap: 2px;
+            background: #000;
         }
-        body.is-fullscreen #stage { padding: 0; overflow: hidden; }
-
-        /* --- SPLIT MODE (2:1 RATIO) --- */
-        .mode-split .slot { display: none; }
+        
+        /* === RESPONSIVE SPLIT MODE (Der Kern der Lösung) === */
+        
+        /* 1. Mobile Portrait (Standard) */
         .mode-split {
-            /* Handy: Oben (Main) ist 2/3 (66%), Unten ist 1/3 (33%) */
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 2fr 1fr; 
-            grid-template-areas: "main main" "side1 side2"; 
+            display: grid;
             height: 100%;
+            /* Oben Main (60%), Unten geteilt (40%) */
+            grid-template-rows: 60fr 40fr; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-areas: 
+                "main main" 
+                "side1 side2";
+            transition: grid-template-rows 0.3s ease;
         }
+        
+        /* Wenn "Lang Chat" aktiv ist (wird per JS Klasse gesetzt) */
+        body.long-chat .mode-split {
+            /* Oben Main (75%), Unten (25%) */
+            grid-template-rows: 75fr 25fr;
+        }
+
+        /* 2. Desktop Landscape */
         @media (min-width: 1024px) {
             .mode-split {
-                grid-template-columns: 3fr 1fr; grid-template-rows: 1fr 1fr;
+                grid-template-columns: 3fr 1fr; 
+                grid-template-rows: 1fr 1fr;
                 grid-template-areas: "main side1" "main side2";
             }
         }
-        .mode-split .slot.p-main { display: flex; grid-area: main; border: 1px solid var(--primary); }
-        .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
+
+        /* Zuweisung */
+        .mode-split .slot { display: none; } /* Verstecke nicht zugewiesene */
+        .mode-split .slot.p-main { display: flex; grid-area: main; border-bottom: 1px solid #333; }
+        .mode-split .slot.p-side1 { display: flex; grid-area: side1; border-right: 1px solid #333; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
-        /* GRID MODE */
-        @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
-        @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
+        /* Grid Mode Fallback */
+        .mode-grid { grid-template-columns: 1fr; grid-auto-rows: min-content; padding: 2px !important; gap: 4px; }
+        @media (min-width: 700px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
 
+        /* Fullscreen */
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* SLOT */
+        /* SLOT DESIGN */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
-            min-height: 200px; border-radius: 4px; overflow: hidden;
+            overflow: hidden;
         }
-        .mode-split .slot, .mode-full .slot { min-height: 0; }
-
+        .mode-grid .slot { min-height: 240px; border-radius: 4px; }
+        
         /* UI BAR */
         .ui-bar {
-            position: absolute; top: 0; left: 0; right: 0; height: 30px;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(2px);
+            position: absolute; top: 0; left: 0; right: 0; height: 28px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(2px);
             display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
             opacity: 0; transition: opacity 0.2s; z-index: 20; pointer-events: none;
         }
         .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
-
-        .lbl { font-size: 0.65rem; font-weight: bold; background: var(--primary); padding: 1px 4px; border-radius: 3px; max-width: 60px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .lbl { font-size: 0.6rem; font-weight: bold; background: var(--primary); padding: 1px 4px; border-radius: 3px; max-width: 60px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .tools { display: flex; gap: 2px; }
-        .btn { width: 24px; height: 24px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem;}
+        .btn { width: 22px; height: 22px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem;}
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
-        .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 0px 2px; font-size: 0.6rem; margin-left: 5px; cursor: pointer; pointer-events: auto; }
+        .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 0 2px; font-size: 0.6rem; margin-left: 5px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT & LAYOUT ENGINE (65/35) --- */
+        /* --- CONTENT & VIDEO SCALING --- */
         .content { 
             flex: 1; display: flex; width: 100%; height: 100%; position: relative; 
-            /* Zwingend nebeneinander, auch auf Handy */
-            flex-direction: row !important; 
-            overflow: hidden;
-        }
-        
-        .vid { 
-            flex: 1; background: #000; width: 100%; height: 100%; min-width: 0; 
-            transition: width 0.3s ease;
-        }
-        
-        .chat-wrap { 
-            width: 0; background: #111; 
-            transition: width 0.3s ease; 
-            border-left: 1px solid #333; position: relative; overflow: hidden; 
-        }
-        
-        /* WENN CHAT AKTIV IST: 65% VIDEO / 35% CHAT */
-        .slot.chat-on .vid { width: 65% !important; flex: none; }
-        .slot.chat-on .chat-wrap { width: 35% !important; flex: none; }
-        
-        /* --- ANTI-BANNER ZOOM HACK --- */
-        .chat-frame {
-            /* Wir machen das Iframe riesig (fast 3x so breit) */
-            width: 285%; 
-            height: 285%;
-            border: none;
-            transform-origin: top left;
-            /* Und zoomen es dann extrem klein (0.35) */
-            transform: scale(0.35); 
-            
-            /* Das führt dazu, dass Twitch denkt, es läuft auf einem Desktop.
-               Der "Hype Train" Banner wird dadurch relativ zum Text WINZIG.
-               Der Text bleibt lesbar, weil er auf hoher Auflösung gerendert und dann runtergezoomt wird. */
+            flex-direction: column; /* Standard: Untereinander für Mobile Perfektion */
+            background: #000;
         }
 
-        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; }
-        .empty span { font-size: 3rem; }
+        /* Desktop Override: Side-by-Side */
+        @media (min-width: 1024px) { .content { flex-direction: row; } }
+
+        .vid { 
+            width: 100%; 
+            /* DER FIX: 16:9 Ratio erzwingen, damit keine schwarzen Balken entstehen */
+            aspect-ratio: 16/9; 
+            background: #000; flex: none; /* Nicht dehnen */
+        }
+        
+        /* Chat füllt den Rest */
+        .chat-wrap { 
+            width: 100%; 
+            flex: 1; /* Nimmt den GANZEN Restplatz ein */
+            background: #0e0e0e; 
+            border-top: 1px solid #333; position: relative; overflow: hidden; 
+            display: none; /* Standard aus */
+        }
+        
+        .slot.chat-on .chat-wrap { display: block; }
+        
+        /* Die kleinen Slots unten brauchen kein Aspect-Ratio Hack, die sollen füllen */
+        .p-side1 .vid, .p-side2 .vid { aspect-ratio: auto; height: 100%; flex: 1; }
+        /* Chat bei den kleinen unten optional ausblenden oder overlay? */
+        /* Wir lassen ihn da, aber er wird klein sein */
+
+        /* CHAT ZOOM (Lesbarkeit) */
+        .chat-frame {
+            width: 100%; height: 100%; border: none; display: block;
+        }
+
+        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #333; cursor: pointer; }
+        .empty span { font-size: 2.5rem; }
 
         /* MODAL */
         dialog { background: #18181b; color: #fff; border: 1px solid #333; width: 90%; max-width: 350px; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 20px; border-radius: 8px; z-index: 12000; }
@@ -186,7 +205,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 27</div>
+        <div class="brand">STREAM COMMAND 28</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -199,11 +218,18 @@
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD ENDE</div>
             <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
-            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (2:1)</div>
+            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (PERFECT)</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-            <div style="margin-top:20px; text-align:center; font-size:0.75rem; color:#555;">Fix: 65/35 & Anti-Banner</div>
+            <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
+                No Black Bars • 100% Width<br>
+                Video Top / Chat Bottom
+            </div>
         </div>
         <div id="tab-settings" class="menu-content">
+            <div class="toggle-row">
+                <span class="toggle-lbl">Lang Chat (Split View)</span>
+                <button id="btn-longchat" class="set-btn" style="flex:0 0 60px" onclick="toggleLongChat()">AUS</button>
+            </div>
             <div id="settings-list"></div>
         </div>
     </div>
@@ -226,6 +252,7 @@
 
         const state = {
             mode: 'mode-grid',
+            longChat: false,
             slots: Array(6).fill(null),
             players: Array(6).fill(null),
             qualities: Array(6).fill('auto'),
@@ -240,6 +267,7 @@
         const nav = document.getElementById('nav');
         const header = document.getElementById('header');
         const settingsList = document.getElementById('settings-list');
+        const btnLongChat = document.getElementById('btn-longchat');
 
         function init() {
             stage.innerHTML = '';
@@ -251,11 +279,33 @@
                 stage.appendChild(el);
             }
             loadStorage();
+            
+            // Apply Long Chat state
+            if(state.longChat) {
+                document.body.classList.add('long-chat');
+                btnLongChat.innerText = "AN";
+                btnLongChat.classList.add('act');
+            }
+
             for(let i=0; i<6; i++) {
                 if(!state.slots[i]) updateSlotHTML(i, null);
             }
             setupScroll();
             renderSettingsPanel();
+        }
+
+        function toggleLongChat() {
+            state.longChat = !state.longChat;
+            if(state.longChat) {
+                document.body.classList.add('long-chat');
+                btnLongChat.innerText = "AN";
+                btnLongChat.classList.add('act');
+            } else {
+                document.body.classList.remove('long-chat');
+                btnLongChat.innerText = "AUS";
+                btnLongChat.classList.remove('act');
+            }
+            persist();
         }
 
         function setupScroll() {
@@ -334,6 +384,7 @@
                     if(HOST !== 'localhost') parentString += `&parent=localhost`;
                     if(HOST.includes('githack')) parentString += `&parent=raw.githack.com`;
 
+                    // Zoomed Chat via transform scale im CSS ist besser als Iframe Zoom
                     ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${parentString}&darkpopout`;
                     ifr.className = 'chat-frame';
                     ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms"; 
@@ -384,12 +435,12 @@
                         <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
                     </select>
                     <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
-                        <option value="auto" ${currQ==='auto'?'selected':''}>Q: Auto</option>
-                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Q: 1080p</option>
-                        <option value="720p" ${currQ==='720p'?'selected':''}>Q: 720p</option>
-                        <option value="480p" ${currQ==='480p'?'selected':''}>Q: 480p</option>
-                        <option value="360p" ${currQ==='360p'?'selected':''}>Q: 360p</option>
-                        <option value="160p" ${currQ==='160p'?'selected':''}>Q: 160p</option>
+                        <option value="auto" ${currQ==='auto'?'selected':''}>Qualität: Auto</option>
+                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Qualität: 1080p</option>
+                        <option value="720p" ${currQ==='720p'?'selected':''}>Qualität: 720p</option>
+                        <option value="480p" ${currQ==='480p'?'selected':''}>Qualität: 480p</option>
+                        <option value="360p" ${currQ==='360p'?'selected':''}>Qualität: 360p</option>
+                        <option value="160p" ${currQ==='160p'?'selected':''}>Qualität: 160p</option>
                     </select>
                     <div class="set-actions">
                         <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat</button>
@@ -544,20 +595,24 @@
         }
 
         function persist() { 
-            const data = { slots: state.slots, qualities: state.qualities };
-            localStorage.setItem('sc-v27', JSON.stringify(data)); 
+            const data = { slots: state.slots, qualities: state.qualities, longChat: state.longChat };
+            localStorage.setItem('sc-v28', JSON.stringify(data)); 
         }
         function loadStorage() {
-            let d = localStorage.getItem('sc-v27');
+            let d = localStorage.getItem('sc-v28');
+            if(!d) d = localStorage.getItem('sc-v27');
             if(!d) d = localStorage.getItem('sc-v26');
             if(!d) d = localStorage.getItem('sc-v25');
-            if(!d) d = localStorage.getItem('sc-v23');
 
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
                     if(Array.isArray(parsed)) { state.slots = parsed; } 
-                    else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('auto'); }
+                    else { 
+                        state.slots = parsed.slots || Array(6).fill(null); 
+                        state.qualities = parsed.qualities || Array(6).fill('auto'); 
+                        state.longChat = parsed.longChat || false;
+                    }
                     state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
                 } catch(e) {}
             }
