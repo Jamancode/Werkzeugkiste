@@ -1,10 +1,10 @@
-<!-- START OF FILE stream_command_28_responsive_perfect.html -->
+<!-- START OF FILE stream_command_29_responsive_smart.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 28 (Responsive Gold)</title>
+    <title>Stream Command 29 (Smart Responsive)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
@@ -14,7 +14,7 @@
             --safe-z: 10000;
         }
 
-        /* GLOBAL RESET */
+        /* RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -26,7 +26,7 @@
 
         /* HEADER */
         header {
-            flex-shrink: 0; height: 35px; background: rgba(5,5,5,0.95); border-bottom: 1px solid #222;
+            flex-shrink: 0; height: 35px; background: rgba(5,5,5,0.98); border-bottom: 1px solid #222;
             display: flex; align-items: center; padding: 0 10px; z-index: 500; transition: transform 0.3s;
         }
         header.hide { transform: translateY(-100%); }
@@ -78,35 +78,33 @@
         .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #151515; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333;}
         .toggle-lbl { font-weight: bold; font-size: 0.85rem; }
 
-        /* STAGE & GRID SYSTEM */
+        /* MAIN STAGE */
         #stage {
             flex: 1; overflow-y: auto; overflow-x: hidden;
             display: grid; padding: 0; gap: 2px;
             background: #000;
         }
         
-        /* === RESPONSIVE SPLIT MODE (Der Kern der Lösung) === */
+        /* === SPLIT MODE LAYOUT === */
         
-        /* 1. Mobile Portrait (Standard) */
+        /* MOBILE PORTRAIT (Standard) */
         .mode-split {
-            display: grid;
-            height: 100%;
-            /* Oben Main (60%), Unten geteilt (40%) */
-            grid-template-rows: 60fr 40fr; 
+            /* 2 Reihen: Oben Main, Unten Side-Slots */
+            grid-template-rows: 65fr 35fr; 
             grid-template-columns: 1fr 1fr; 
             grid-template-areas: 
                 "main main" 
                 "side1 side2";
+            height: 100%;
             transition: grid-template-rows 0.3s ease;
         }
         
-        /* Wenn "Lang Chat" aktiv ist (wird per JS Klasse gesetzt) */
+        /* Wenn "Lang Chat" aktiv ist */
         body.long-chat .mode-split {
-            /* Oben Main (75%), Unten (25%) */
-            grid-template-rows: 75fr 25fr;
+            grid-template-rows: 80fr 20fr; /* Mehr Platz für Main (und damit Chat) */
         }
 
-        /* 2. Desktop Landscape */
+        /* DESKTOP / TABLET (Landscape) */
         @media (min-width: 1024px) {
             .mode-split {
                 grid-template-columns: 3fr 1fr; 
@@ -115,21 +113,19 @@
             }
         }
 
-        /* Zuweisung */
-        .mode-split .slot { display: none; } /* Verstecke nicht zugewiesene */
+        .mode-split .slot { display: none; }
         .mode-split .slot.p-main { display: flex; grid-area: main; border-bottom: 1px solid #333; }
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; border-right: 1px solid #333; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
-        /* Grid Mode Fallback */
+        /* Grid & Full Modes */
         .mode-grid { grid-template-columns: 1fr; grid-auto-rows: min-content; padding: 2px !important; gap: 4px; }
         @media (min-width: 700px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
 
-        /* Fullscreen */
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* SLOT DESIGN */
+        /* SLOT CONTAINER */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
             overflow: hidden;
@@ -151,42 +147,47 @@
         .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 0 2px; font-size: 0.6rem; margin-left: 5px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT & VIDEO SCALING --- */
+        /* --- CONTENT SMART LAYOUT --- */
         .content { 
             flex: 1; display: flex; width: 100%; height: 100%; position: relative; 
-            flex-direction: column; /* Standard: Untereinander für Mobile Perfektion */
-            background: #000;
+            flex-direction: column; /* Mobile First: Untereinander */
         }
-
-        /* Desktop Override: Side-by-Side */
+        
+        /* Desktop: Nebeneinander */
         @media (min-width: 1024px) { .content { flex-direction: row; } }
 
         .vid { 
             width: 100%; 
-            /* DER FIX: 16:9 Ratio erzwingen, damit keine schwarzen Balken entstehen */
+            /* Video nimmt seine natürliche 16:9 Höhe ein. KEINE schwarzen Balken. */
             aspect-ratio: 16/9; 
-            background: #000; flex: none; /* Nicht dehnen */
+            background: #000; flex: none; 
         }
         
-        /* Chat füllt den Rest */
+        /* Chat füllt den REST */
         .chat-wrap { 
             width: 100%; 
-            flex: 1; /* Nimmt den GANZEN Restplatz ein */
+            flex: 1; /* Füllt alles unter dem Video auf */
             background: #0e0e0e; 
             border-top: 1px solid #333; position: relative; overflow: hidden; 
-            display: none; /* Standard aus */
+            display: none; 
         }
         
+        /* Wenn Chat an ist */
         .slot.chat-on .chat-wrap { display: block; }
-        
-        /* Die kleinen Slots unten brauchen kein Aspect-Ratio Hack, die sollen füllen */
-        .p-side1 .vid, .p-side2 .vid { aspect-ratio: auto; height: 100%; flex: 1; }
-        /* Chat bei den kleinen unten optional ausblenden oder overlay? */
-        /* Wir lassen ihn da, aber er wird klein sein */
 
-        /* CHAT ZOOM (Lesbarkeit) */
+        /* Desktop Anpassung für Side-by-Side */
+        @media (min-width: 1024px) {
+            .vid { width: auto; aspect-ratio: auto; flex: 1; height: 100%; }
+            .chat-wrap { width: 340px; flex: none; height: 100%; border-top: none; border-left: 1px solid #333; }
+        }
+        
+        /* Für die kleinen Side Slots unten (Video füllt Höhe) */
+        .p-side1 .vid, .p-side2 .vid { aspect-ratio: auto; height: 100%; flex: 1; }
+
+        /* CHAT ANTI-BANNER ZOOM */
         .chat-frame {
-            width: 100%; height: 100%; border: none; display: block;
+            width: 250%; height: 250%; border: none; display: block;
+            transform-origin: top left; transform: scale(0.4); 
         }
 
         .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #333; cursor: pointer; }
@@ -205,7 +206,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 28</div>
+        <div class="brand">STREAM COMMAND 29</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -218,16 +219,15 @@
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD ENDE</div>
             <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
-            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (PERFECT)</div>
+            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-            <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
-                No Black Bars • 100% Width<br>
-                Video Top / Chat Bottom
+            <div style="margin-top:20px; text-align:center; font-size:0.75rem; color:#555;">
+                Video Top / Chat Bottom<br>No Black Bars
             </div>
         </div>
         <div id="tab-settings" class="menu-content">
             <div class="toggle-row">
-                <span class="toggle-lbl">Lang Chat (Split View)</span>
+                <span class="toggle-lbl">Long Chat Mode</span>
                 <button id="btn-longchat" class="set-btn" style="flex:0 0 60px" onclick="toggleLongChat()">AUS</button>
             </div>
             <div id="settings-list"></div>
@@ -246,7 +246,6 @@
     </dialog>
 
     <script>
-        // Hosting Fix
         const HOST = window.location.hostname || "localhost";
         const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv", "raw.githack.com"];
 
@@ -279,17 +278,12 @@
                 stage.appendChild(el);
             }
             loadStorage();
-            
-            // Apply Long Chat state
             if(state.longChat) {
                 document.body.classList.add('long-chat');
                 btnLongChat.innerText = "AN";
                 btnLongChat.classList.add('act');
             }
-
-            for(let i=0; i<6; i++) {
-                if(!state.slots[i]) updateSlotHTML(i, null);
-            }
+            for(let i=0; i<6; i++) { if(!state.slots[i]) updateSlotHTML(i, null); }
             setupScroll();
             renderSettingsPanel();
         }
@@ -320,7 +314,6 @@
 
         function updateSlotHTML(i, channel) {
             const el = document.getElementById('s-'+i);
-            
             if(state.players[i]) {
                 try { state.players[i].setMuted(true); } catch(e){}
                 state.players[i] = null;
@@ -384,7 +377,6 @@
                     if(HOST !== 'localhost') parentString += `&parent=localhost`;
                     if(HOST.includes('githack')) parentString += `&parent=raw.githack.com`;
 
-                    // Zoomed Chat via transform scale im CSS ist besser als Iframe Zoom
                     ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${parentString}&darkpopout`;
                     ifr.className = 'chat-frame';
                     ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms"; 
@@ -596,10 +588,11 @@
 
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities, longChat: state.longChat };
-            localStorage.setItem('sc-v28', JSON.stringify(data)); 
+            localStorage.setItem('sc-v29', JSON.stringify(data)); 
         }
         function loadStorage() {
-            let d = localStorage.getItem('sc-v28');
+            let d = localStorage.getItem('sc-v29');
+            if(!d) d = localStorage.getItem('sc-v28');
             if(!d) d = localStorage.getItem('sc-v27');
             if(!d) d = localStorage.getItem('sc-v26');
             if(!d) d = localStorage.getItem('sc-v25');
