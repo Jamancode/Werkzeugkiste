@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 15 (Final Fixed)</title>
+    <title>Stream Command</title>
+    <!-- Twitch Embed API -->
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #050505; --panel: #111; --primary: #9146FF; --active: #00ffcc;
+            --bg: #000; --panel: #111; --primary: #9146FF; --active: #00ffcc;
             --danger: #ff4444; --edit: #ffaa00; --text: #fff; --safe-z: 10000;
         }
 
-        /* --- GLOBAL --- */
+        /* GLOBAL RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            height: 100dvh; display: flex; flex-direction: column; overflow: hidden; 
+            /* 100dvh verhindert, dass Mobile-Browser-Leisten unten etwas verdecken */
+            height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column; overflow: hidden; 
         }
 
         /* --- HEADER --- */
@@ -86,10 +90,11 @@
         }
         body.is-fullscreen #stage { margin-top: 0; padding: 0; overflow: hidden; }
 
-        /* Layouts */
+        /* GRID */
         @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
         @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
 
+        /* SPLIT */
         .mode-split .slot { display: none; }
         .mode-split {
             grid-template-columns: 1fr; grid-template-rows: 50vh 30vh 30vh;
@@ -105,8 +110,12 @@
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
+        /* FULLSCREEN */
         .mode-full .slot { display: none; }
-        .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
+        .mode-full .slot.is-focus { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
+            background: #000;
+        }
 
         /* --- SLOT --- */
         .slot {
@@ -131,47 +140,58 @@
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
         .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
         .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+        
         .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
         .mode-split .pos-sel { display: block; pointer-events: auto; }
 
-        /* --- CONTENT AREA (FIXED SIDE-BY-SIDE) --- */
+        /* --- CONTENT AREA (Der korrigierte Teil) --- */
         .content { 
             flex: 1; 
             display: flex; 
-            flex-direction: row !important; /* Zwingt nebeneinander */
-            flex-wrap: nowrap !important; /* Kein Umbruch erlaubt! */
-            width: 100%; height: 100%; position: relative; 
+            flex-direction: row !important; /* Zwingt "Links Video, Rechts Chat" */
+            width: 100%; height: 100%; 
+            position: relative; 
+            overflow: hidden; /* Verhindert das Ausbrechen */
         }
         
-        .vid { flex: 1; background: #000; height: 100%; min-width: 0; }
+        .vid { 
+            flex: 1; 
+            background: #000; 
+            height: 100%; 
+            min-width: 0; /* Wichtig für Flexbox Scaling */
+        }
         
+        /* CHAT WRAPPER */
         .chat-wrap { 
-            width: 0; background: #111; 
+            width: 0; 
+            background: #111; 
             transition: width 0.3s ease; 
-            border-left: 1px solid #333; position: relative;
-            /* Scrollbar aktivieren und riesiges Padding für Cookie Banner */
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding-bottom: 300px; 
+            border-left: 1px solid #333; 
+            position: relative;
+            height: 100%;
+            /* Scrollbar erlauben falls Inhalt zu groß (Cookie Banner) */
+            overflow-y: auto; 
+            overflow-x: hidden;
         }
         
-        /* Desktop Width */
+        /* Desktop Chat Breite */
         .slot.chat-on .chat-wrap { width: 340px; }
         
-        /* Mobile Width Override: Nebeneinander bleiben! */
+        /* Mobile Chat: Fest nebeneinander */
         @media (max-width: 650px) {
             .slot.chat-on .chat-wrap { 
-                width: 45%; /* Etwas weniger als die Hälfte */
-                height: 100%; /* Volle Höhe */
-                border-left: 1px solid #333; 
-                /* Kein border-top, da wir links/rechts sind */
+                width: 45%; /* Chat bekommt 45% der Breite */
+                border-left: 1px solid #333;
+                /* KEIN border-top, wir bleiben side-by-side */
             }
         }
 
-        /* Iframe Zoom */
+        /* IFRAME - Normalisiert (Kein Zoom mehr!) */
         .chat-frame {
-            width: 125%; height: 125%; border: none;
-            transform-origin: top left; transform: scale(0.8);
-            pointer-events: auto;
+            width: 100%; 
+            height: 100%; 
+            border: none;
+            display: block;
         }
 
         .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; transition: 0.2s; }
@@ -190,7 +210,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 15</div>
+        <div class="brand">STREAM COMMAND 16</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -207,7 +227,7 @@
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
             <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
-                Forced Side-by-Side • Audio in Settings
+                Chat Normalized • Scroll Enabled
             </div>
         </div>
 
@@ -220,7 +240,7 @@
 
     <dialog id="modal">
         <h3 id="modalTitle">Stream hinzufügen</h3>
-        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/mowky">
+        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/papaplatte">
         <div class="row-btn">
             <button class="b-no" onclick="modal.close()">Abbruch</button>
             <button class="b-ok" onclick="save()">Speichern</button>
@@ -382,13 +402,15 @@
                         <span>SLOT ${i+1}</span>
                         <span>${isMain?'MAIN':isS1?'SIDE 1':isS2?'SIDE 2':''}</span>
                     </div>
-                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
+                    
+                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" 
+                        onchange="settingsUpdateName(${i}, this.value)">
                     
                     <select class="set-select" onchange="swapPos(${i}, this.value)">
-                        <option value="main" ${isMain?'selected':''}>Pos: Main</option>
-                        <option value="s1" ${isS1?'selected':''}>Pos: Side 1</option>
-                        <option value="s2" ${isS2?'selected':''}>Pos: Side 2</option>
-                        <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
+                        <option value="main" ${isMain?'selected':''}>Position: Main</option>
+                        <option value="s1" ${isS1?'selected':''}>Position: Side 1</option>
+                        <option value="s2" ${isS2?'selected':''}>Position: Side 2</option>
+                        <option value="x" ${isUnassigned?'selected':''}>Position: ---</option>
                     </select>
 
                     <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
@@ -469,13 +491,11 @@
                         if(btn) btn.classList.toggle('act', m);
                     } else {
                         p.setMuted(true);
-                        // UI update for others
                         const b = document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);
                         if(b) b.classList.remove('act');
                     }
                 }
             });
-            // Update settings panel explicitly to reflect audio changes
             renderSettingsPanel();
         }
 
@@ -557,10 +577,10 @@
 
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities };
-            localStorage.setItem('sc-v15', JSON.stringify(data)); 
+            localStorage.setItem('sc-v16', JSON.stringify(data)); 
         }
         function loadStorage() {
-            const d = localStorage.getItem('sc-v15');
+            const d = localStorage.getItem('sc-v16');
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
