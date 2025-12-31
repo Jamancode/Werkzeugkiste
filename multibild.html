@@ -1,16 +1,17 @@
-<!-- START OF FILE stream_command_23_mobile_fix.html -->
+<!-- START OF FILE stream_command_25_complete.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 23 (Mobile Layout)</title>
+    <title>Stream Command 25 (Complete)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #000; --panel: #111; --primary: #9146FF; 
-            --active: #00ffcc; --danger: #ff4444; --text: #fff; --safe-z: 10000;
+            --bg: #050505; --panel: #111; --primary: #9146FF;
+            --active: #00ffcc; --danger: #ff4444; --text: #fff;
+            --safe-z: 10000;
         }
 
         /* RESET */
@@ -19,7 +20,8 @@
         body { 
             background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            height: 100dvh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            display: flex; flex-direction: column; 
         }
 
         /* HEADER */
@@ -36,21 +38,21 @@
             background: #111; border: 1px solid #444; border-radius: 6px;
             color: white; font-size: 1.2rem; cursor: pointer; z-index: var(--safe-z);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        /* NAV */
+        /* NAV & TABS */
         #nav {
             position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
             background: #0a0a0a; border-left: 1px solid #333;
-            transform: translateX(100%); transition: transform 0.25s ease;
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 9000; padding-top: 50px; display: flex; flex-direction: column;
             box-shadow: -10px 0 50px rgba(0,0,0,0.9);
         }
         #nav.open { transform: translateX(0); }
         
         .menu-tabs { display: flex; border-bottom: 1px solid #333; background: #0e0e0e; flex-shrink: 0; }
-        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; }
+        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
         .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
         .menu-content { flex: 1; overflow-y: auto; padding: 10px; display: none; }
@@ -64,6 +66,16 @@
         .nav-item.exit { background: #300; border-color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
+        /* SETTINGS ROWS (DIE VERMISSTEN FUNKTIONEN) */
+        .set-row { background: #141414; padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #333; }
+        .set-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.75rem; font-weight: bold; color: #888; }
+        .set-input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 6px; border-radius: 4px; margin-bottom: 4px; font-size: 0.9rem; }
+        .set-select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 4px; border-radius: 4px; margin-bottom: 4px; font-size: 0.85rem; }
+        .set-actions { display: flex; gap: 5px; }
+        .set-btn { flex: 1; padding: 6px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .set-btn.act { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .set-btn.danger { background: #300; border-color: #500; }
+
         /* STAGE */
         #stage {
             flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -72,7 +84,7 @@
         }
         body.is-fullscreen #stage { padding: 0; overflow: hidden; }
 
-        /* LAYOUTS */
+        /* LAYOUT MODI */
         @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
         @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
 
@@ -87,19 +99,19 @@
                 grid-template-areas: "main side1" "main side2";
             }
         }
-        .mode-split .slot.p-main { display: flex; grid-area: main; border: 1px solid var(--primary); }
+        .mode-split .slot.p-main { display: flex; grid-area: main; border: 2px solid var(--primary); }
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* SLOT */
+        /* SLOT CONTAINER */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
-            min-height: 250px; border-radius: 4px; overflow: hidden; contain: content;
+            min-height: 250px; border-radius: 4px; overflow: hidden;
         }
-        .mode-split .slot, .mode-full .slot { min-height: 0; }
+        @media(min-width: 1100px) { .slot { min-height: 0; } }
 
         /* UI BAR */
         .ui-bar {
@@ -110,79 +122,65 @@
         }
         .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
 
-        .lbl { font-size: 0.7rem; font-weight: bold; background: var(--primary); padding: 1px 5px; border-radius: 3px; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lbl { font-size: 0.7rem; font-weight: bold; background: var(--primary); padding: 1px 5px; border-radius: 3px; max-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .tools { display: flex; gap: 3px; }
-        .btn { width: 26px; height: 26px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size:0.9rem;}
+        .btn { width: 26px; height: 26px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;}
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
         .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 1px; font-size: 0.65rem; margin-left: 8px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT & CHAT INTELLIGENT LAYOUT --- */
+        /* CONTENT & MOBILE LAYOUT */
         .content { 
-            flex: 1; display: flex; 
-            width: 100%; height: 100%; position: relative; 
-            /* Standard Desktop: Nebeneinander */
+            flex: 1; display: flex; width: 100%; height: 100%; position: relative; 
+            /* Desktop Standard: Nebeneinander */
             flex-direction: row; 
         }
         
-        .vid { flex: 1; background: #000; height: 100%; width: 100%; min-width: 0; }
+        .vid { flex: 1; background: #000; width: 100%; height: 100%; min-width: 0; }
         
-        /* Desktop Chat */
         .chat-wrap { 
             width: 0; background: #111; 
-            transition: width 0.2s ease, height 0.2s ease; 
-            border-left: 1px solid #333; 
-            overflow: hidden; /* Iframe scrollt intern */
+            transition: width 0.3s ease, height 0.3s ease; 
+            border-left: 1px solid #333; position: relative; overflow: hidden; 
         }
+        
+        /* Desktop Chat an */
         .slot.chat-on .chat-wrap { width: 320px; }
         
-        /* --- MOBILE MODE (Portrait / Handy) --- */
+        /* MOBILE OVERRIDE: Video Oben, Chat Unten */
         @media (max-width: 650px) {
-            .content { 
-                /* Handy: Untereinander! Viel besser lesbar */
-                flex-direction: column !important; 
-            }
+            .content { flex-direction: column !important; }
             
             .vid {
-                /* Video nimmt Höhe automatisch, aber nicht alles */
-                flex: 1; 
-                width: 100%;
+                flex: 1; width: 100%;
                 min-height: 180px; /* Mindesthöhe Video */
             }
 
             .chat-wrap {
                 width: 100% !important; /* Volle Breite */
                 height: 0; /* Standard versteckt */
-                border-left: none;
-                border-top: 1px solid #333;
+                border-left: none; border-top: 1px solid #333;
             }
 
             .slot.chat-on .chat-wrap {
-                /* Wenn Chat an: Nimmt ca 55% der Höhe ein */
-                height: 55%; 
-                flex: none; /* Feste Höhe */
+                height: 50%; /* Chat nimmt 50% Höhe */
+                flex: none;
             }
-            
-            /* UI Bar Anpassung */
-            .ui-bar { height: 36px; background: rgba(0,0,0,0.9); }
-            .btn { width: 32px; height: 32px; }
         }
 
-        .chat-frame { width: 100%; height: 100%; border: none; display: block; }
+        /* CHAT FRAME (Der Fix aus v6) */
+        .chat-frame {
+            width: 125%; /* Ausgleich für Scale */
+            height: 125%;
+            border: none;
+            transform-origin: top left;
+            transform: scale(0.8); /* Zoom out für mehr Platz */
+        }
+
         .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; }
         .empty span { font-size: 3rem; }
 
-        /* SETTINGS UI */
-        .set-row { background: #141414; padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #333; }
-        .set-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.75rem; font-weight: bold; color: #888; }
-        .set-input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 0.9rem;}
-        .set-select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; margin-bottom: 5px; font-size: 0.85rem;}
-        .set-actions { display: flex; gap: 5px; }
-        .set-btn { flex: 1; padding: 8px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
-        .set-btn.act { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .set-btn.danger { background: #300; border-color: #500; }
-
-        /* DIALOG */
+        /* MODAL */
         dialog { background: #18181b; color: #fff; border: 1px solid #333; width: 90%; max-width: 350px; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 20px; border-radius: 8px; z-index: 12000; }
         dialog::backdrop { background: rgba(0,0,0,0.8); }
         input { width: 100%; padding: 10px; margin: 15px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; }
@@ -195,7 +193,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 23</div>
+        <div class="brand">STREAM COMMAND 25</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -203,14 +201,14 @@
     <div id="nav">
         <div class="menu-tabs">
             <button class="tab-btn active" onclick="switchTab('view')">ANSICHT</button>
-            <button class="tab-btn" onclick="switchTab('settings')">KANÄLE</button>
+            <button class="tab-btn" onclick="switchTab('settings')">EINSTELLUNGEN</button>
         </div>
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD ENDE</div>
             <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-            <div style="margin-top:20px; text-align:center; font-size:0.75rem; color:#555;">Mobile Optimized: Top/Bottom</div>
+            <div style="margin-top:20px; text-align:center; font-size:0.75rem; color:#555;">Mobile Layout + Settings + v6 Chat</div>
         </div>
         <div id="tab-settings" class="menu-content">
             <div id="settings-list"></div>
@@ -224,22 +222,21 @@
         <input type="text" id="inp" placeholder="Kanalname..." autocomplete="off">
         <div class="row-btn">
             <button class="b-no" onclick="modal.close()">Abbruch</button>
-            <button class="b-ok" onclick="save()">Laden</button>
+            <button class="b-ok" onclick="save()">Speichern</button>
         </div>
     </dialog>
 
     <script>
-        // --- HOSTING FIX (Githack & Co) ---
-        const CURRENT_HOST = window.location.hostname;
-        // Githack explizit hinzufügen, damit Twitch den Chat erlaubt
-        const PARENTS = ["twitch.tv", "localhost", "127.0.0.1", "raw.githack.com", "githack.com"];
-        if(CURRENT_HOST && !PARENTS.includes(CURRENT_HOST)) PARENTS.push(CURRENT_HOST);
+        // --- KONFIGURATION (v6 Logic) ---
+        const HOST = window.location.hostname || "localhost";
+        // WICHTIG: Twitch braucht diese Parent-Infos
+        const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv"];
 
         const state = {
             mode: 'mode-grid',
             slots: Array(6).fill(null),
             players: Array(6).fill(null),
-            qualities: Array(6).fill('360p'),
+            qualities: Array(6).fill('auto'), // Wieder da!
             pos: { main: 0, s1: 1, s2: 2 },
             focus: 0,
             editIndex: -1
@@ -325,29 +322,33 @@
             `;
             document.getElementById(`lbl-${i}`).innerText = channel;
 
+            // PLAYER INIT (V6 STYLE)
             setTimeout(() => {
                 try {
-                    const options = {
-                        width: '100%', height: '100%',
-                        channel: channel,
-                        parent: PARENTS,
-                        layout: 'video',
-                        autoplay: true,
-                        muted: true
-                    };
-                    const p = new Twitch.Player('v-'+i, options);
-                    startQualityPoller(p, state.qualities[i]);
+                    const p = new Twitch.Player('v-'+i, {
+                        width: '100%', height: '100%', channel: channel, parent: PARENTS,
+                        layout: 'video', autoplay: true, muted: true
+                    });
+                    
+                    p.addEventListener(Twitch.Player.READY, () => {
+                        p.setVolume(0.5);
+                        applyQuality(p, state.qualities[i]);
+                    });
                     state.players[i] = p;
 
+                    // CHAT INIT (V6 STYLE - WICHTIG!)
                     const cDiv = document.getElementById('c-'+i);
                     const ifr = document.createElement('iframe');
-                    const parentParam = PARENTS.map(p => `parent=${p}`).join('&');
-                    // Chat Embed URL (Dark Mode + Parent Fix)
-                    ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${parentParam}&darkpopout`;
+                    
+                    let parentString = `parent=${HOST}`;
+                    if(HOST !== 'localhost') parentString += `&parent=localhost`;
+
+                    ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${parentString}&darkpopout`;
                     ifr.className = 'chat-frame';
-                    // Sandbox für Mobile optimiert (Storage Access wichtig für Chat-Login)
-                    ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms allow-storage-access-by-user-activation allow-top-navigation"; 
+                    // Sandbox exakt wie in v6
+                    ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms"; 
                     cDiv.appendChild(ifr);
+
                 } catch(e) {}
             }, 50);
             
@@ -355,32 +356,18 @@
             renderSettingsPanel();
         }
 
-        function startQualityPoller(player, targetQual) {
-            let attempts = 0;
-            const interval = setInterval(() => {
-                attempts++;
-                if (attempts > 20) { clearInterval(interval); return; }
-                try {
-                    const qualities = player.getQualities();
-                    if (qualities && qualities.length > 0) {
-                        applyQualityNow(player, qualities, targetQual);
-                        player.setVolume(0.5);
-                        clearInterval(interval);
-                    }
-                } catch(e) {}
-            }, 1000);
-        }
+        // --- FUNKTIONEN (WIEDER DA) ---
 
-        function applyQualityNow(player, qualities, targetName) {
-            let target = null;
-            if(targetName === 'auto') target = qualities.find(q => q.group === 'auto');
-            else target = qualities.find(q => q.name.includes(targetName));
-            if(target) player.setQuality(target.group);
-        }
-
-        function applyQualityToRunning(player, qualityName) {
-            const quals = player.getQualities();
-            if(quals && quals.length) applyQualityNow(player, quals, qualityName);
+        function applyQuality(player, qualityName) {
+            if(!player) return;
+            setTimeout(() => {
+                const quals = player.getQualities();
+                if(!quals || quals.length === 0) return;
+                let target = null;
+                if(qualityName === 'auto') target = quals.find(q => q.group === 'auto');
+                else target = quals.find(q => q.name.includes(qualityName));
+                if(target) player.setQuality(target.group);
+            }, 2000);
         }
 
         function renderSettingsPanel() {
@@ -389,12 +376,13 @@
                 const ch = state.slots[i] || "";
                 const row = document.createElement('div');
                 row.className = 'set-row';
+                
                 const isMain = state.pos.main === i;
                 const isS1 = state.pos.s1 === i;
                 const isS2 = state.pos.s2 === i;
                 const isUnassigned = !isMain && !isS1 && !isS2;
                 const chatActive = document.getElementById('s-'+i)?.classList.contains('chat-on');
-                const currQ = state.qualities[i];
+                const currQ = state.qualities[i] || 'auto';
 
                 row.innerHTML = `
                     <div class="set-header">
@@ -409,15 +397,15 @@
                         <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
                     </select>
                     <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
-                        <option value="auto" ${currQ==='auto'?'selected':''}>Q: Auto</option>
-                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Q: 1080p</option>
-                        <option value="720p" ${currQ==='720p'?'selected':''}>Q: 720p</option>
-                        <option value="480p" ${currQ==='480p'?'selected':''}>Q: 480p</option>
-                        <option value="360p" ${currQ==='360p'?'selected':''}>Q: 360p</option>
-                        <option value="160p" ${currQ==='160p'?'selected':''}>Q: 160p</option>
+                        <option value="auto" ${currQ==='auto'?'selected':''}>Qualität: Auto</option>
+                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Qualität: 1080p</option>
+                        <option value="720p" ${currQ==='720p'?'selected':''}>Qualität: 720p</option>
+                        <option value="480p" ${currQ==='480p'?'selected':''}>Qualität: 480p</option>
+                        <option value="360p" ${currQ==='360p'?'selected':''}>Qualität: 360p</option>
+                        <option value="160p" ${currQ==='160p'?'selected':''}>Qualität: 160p</option>
                     </select>
                     <div class="set-actions">
-                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat ${chatActive?'AN':'AUS'}</button>
+                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat</button>
                         <button class="set-btn danger" onclick="delStream(${i})">Leeren</button>
                     </div>
                 `;
@@ -436,7 +424,7 @@
 
         function settingsUpdateQuality(i, val) {
             state.qualities[i] = val;
-            if(state.players[i]) applyQualityToRunning(state.players[i], val);
+            if(state.players[i]) applyQuality(state.players[i], val);
             persist();
         }
 
@@ -570,18 +558,19 @@
 
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities };
-            localStorage.setItem('sc-v23', JSON.stringify(data)); 
+            localStorage.setItem('sc-v25', JSON.stringify(data)); 
         }
         function loadStorage() {
-            // Versuche v23, dann v22 Fallback
-            let d = localStorage.getItem('sc-v23');
-            if(!d) d = localStorage.getItem('sc-v22');
-            
+            // Priority: v25 > v23 > v17
+            let d = localStorage.getItem('sc-v25');
+            if(!d) d = localStorage.getItem('sc-v23'); 
+            if(!d) d = localStorage.getItem('sc-v17'); 
+
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
                     if(Array.isArray(parsed)) { state.slots = parsed; } 
-                    else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('360p'); }
+                    else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('auto'); }
                     state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
                 } catch(e) {}
             }
