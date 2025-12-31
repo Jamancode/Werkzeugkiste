@@ -3,189 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 7 - Ultimate Edition</title>
+    <title>Stream Command V8 - Control Center</title>
+    <!-- Twitch Embed API -->
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
     <style>
-:root{--bg:#050505;--panel:#111;--primary:#9146FF;--active:#00ffcc;--danger:#ff4444;--edit:#ffaa00;--text:#fff;--safe-z:10000;--transition-speed:0.25s}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;outline:none;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative;touch-action:pan-y}
-header{position:fixed;top:0;left:0;right:0;height:50px;background:rgba(10,10,10,0.98);border-bottom:1px solid #333;display:flex;align-items:center;padding:0 15px;transition:transform var(--transition-speed) ease;z-index:500;backdrop-filter:blur(10px)}
-header.hide{transform:translateY(-100%)}
-.brand{font-weight:800;font-size:1rem;color:var(--primary);letter-spacing:1px;text-shadow:0 0 10px rgba(145,70,255,0.5)}
-.float-btn{position:fixed;top:7px;right:10px;width:38px;height:38px;background:linear-gradient(135deg,#1a1a1a 0%,#111 100%);border:1px solid #444;border-radius:6px;color:white;font-size:1.5rem;cursor:pointer;z-index:var(--safe-z);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);transition:all 0.2s ease;user-select:none}
-.float-btn:hover{background:linear-gradient(135deg,var(--primary) 0%,#7928ca 100%);transform:scale(1.05)}
-.float-btn:active{transform:scale(0.95)}
-#nav{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:380px;background:linear-gradient(180deg,#0a0a0a 0%,#000 100%);border-left:1px solid #333;transform:translateX(100%);transition:transform var(--transition-speed) cubic-bezier(0.4,0,0.2,1);z-index:calc(var(--safe-z) + 1);display:flex;flex-direction:column;box-shadow:-10px 0 50px rgba(0,0,0,0.8);overflow:hidden}
-#nav.open{transform:translateX(0)}
-.nav-header{padding:15px 20px;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;background:rgba(20,20,20,0.5);backdrop-filter:blur(10px)}
-.nav-title{font-weight:bold;font-size:1.1rem;color:var(--primary)}
-.nav-close{width:32px;height:32px;border:1px solid #444;background:#1a1a1a;color:#fff;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all 0.2s}
-.nav-close:hover{background:var(--danger);border-color:var(--danger)}
-.nav-content{flex:1;overflow-y:auto;overflow-x:hidden}
-.nav-content::-webkit-scrollbar{width:6px}
-.nav-content::-webkit-scrollbar-track{background:#0a0a0a}
-.nav-content::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
-.nav-section{padding:20px;border-bottom:1px solid #222}
-.nav-section-title{font-size:0.75rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:bold}
-.mode-buttons{display:flex;flex-direction:column;gap:8px}
-.nav-item{padding:12px 15px;background:linear-gradient(135deg,#1a1a1a 0%,#111 100%);border-radius:8px;text-align:center;font-weight:bold;font-size:0.9rem;cursor:pointer;border:1px solid transparent;transition:all 0.2s ease;user-select:none;position:relative;overflow:hidden}
-.nav-item:active{transform:scale(0.98)}
-.nav-item:hover{border-color:#555}
-.nav-item.active{background:linear-gradient(135deg,var(--primary) 0%,#7928ca 100%);color:white;border-color:var(--primary);box-shadow:0 4px 15px rgba(145,70,255,0.4)}
-.nav-item.exit{background:linear-gradient(135deg,#500 0%,#300 100%);border:1px solid var(--danger);color:var(--danger);display:none}
-body.is-fullscreen .nav-item.exit{display:block}
-.settings-list{display:flex;flex-direction:column;gap:8px}
-.setting-item{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:12px;transition:all 0.2s ease}
-.setting-item.empty{opacity:0.5;border-style:dashed}
-.setting-item:not(.empty):hover{border-color:var(--primary);background:#222}
-.setting-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.setting-label{font-size:0.7rem;color:#666;font-weight:bold;text-transform:uppercase}
-.setting-badge{background:var(--primary);color:#fff;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:bold}
-.setting-badge.empty{background:#333;color:#666}
-.setting-channel{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.channel-input{flex:1;background:#000;border:1px solid #444;color:#fff;padding:8px 10px;border-radius:4px;font-size:0.85rem;transition:all 0.2s}
-.channel-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(145,70,255,0.2)}
-.channel-input::placeholder{color:#555}
-.mini-btn{width:32px;height:32px;border:1px solid #444;background:#222;color:#aaa;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;flex-shrink:0}
-.mini-btn:active{transform:scale(0.9)}
-.mini-btn.save:hover{background:var(--active);border-color:var(--active);color:#000}
-.mini-btn.clear:hover{background:var(--danger);border-color:var(--danger);color:#fff}
-.setting-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.control-btn{padding:8px;background:#222;border:1px solid #444;border-radius:4px;font-size:0.75rem;color:#aaa;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:500}
-.control-btn:active{transform:scale(0.95)}
-.control-btn.active{background:var(--active);border-color:var(--active);color:#000;font-weight:bold}
-.control-btn.position{grid-column:1 / -1;background:#333}
-.control-btn.position.active{background:var(--primary);border-color:var(--primary);color:#fff}
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.quick-action{padding:10px;background:#1a1a1a;border:1px solid #444;border-radius:6px;text-align:center;font-size:0.8rem;cursor:pointer;transition:all 0.2s;font-weight:500}
-.quick-action:active{transform:scale(0.95)}
-.quick-action:hover{background:#222;border-color:var(--primary)}
-.nav-footer{padding:15px 20px;border-top:1px solid #333;font-size:0.7rem;color:#555;text-align:center;background:rgba(10,10,10,0.5)}
-#stage{flex:1;margin-top:50px;overflow-y:auto;overflow-x:hidden;display:grid;padding:4px;gap:4px;grid-template-columns:1fr;grid-auto-rows:min-content;scroll-behavior:smooth}
-#stage::-webkit-scrollbar{width:8px}
-#stage::-webkit-scrollbar-track{background:#0a0a0a}
-#stage::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
-body.is-fullscreen #stage{margin-top:0;padding:0;overflow:hidden}
-@media (min-width:700px){#stage.mode-grid{grid-template-columns:1fr 1fr}}
-@media (min-width:1100px){#stage.mode-grid{grid-template-columns:repeat(3,1fr);grid-auto-rows:50vh}}
-.mode-split .slot{display:none}
-.mode-split{grid-template-columns:1fr;grid-template-rows:50vh 25vh 25vh;grid-template-areas:"main" "side1" "side2";height:calc(100vh - 50px);gap:2px}
-@media (min-width:1024px){.mode-split{grid-template-columns:3fr 1fr;grid-template-rows:1fr 1fr;grid-template-areas:"main side1" "main side2"}}
-.mode-split .slot.p-main{display:flex;grid-area:main;border:2px solid var(--primary);z-index:10;box-shadow:0 0 20px rgba(145,70,255,0.3)}
-.mode-split .slot.p-side1{display:flex;grid-area:side1}
-.mode-split .slot.p-side2{display:flex;grid-area:side2}
-.mode-full .slot{display:none}
-.mode-full .slot.is-focus{display:flex;position:fixed;top:0;left:0;width:100%;height:100%;z-index:2000;background:#000}
-.slot{background:var(--panel);position:relative;display:flex;flex-direction:column;min-height:280px;border-radius:4px;overflow:hidden;contain:content;transition:transform 0.2s ease}
-@media(min-width:1100px){.slot{min-height:0}}
-.ui-bar{position:absolute;top:0;left:0;right:0;height:40px;background:rgba(0,0,0,0.95);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 10px;opacity:0;transition:opacity 0.2s ease;z-index:20;pointer-events:none;border-bottom:1px solid rgba(255,255,255,0.05)}
-.slot:hover .ui-bar,.slot.active-touch .ui-bar,.slot.chat-on .ui-bar{opacity:1;pointer-events:auto}
-.lbl{font-size:0.8rem;font-weight:bold;background:linear-gradient(135deg,var(--primary) 0%,#7928ca 100%);padding:4px 8px;border-radius:4px;max-width:120px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.tools{display:flex;gap:4px}
-.btn{width:30px;height:30px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.6);color:#ccc;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;font-size:0.9rem;user-select:none}
-.btn:hover{background:var(--primary);color:#fff;transform:scale(1.1)}
-.btn:active{transform:scale(0.95)}
-.btn.act{background:var(--active);color:#000;border-color:var(--active)}
-.content{flex:1;display:flex;width:100%;height:100%;position:relative}
-.vid{flex:1;background:#000;width:100%;height:100%}
-.chat-wrap{width:0;background:#111;transition:width var(--transition-speed) ease;border-left:1px solid #333;overflow:hidden}
-.slot.chat-on .chat-wrap{width:340px}
-@media (max-width:650px){.slot.chat-on .content{flex-direction:column}.slot.chat-on .chat-wrap{width:100% !important;height:45%;border-left:none;border-top:1px solid #333}}
-.chat-frame{width:125%;height:125%;border:none;transform-origin:top left;transform:scale(0.8)}
-.empty{flex:1;display:flex;align-items:center;justify-content:center;color:#444;cursor:pointer;transition:all 0.3s ease}
-.empty span{font-size:3rem}
-.empty:hover{background:#151515;color:var(--primary)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
-.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:calc(var(--safe-z) + 200);display:flex;flex-direction:column;gap:10px;pointer-events:none}
-.toast{background:rgba(20,20,20,0.95);backdrop-filter:blur(10px);border:1px solid #444;padding:12px 20px;border-radius:8px;color:#fff;font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.5);animation:slideUp 0.3s ease;min-width:200px;text-align:center}
-.toast.success{border-color:var(--active)}
-.toast.error{border-color:var(--danger)}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@media (max-width:768px){#nav{max-width:100%}.nav-section{padding:15px}.setting-item{padding:10px}}
+        :root {
+            --bg: #050505;
+            --panel: #111;
+            --primary: #9146FF;
+            --active: #00ffcc;
+            --danger: #ff4444;
+            --edit: #ffaa00;
+            --text: #fff;
+            --safe-z: 10000;
+        }
+
+        /* --- GLOBAL SETUP --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+        }
+
+        /* --- HEADER & TOP BAR --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 50px;
+            background: rgba(10,10,10,0.98); border-bottom: 1px solid #333;
+            display: flex; align-items: center; padding: 0 15px;
+            transition: transform 0.3s ease; z-index: 500;
+        }
+        header.hide { transform: translateY(-100%); }
+        .brand { font-weight: 800; font-size: 1rem; color: var(--primary); letter-spacing: 1px; }
+
+        /* --- DER RETTER: FLOATING MENU BUTTON --- */
+        .float-btn {
+            position: fixed; top: 7px; right: 10px; width: 38px; height: 38px;
+            background: #111; border: 1px solid #444; border-radius: 6px;
+            color: white; font-size: 1.5rem; cursor: pointer; z-index: var(--safe-z);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .float-btn:active { background: var(--primary); }
+
+        /* --- NAVIGATION & SETTINGS OVERLAY --- */
+        #nav {
+            position: fixed; top: 0; right: 0; bottom: 0; width: 320px; /* Breiter für Settings */
+            background: #0a0a0a; border-left: 1px solid #333;
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9000; padding: 60px 0 0 0; /* Padding oben für Close Button */
+            display: flex; flex-direction: column; 
+            box-shadow: -10px 0 50px rgba(0,0,0,0.8);
+        }
+        #nav.open { transform: translateX(0); }
+        
+        /* Menu Tabs */
+        .menu-tabs { display: flex; border-bottom: 1px solid #333; }
+        .tab-btn { flex: 1; padding: 15px; background: #111; border: none; color: #888; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
+
+        /* Menu Content Area */
+        .menu-content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
+        .menu-content.active { display: block; }
+
+        /* Navigation Buttons */
+        .nav-item {
+            padding: 15px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer;
+            border: 1px solid transparent; transition: 0.2s; margin-bottom: 8px;
+        }
+        .nav-item:hover { border-color: #555; }
+        .nav-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-item.exit { background: #300; border: 1px solid var(--danger); color: var(--danger); display: none; }
+        body.is-fullscreen .nav-item.exit { display: block; }
+
+        /* SETTINGS ROW DESIGN */
+        .set-row {
+            background: #141414; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333;
+        }
+        .set-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .slot-label { font-size: 0.8rem; font-weight: bold; color: #666; }
+        
+        .set-input { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; font-size: 0.9rem; }
+        
+        .set-actions { display: flex; gap: 5px; margin-top: 8px; }
+        .set-btn { flex: 1; padding: 6px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc; cursor: pointer; font-size: 0.8rem; }
+        .set-btn.act { background: var(--primary); color: white; border-color: var(--primary); }
+        .set-btn.danger { background: #300; color: #f88; border-color: #500; }
+
+        /* Split Position Dropdown in Settings */
+        .set-select { background: #222; color: white; border: 1px solid #444; border-radius: 4px; padding: 6px; width: 100%; margin-top: 5px; }
+
+        /* --- STAGE (RASTER) --- */
+        #stage {
+            flex: 1; margin-top: 50px; 
+            overflow-y: auto; overflow-x: hidden; 
+            display: grid; padding: 4px; gap: 4px;
+            grid-template-columns: 1fr; grid-auto-rows: min-content;
+        }
+        body.is-fullscreen #stage { margin-top: 0; padding: 0; overflow: hidden; }
+
+        /* GRID MODUS */
+        @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
+
+        /* SPLIT MODUS */
+        .mode-split .slot { display: none; }
+        .mode-split {
+            grid-template-columns: 1fr; grid-template-rows: 50vh 30vh 30vh;
+            grid-template-areas: "main" "side1" "side2"; height: calc(100vh - 50px);
+        }
+        @media (min-width: 1024px) {
+            .mode-split {
+                grid-template-columns: 3fr 1fr; grid-template-rows: 1fr 1fr;
+                grid-template-areas: "main side1" "main side2";
+            }
+        }
+        /* Positions-Logik */
+        .mode-split .slot.p-main { display: flex; grid-area: main; border: 2px solid var(--primary); z-index: 10; }
+        .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
+        .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
+
+        /* FULLSCREEN MODUS */
+        .mode-full .slot { display: none; }
+        .mode-full .slot.is-focus { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
+            background: #000;
+        }
+
+        /* --- SLOT KOMPONENTE --- */
+        .slot {
+            background: var(--panel); position: relative; display: flex; flex-direction: column;
+            min-height: 280px; border-radius: 4px; overflow: hidden; contain: content;
+        }
+        @media(min-width: 1100px) { .slot { min-height: 0; } }
+
+        /* UI Toolbar */
+        .ui-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 38px;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
+            opacity: 0; transition: opacity 0.2s; z-index: 20; pointer-events: none;
+        }
+        .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
+
+        .lbl { font-size: 0.75rem; font-weight: bold; background: var(--primary); padding: 2px 6px; border-radius: 3px; max-width: 90px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        
+        .tools { display: flex; gap: 4px; }
+        .btn {
+            width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.6); color: #ccc;
+            border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .btn:hover { background: var(--primary); color: #fff; }
+        .btn.act { background: var(--active); color: #000; border-color: var(--active); }
+        .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
+        .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+        /* Content (Video/Chat) */
+        .content { flex: 1; display: flex; width: 100%; height: 100%; position: relative; }
+        .vid { flex: 1; background: #000; width: 100%; height: 100%; }
+        
+        .chat-wrap { 
+            width: 0; background: #111; transition: width 0.3s ease, height 0.3s ease; 
+            border-left: 1px solid #333; position: relative; overflow: hidden;
+        }
+        .slot.chat-on .chat-wrap { width: 320px; }
+        
+        @media (max-width: 650px) {
+            .slot.chat-on .content { flex-direction: column; }
+            .slot.chat-on .chat-wrap { 
+                width: 100% !important; height: 45%; 
+                border-left: none; border-top: 1px solid #333; 
+            }
+        }
+
+        /* Iframe Zoom Fix */
+        .chat-frame {
+            width: 125%; height: 125%; border: none;
+            transform-origin: top left; transform: scale(0.8);
+        }
+
+        /* Empty State */
+        .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; cursor: pointer; transition: 0.2s; }
+        .empty span { font-size: 3rem; }
+        .empty:hover { background: #151515; color: var(--primary); }
+
+        /* MODAL */
+        dialog {
+            background: #18181b; color: #fff; border: 1px solid #333; width: 90%; max-width: 350px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 25px; border-radius: 8px;
+            box-shadow: 0 50px 100px rgba(0,0,0,1); z-index: 12000;
+        }
+        dialog::backdrop { background: rgba(0,0,0,0.8); }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        .row-btn { display: flex; justify-content: flex-end; gap: 10px; }
+        .b-ok { background: var(--primary); border: none; padding: 10px 20px; color: #fff; border-radius: 4px; cursor: pointer; }
+        .b-no { background: transparent; border: 1px solid #444; padding: 10px 20px; color: #aaa; border-radius: 4px; cursor: pointer; }
+
     </style>
 </head>
 <body id="body">
-    <header id="header"><div class="brand">STREAM COMMAND 7</div></header>
+
+    <header id="header">
+        <div class="brand">STREAM COMMAND 8</div>
+    </header>
+
+    <!-- Floating Menu Toggle -->
     <div class="float-btn" onclick="toggleNav()">☰</div>
-    <nav id="nav">
-        <div class="nav-header">
-            <div class="nav-title">⚙️ Steuerung</div>
-            <div class="nav-close" onclick="toggleNav()">✕</div>
+
+    <!-- Navigation & Settings Menu -->
+    <div id="nav">
+        <!-- Tabs -->
+        <div class="menu-tabs">
+            <button class="tab-btn active" onclick="switchTab('view')">ANSICHT</button>
+            <button class="tab-btn" onclick="switchTab('settings')">EINSTELLUNGEN</button>
         </div>
-        <div class="nav-content">
-            <div class="nav-section">
-                <div class="nav-section-title">Ansichtsmodus</div>
-                <div class="mode-buttons">
-                    <div class="nav-item exit" onclick="exitFullscreen()">⚠️ Vollbild verlassen</div>
-                    <div class="nav-item active" onclick="setMode('mode-grid')">📱 Grid Übersicht</div>
-                    <div class="nav-item" onclick="setMode('mode-split')">📺 Split View (1+2)</div>
-                    <div class="nav-item" onclick="setMode('mode-full')">🖥️ Vollbild</div>
-                </div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Stream Verwaltung</div>
-                <div class="settings-list" id="settingsList"></div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Schnellaktionen</div>
-                <div class="quick-actions">
-                    <div class="quick-action" onclick="muteAll()">🔇 Alle Stumm</div>
-                    <div class="quick-action" onclick="closeAllChats()">💬 Chats Aus</div>
-                    <div class="quick-action" onclick="clearAll()">🗑️ Alle Löschen</div>
-                    <div class="quick-action" onclick="refreshAll()">🔄 Neu Laden</div>
-                </div>
+
+        <!-- Tab 1: Ansicht -->
+        <div id="tab-view" class="menu-content active">
+            <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD VERLASSEN</div>
+            <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
+            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (1+2)</div>
+            <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
+            
+            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+            <div style="text-align:center; font-size:0.8rem; color:#666;">
+                Status: <span id="sys-status">Optimal</span>
             </div>
         </div>
-        <div class="nav-footer">Stream Command 7<br>Ultimate Edition v2.0</div>
-    </nav>
-    <main id="stage" class="mode-grid"></main>
-    <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Tab 2: Einstellungen (Das neue Control Center) -->
+        <div id="tab-settings" class="menu-content">
+            <div style="font-size:0.8rem; color:#888; margin-bottom:15px; text-align:center;">
+                Verwalte alle 6 Slots zentral.
+            </div>
+            <div id="settings-list">
+                <!-- Wird via JS gefüllt -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Das Raster -->
+    <div id="stage" class="mode-grid"></div>
+
+    <!-- Modal Dialog -->
+    <dialog id="modal">
+        <h3 id="modalTitle">Stream hinzufügen</h3>
+        <input type="text" id="inp" placeholder="z.B. elotrix">
+        <div class="row-btn">
+            <button class="b-no" onclick="modal.close()">Abbruch</button>
+            <button class="b-ok" onclick="save()">Speichern</button>
+        </div>
+    </dialog>
+
     <script>
-const CONFIG={HOST:window.location.hostname||"localhost",SLOT_COUNT:6,STORAGE_KEY:'sc-v7-ultimate',DEFAULT_QUALITY:['360p','480p'],TOUCH_FEEDBACK_DURATION:3000,SCROLL_THRESHOLD:50,PLAYER_LOAD_DELAY:50,QUALITY_CHECK_DELAY:1500};
-const PARENTS=[CONFIG.HOST,"localhost","127.0.0.1","twitch.tv"];
-const state={mode:'mode-grid',slots:Array(CONFIG.SLOT_COUNT).fill(null),players:Array(CONFIG.SLOT_COUNT).fill(null),chatStates:Array(CONFIG.SLOT_COUNT).fill(false),audioStates:Array(CONFIG.SLOT_COUNT).fill(false),pos:{main:0,s1:1,s2:2},focus:0,isInitialized:false};
-const DOM={stage:document.getElementById('stage'),nav:document.getElementById('nav'),header:document.getElementById('header'),body:document.getElementById('body'),settingsList:document.getElementById('settingsList'),toastContainer:document.getElementById('toastContainer')};
-function safeExecute(fn,context='Unknown'){try{return fn()}catch(error){console.error(`Error in ${context}:`,error);return null}}
-function debounce(func,wait){let timeout;return function(...args){clearTimeout(timeout);timeout=setTimeout(()=>func(...args),wait)}}
-function sanitizeChannelName(input){if(!input)return '';let clean=input.trim();clean=clean.replace(/^https?:\/\//,'');if(clean.includes('twitch.tv/'))clean=clean.split('twitch.tv/')[1];clean=clean.split('/')[0].split('?')[0];return clean.toLowerCase()}
-function getSlot(index){return document.getElementById(`s-${index}`)}
-function showToast(message,type='info'){const toast=document.createElement('div');toast.className=`toast ${type}`;toast.textContent=message;DOM.toastContainer.appendChild(toast);setTimeout(()=>{toast.style.opacity='0';setTimeout(()=>toast.remove(),300)},2000)}
-function init(){if(state.isInitialized)return;console.log('🚀 Initializing...');buildSlotStructure();loadStorage();for(let i=0;i<CONFIG.SLOT_COUNT;i++){if(!state.slots[i])updateSlotHTML(i,null)}buildSettingsList();setupEventListeners();setupScroll();setupKeyboardShortcuts();state.isInitialized=true;console.log('✅ Ready')}
-function buildSlotStructure(){DOM.stage.innerHTML='';for(let i=0;i<CONFIG.SLOT_COUNT;i++){const slot=document.createElement('div');slot.className='slot';slot.id=`s-${i}`;slot.addEventListener('click',function(){this.classList.add('active-touch');setTimeout(()=>this.classList.remove('active-touch'),CONFIG.TOUCH_FEEDBACK_DURATION)});DOM.stage.appendChild(slot)}}
-function setupEventListeners(){document.addEventListener('click',(e)=>{if(DOM.nav.classList.contains('open')&&!DOM.nav.contains(e.target)&&!e.target.classList.contains('float-btn'))DOM.nav.classList.remove('open')})}
-function setupScroll(){let lastScrollY=0;const handleScroll=debounce(()=>{const currentScrollY=DOM.stage.scrollTop;if(state.mode==='mode-grid'){if(currentScrollY>CONFIG.SCROLL_THRESHOLD&&currentScrollY>lastScrollY)DOM.header.classList.add('hide');else DOM.header.classList.remove('hide')}lastScrollY=currentScrollY},10);DOM.stage.addEventListener('scroll',handleScroll)}
-function setupKeyboardShortcuts(){document.addEventListener('keydown',(e)=>{const activeElement=document.activeElement;if(activeElement.tagName==='INPUT'||activeElement.tagName==='TEXTAREA')return;switch(e.key.toLowerCase()){case 'g':setMode('mode-grid');break;case 's':setMode('mode-split');break;case 'f':state.mode==='mode-full'?exitFullscreen():setMode('mode-full');break;case 'escape':if(state.mode==='mode-full')exitFullscreen();if(DOM.nav.classList.contains('open'))DOM.nav.classList.remove('open');break;case 'm':toggleNav();break}})}
-function buildSettingsList(){DOM.settingsList.innerHTML='';for(let i=0;i<CONFIG.SLOT_COUNT;i++){const item=document.createElement('div');item.className=state.slots[i]?'setting-item':'setting-item empty';item.id=`setting-${i}`;const channel=state.slots[i]||'';const isEmpty=!channel;let positionText='';if(state.pos.main===i)positionText='Main';else if(state.pos.s1===i)positionText='Side 1';else if(state.pos.s2===i)positionText='Side 2';item.innerHTML=`<div class="setting-header"><span class="setting-label">Slot ${i+1}</span><span class="setting-badge ${isEmpty?'empty':''}">${isEmpty?'Leer':channel}</span></div><div class="setting-channel"><input type="text" class="channel-input" placeholder="Channel Name..." value="${channel}" data-index="${i}" onchange="saveChannelFromSettings(${i},this.value)">${isEmpty?`<div class="mini-btn save" onclick="saveChannelFromSettings(${i},document.querySelector('[data-index=\\"${i}\\"]').value)">✓</div>`:`<div class="mini-btn clear" onclick="clearSlotFromSettings(${i})">✕</div>`}</div><div class="setting-controls">${!isEmpty?`<div class="control-btn ${state.audioStates[i]?'active':''}" onclick="toggleAudioFromSettings(${i})">🔊 ${state.audioStates[i]?'An':'Aus'}</div><div class="control-btn ${state.chatStates[i]?'active':''}" onclick="toggleChatFromSettings(${i})">💬 ${state.chatStates[i]?'An':'Aus'}</div><div class="control-btn" onclick="focusSlot(${i})">⛶ Focus</div><div class="control-btn position ${state.pos.main===i?'active':''}" onclick="setPosition(${i},'main')">${positionText||'Position wählen'}</div>`:''}</div>`;DOM.settingsList.appendChild(item)}}
-function saveChannelFromSettings(index,value){const channel=sanitizeChannelName(value);if(!channel){showToast('Bitte gültigen Channel eingeben','error');return}state.slots[index]=channel;updateSlotHTML(index,channel);buildSettingsList();persist();showToast(`${channel} zu Slot ${index+1} hinzugefügt`,'success')}
-function clearSlotFromSettings(index){state.slots[index]=null;state.chatStates[index]=false;state.audioStates[index]=false;updateSlotHTML(index,null);buildSettingsList();persist();showToast(`Slot ${index+1} geleert`,'success')}
-function toggleAudioFromSettings(index){const btn=document.querySelector(`#s-${index} .btn[onclick^="toggleAudio"]`);if(btn){toggleAudio(index,btn);buildSettingsList()}}
-function toggleChatFromSettings(index){const btn=document.querySelector(`#s-${index} .btn[onclick^="toggleChat"]`);if(btn){toggleChat(index,btn);buildSettingsList()}}
-function focusSlot(index){state.focus=index;setMode('mode-full');DOM.nav.classList.remove('open')}
-function setPosition(index,role){swapPos(index,role);buildSettingsList();showToast(`Slot ${index+1} → ${role==='main'?'Main':role==='s1'?'Side 1':'Side 2'}`,'success')}
-function muteAll(){state.players.forEach((player,i)=>{if(player){safeExecute(()=>player.setMuted(true));const btn=document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);if(btn)btn.classList.remove('act');state.audioStates[i]=false}});buildSettingsList();showToast('Alle Streams stummgeschaltet','success')}
-function closeAllChats(){for(let i=0;i<CONFIG.SLOT_COUNT;i++){const slot=getSlot(i);if(slot){slot.classList.remove('chat-on');const btn=document.querySelector(`#s-${i} .btn[onclick^="toggleChat"]`);if(btn)btn.classList.remove('act');state.chatStates[i]=false}}buildSettingsList();showToast('Alle Chats geschlossen','success')}
-function clearAll(){if(!confirm('Wirklich alle Streams entfernen?'))return;for(let i=0;i<CONFIG.SLOT_COUNT;i++){state.slots[i]=null;state.chatStates[i]=false;state.audioStates[i]=false;updateSlotHTML(i,null)}buildSettingsList();persist();showToast('Alle Slots geleert','success')}
-function refreshAll(){state.slots.forEach((channel,i)=>{if(channel)updateSlotHTML(i,channel)});buildSettingsList();showToast('Alle Streams neu geladen','success')}
-function updateSlotHTML(index,channel){const slot=getSlot(index);if(!slot)return;cleanupPlayer(index);slot.innerHTML='';if(!channel){slot.innerHTML=`<div class="empty" onclick="openSettingsForSlot(${index})"><span>+</span></div>`;slot.classList.remove('chat-on');return}renderOccupiedSlot(index,channel);loadTwitchPlayer(index,channel);updateSlotClasses(index)}
-function cleanupPlayer(index){if(state.players[index]){safeExecute(()=>{state.players[index].setMuted(true);state.players[index].pause()});state.players[index]=null}}
-function renderOccupiedSlot(index,channel){const slot=getSlot(index);if(!slot)return;const isFocused=state.mode==='mode-full'&&state.focus===index;slot.innerHTML=`<div class="ui-bar" onclick="event.stopPropagation()"><span class="lbl" title="${channel}">${channel}</span><div class="tools"><button class="btn ${state.audioStates[index]?'act':''}" onclick="toggleAudio(${index},this)">🔊</button><button class="btn ${state.chatStates[index]?'act':''}" onclick="toggleChat(${index},this)">💬</button><button class="btn" onclick="toggleFull(${index})">${isFocused?'↙️':'⛶'}</button></div></div><div class="content"><div class="vid" id="v-${index}"><div class="loading"></div></div><div class="chat-wrap" id="c-${index}"></div></div>`}
-function loadTwitchPlayer(index,channel){setTimeout(()=>{safeExecute(()=>{const player=new Twitch.Player(`v-${index}`,{width:'100%',height:'100%',channel:channel,parent:PARENTS,layout:'video',autoplay:true,muted:true});player.addEventListener(Twitch.Player.READY,()=>{player.setVolume(0.5);setTimeout(()=>{safeExecute(()=>{const qualities=player.getQualities();const lowQuality=qualities.find(q=>CONFIG.DEFAULT_QUALITY.some(dq=>q.name.includes(dq)));if(lowQuality)player.setQuality(lowQuality.group)})},CONFIG.QUALITY_CHECK_DELAY)});state.players[index]=player;loadChatIframe(index,channel)})},CONFIG.PLAYER_LOAD_DELAY)}
-function loadChatIframe(index,channel){const chatDiv=document.getElementById(`c-${index}`);if(!chatDiv)return;const iframe=document.createElement('iframe');iframe.src=`https://www.twitch.tv/embed/${channel}/chat?parent=${CONFIG.HOST}&parent=localhost&darkpopout`;iframe.className='chat-frame';iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-modals allow-forms');chatDiv.appendChild(iframe)}
-function openSettingsForSlot(index){DOM.nav.classList.add('open');setTimeout(()=>{const input=document.querySelector(`[data-index="${index}"]`);if(input){input.focus();input.scrollIntoView({behavior:'smooth',block:'center'})}},300)}
-function toggleAudio(index,button){state.players.forEach((player,i)=>{if(!player)return;safeExecute(()=>{if(i===index){const isMuted=player.getMuted();player.setMuted(!isMuted);button.classList.toggle('act',!isMuted);state.audioStates[i]=!isMuted}else{player.setMuted(true);const otherBtn=document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);if(otherBtn)otherBtn.classList.remove('act');state.audioStates[i]=false}})});buildSettingsList()}
-function toggleChat(index,button){const slot=getSlot(index);if(!slot)return;slot.classList.toggle('chat-on');button.classList.toggle('act');state.chatStates[index]=slot.classList.contains('chat-on');buildSettingsList()}
-function toggleFull(index){if(state.mode==='mode-full'&&state.focus===index)setMode('mode-grid');else{state.focus=index;setMode('mode-full')}}
-function exitFullscreen(){setMode('mode-grid')}
-function setMode(mode){if(state.mode===mode)return;state.mode=mode;DOM.stage.className=mode;if(mode==='mode-full')DOM.body.classList.add('is-fullscreen');else DOM.body.classList.remove('is-fullscreen');updateNavActive();DOM.nav.classList.remove('open');refreshAllClasses();if(mode!=='mode-full'&&state.players[state.focus]){const btn=document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);if(btn)btn.innerText='⛶'}}
-function updateNavActive(){const items=document.querySelectorAll('.nav-item');items.forEach(el=>el.classList.remove('active'));const modeIndex={'mode-grid':1,'mode-split':2,'mode-full':3};const activeIndex=modeIndex[state.mode];if(activeIndex!==undefined&&items[activeIndex])items[activeIndex].classList.add('active')}
-function swapPos(index,role){if(role==='x')return;const oldOwner=state.pos[role];let currentRole=null;if(state.pos.main===index)currentRole='main';else if(state.pos.s1===index)currentRole='s1';else if(state.pos.s2===index)currentRole='s2';state.pos[role]=index;if(currentRole)state.pos[currentRole]=oldOwner;refreshAllClasses()}
-function updateSlotClasses(index){const slot=getSlot(index);if(!slot)return;slot.classList.remove('p-main','p-side1','p-side2','is-focus');if(state.mode==='mode-split'){if(state.pos.main===index)slot.classList.add('p-main');if(state.pos.s1===index)slot.classList.add('p-side1');if(state.pos.s2===index)slot.classList.add('p-side2')}if(state.mode==='mode-full'&&state.focus===index)slot.classList.add('is-focus')}
-function refreshAllClasses(){for(let i=0;i<CONFIG.SLOT_COUNT;i++)updateSlotClasses(i)}
-function toggleNav(){DOM.nav.classList.toggle('open');if(DOM.nav.classList.contains('open'))buildSettingsList()}
-function persist(){try{const data={slots:state.slots,chatStates:state.chatStates,audioStates:state.audioStates,pos:state.pos};localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(data))}catch(error){console.error('Failed to save:',error)}}
-function loadStorage(){try{const data=localStorage.getItem(CONFIG.STORAGE_KEY);if(!data)return;const saved=JSON.parse(data);if(saved.slots&&Array.isArray(saved.slots))saved.slots.forEach((channel,i)=>{if(channel&&i<CONFIG.SLOT_COUNT){state.slots[i]=channel;updateSlotHTML(i,channel)}});if(saved.chatStates)state.chatStates=saved.chatStates;if(saved.audioStates)state.audioStates=saved.audioStates;if(saved.pos)state.pos=saved.pos}catch(error){console.error('Failed to load:',error)}}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+        const HOST = window.location.hostname || "localhost";
+        const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv"];
+
+        const state = {
+            mode: 'mode-grid',
+            slots: Array(6).fill(null),
+            players: Array(6).fill(null),
+            pos: { main: 0, s1: 1, s2: 2 },
+            focus: 0,
+            editIndex: -1
+        };
+
+        const stage = document.getElementById('stage');
+        const modal = document.getElementById('modal');
+        const inp = document.getElementById('inp');
+        const nav = document.getElementById('nav');
+        const header = document.getElementById('header');
+        const body = document.getElementById('body');
+        const settingsList = document.getElementById('settings-list');
+
+        // --- INIT ---
+        function init() {
+            // Gerüst bauen
+            stage.innerHTML = '';
+            for(let i=0; i<6; i++) {
+                const el = document.createElement('div');
+                el.className = 'slot';
+                el.id = 's-'+i;
+                el.onclick = () => { el.classList.add('active-touch'); setTimeout(()=>el.classList.remove('active-touch'), 3000); };
+                stage.appendChild(el);
+            }
+
+            loadStorage();
+
+            // Initiale Leere Slots
+            for(let i=0; i<6; i++) {
+                if(!state.slots[i]) updateSlotHTML(i, null);
+            }
+            
+            setupScroll();
+            renderSettingsPanel(); // Settings Panel initial befüllen
+        }
+
+        function setupScroll() {
+            let lastY = 0;
+            stage.addEventListener('scroll', () => {
+                const curY = stage.scrollTop;
+                if(state.mode === 'mode-grid' && curY > 50 && curY > lastY) header.classList.add('hide');
+                else header.classList.remove('hide');
+                lastY = curY;
+            });
+        }
+
+        // --- CORE: SLOT UPDATE ---
+        function updateSlotHTML(i, channel) {
+            const el = document.getElementById('s-'+i);
+            
+            // Cleanup Player
+            if(state.players[i]) {
+                try { state.players[i].setMuted(true); } catch(e){}
+                state.players[i] = null;
+                el.innerHTML = ''; 
+            }
+
+            // Case: Empty
+            if(!channel) {
+                el.innerHTML = `<div class="empty" onclick="openModal(${i})"><span>+</span></div>`;
+                el.classList.remove('chat-on');
+                renderSettingsPanel(); // Settings updaten
+                return;
+            }
+
+            // Case: Active
+            el.innerHTML = `
+                <div class="ui-bar" onclick="event.stopPropagation()">
+                    <div style="display:flex; align-items:center;">
+                        <span class="lbl">${channel}</span>
+                    </div>
+                    <div class="tools">
+                        <button class="btn" onclick="toggleAudio(${i}, this)" title="Audio">🔊</button>
+                        <button class="btn" onclick="toggleChat(${i}, this)" title="Chat">💬</button>
+                        <button class="btn" onclick="toggleFull(${i})" title="Vollbild">${state.mode==='mode-full' && state.focus===i ? '↙️' : '⛶'}</button>
+                        <button class="btn edit" onclick="editStream(${i})" title="Edit">✏️</button>
+                        <button class="btn del" onclick="delStream(${i})" title="Löschen">✕</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="vid" id="v-${i}"></div>
+                    <div class="chat-wrap" id="c-${i}"></div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                try {
+                    const p = new Twitch.Player('v-'+i, {
+                        width: '100%', height: '100%', channel: channel, parent: PARENTS,
+                        layout: 'video', autoplay: true, muted: true
+                    });
+                    
+                    p.addEventListener(Twitch.Player.READY, () => {
+                        p.setVolume(0.5);
+                        setTimeout(() => {
+                            const q = p.getQualities();
+                            const low = q.find(x => x.name.includes('360p') || x.name.includes('480p'));
+                            if(low) p.setQuality(low.group);
+                        }, 1500);
+                    });
+                    state.players[i] = p;
+
+                    const cDiv = document.getElementById('c-'+i);
+                    const ifr = document.createElement('iframe');
+                    ifr.src = `https://www.twitch.tv/embed/${channel}/chat?parent=${HOST}&parent=localhost&darkpopout`;
+                    ifr.className = 'chat-frame';
+                    ifr.sandbox = "allow-scripts allow-same-origin allow-popups allow-modals allow-forms"; 
+                    cDiv.appendChild(ifr);
+                } catch(e) { console.error(e); }
+            }, 50);
+            
+            updateSlotClasses(i);
+            renderSettingsPanel(); // Settings updaten wenn sich was ändert
+        }
+
+        // --- SETTINGS PANEL LOGIK ---
+        function renderSettingsPanel() {
+            settingsList.innerHTML = '';
+            
+            for(let i=0; i<6; i++) {
+                const ch = state.slots[i] || "";
+                const row = document.createElement('div');
+                row.className = 'set-row';
+
+                // Check Split Position
+                const isMain = state.pos.main === i;
+                const isS1 = state.pos.s1 === i;
+                const isS2 = state.pos.s2 === i;
+                const isUnassigned = !isMain && !isS1 && !isS2;
+
+                const chatActive = document.getElementById('s-'+i)?.classList.contains('chat-on');
+
+                row.innerHTML = `
+                    <div class="set-row-header">
+                        <span class="slot-label">SLOT ${i+1}</span>
+                        ${ch ? `<span style="font-size:0.7rem; color:${chatActive ? 'var(--primary)' : '#555'}">●</span>` : ''}
+                    </div>
+                    
+                    <!-- Eingabefeld für direkten Wechsel -->
+                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
+
+                    <!-- Positions Dropdown -->
+                    <select class="set-select" onchange="swapPos(${i}, this.value)">
+                        <option value="main" ${isMain?'selected':''}>Position: MAIN (Groß)</option>
+                        <option value="s1" ${isS1?'selected':''}>Position: SIDE 1 (Oben)</option>
+                        <option value="s2" ${isS2?'selected':''}>Position: SIDE 2 (Unten)</option>
+                        <option value="x" ${isUnassigned?'selected':''}>Position: ---</option>
+                    </select>
+
+                    <!-- Aktionen -->
+                    <div class="set-actions">
+                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, this)">Chat</button>
+                        <button class="set-btn danger" onclick="delStream(${i})">Leeren</button>
+                    </div>
+                `;
+                settingsList.appendChild(row);
+            }
+        }
+
+        function settingsUpdateName(i, val) {
+            val = cleanUrl(val);
+            if(val && val !== state.slots[i]) {
+                state.slots[i] = val;
+                updateSlotHTML(i, val);
+                persist();
+            } else if (!val) {
+                delStream(i);
+            }
+        }
+
+        // --- HELPERS ---
+        function cleanUrl(v) {
+            if(!v) return "";
+            v = v.trim().replace(/.*\/\//, '');
+            if(v.includes('twitch.tv/')) v = v.split('twitch.tv/')[1];
+            v = v.split('/')[0].split('?')[0];
+            return v;
+        }
+
+        function openModal(i) {
+            state.editIndex = i;
+            document.getElementById('modalTitle').innerText = state.slots[i] ? "Stream ändern" : "Stream hinzufügen";
+            inp.value = state.slots[i] || '';
+            modal.showModal();
+            setTimeout(() => inp.focus(), 100);
+        }
+
+        function save() {
+            let v = cleanUrl(inp.value);
+            if(v) {
+                state.slots[state.editIndex] = v;
+                updateSlotHTML(state.editIndex, v);
+                persist();
+            }
+            modal.close();
+        }
+
+        function editStream(i) { openModal(i); }
+        function delStream(i) {
+            state.slots[i] = null;
+            updateSlotHTML(i, null);
+            persist();
+        }
+
+        function toggleAudio(idx, btn) {
+            state.players.forEach((p, i) => {
+                if(p) {
+                    if(i === idx) {
+                        const m = p.getMuted();
+                        p.setMuted(!m);
+                        if(btn) btn.classList.toggle('act', m);
+                    } else {
+                        p.setMuted(true);
+                        const b = document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);
+                        if(b) b.classList.remove('act');
+                    }
+                }
+            });
+        }
+
+        function toggleChat(i, btn) {
+            const el = document.getElementById('s-'+i);
+            if(el) {
+                el.classList.toggle('chat-on');
+                // Button im Grid updaten
+                const gridBtn = el.querySelector('.btn[onclick^="toggleChat"]');
+                if(gridBtn) gridBtn.classList.toggle('act');
+                // Button im Settings Menu updaten (re-render simple)
+                renderSettingsPanel(); 
+            }
+        }
+
+        function toggleFull(i) {
+            if(state.mode === 'mode-full' && state.focus === i) setMode('mode-grid');
+            else { state.focus = i; setMode('mode-full'); }
+        }
+
+        function exitFullscreen() { setMode('mode-grid'); }
+
+        // --- LAYOUT ---
+        function setMode(m) {
+            state.mode = m;
+            stage.className = m;
+            
+            if(m === 'mode-full') body.classList.add('is-fullscreen');
+            else body.classList.remove('is-fullscreen');
+
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(el => el.classList.remove('active'));
+            if(m === 'mode-grid') items[1].classList.add('active');
+            if(m === 'mode-split') items[2].classList.add('active');
+            if(m === 'mode-full') items[3].classList.add('active');
+
+            nav.classList.remove('open');
+            refreshAllClasses();
+            
+            if(m !== 'mode-full' && state.players[state.focus]) {
+                 const btn = document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);
+                 if(btn) btn.innerText = '⛶';
+            }
+        }
+
+        function swapPos(idx, role) {
+            const oldOwner = state.pos[role];
+            let currentRole = null;
+            if(state.pos.main == idx) currentRole = 'main';
+            if(state.pos.s1 == idx) currentRole = 's1';
+            if(state.pos.s2 == idx) currentRole = 's2';
+            
+            state.pos[role] = idx;
+            if(currentRole) state.pos[currentRole] = oldOwner;
+            
+            refreshAllClasses();
+            renderSettingsPanel(); // Update Dropdowns
+        }
+
+        function updateSlotClasses(i) {
+            const el = document.getElementById('s-'+i);
+            el.classList.remove('p-main', 'p-side1', 'p-side2', 'is-focus');
+            
+            if(state.mode === 'mode-split') {
+                if(state.pos.main == i) el.classList.add('p-main');
+                if(state.pos.s1 == i) el.classList.add('p-side1');
+                if(state.pos.s2 == i) el.classList.add('p-side2');
+            }
+            if(state.mode === 'mode-full' && state.focus == i) {
+                el.classList.add('is-focus');
+            }
+        }
+
+        function refreshAllClasses() { for(let i=0; i<6; i++) updateSlotClasses(i); }
+
+        function toggleNav() { nav.classList.toggle('open'); }
+        
+        // Tab Switcher
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.menu-content').forEach(c => c.classList.remove('active'));
+            
+            if(tabName === 'view') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-view').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-settings').classList.add('active');
+                renderSettingsPanel(); // Refresh beim Öffnen
+            }
+        }
+
+        // --- STORAGE ---
+        function persist() { localStorage.setItem('sc-v8-control', JSON.stringify(state.slots)); }
+        function loadStorage() {
+            const d = localStorage.getItem('sc-v8-control');
+            if(d) {
+                try {
+                    const arr = JSON.parse(d);
+                    arr.forEach((n, i) => { 
+                        if(n) { 
+                            state.slots[i] = n; 
+                            updateSlotHTML(i, n); 
+                        } 
+                    });
+                } catch(e) {}
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>
