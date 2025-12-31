@@ -3,32 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command V8 - Control Center</title>
-    <!-- Twitch Embed API -->
+    <title>Stream Command 10 (Final)</title>
+    <!-- Twitch API -->
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #050505;
-            --panel: #111;
-            --primary: #9146FF;
-            --active: #00ffcc;
-            --danger: #ff4444;
-            --edit: #ffaa00;
-            --text: #fff;
-            --safe-z: 10000;
+            --bg: #050505; --panel: #111; --primary: #9146FF; --active: #00ffcc;
+            --danger: #ff4444; --edit: #ffaa00; --text: #fff; --safe-z: 10000;
         }
 
-        /* --- GLOBAL SETUP --- */
+        /* --- GLOBAL --- */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: var(--bg); color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
-        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- HEADER & TOP BAR --- */
+        /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: 50px;
             background: rgba(10,10,10,0.98); border-bottom: 1px solid #333;
@@ -38,7 +27,7 @@
         header.hide { transform: translateY(-100%); }
         .brand { font-weight: 800; font-size: 1rem; color: var(--primary); letter-spacing: 1px; }
 
-        /* --- DER RETTER: FLOATING MENU BUTTON --- */
+        /* --- MENU BUTTON --- */
         .float-btn {
             position: fixed; top: 7px; right: 10px; width: 38px; height: 38px;
             background: #111; border: 1px solid #444; border-radius: 6px;
@@ -48,54 +37,42 @@
         }
         .float-btn:active { background: var(--primary); }
 
-        /* --- NAVIGATION & SETTINGS OVERLAY --- */
+        /* --- NAVIGATION & SETTINGS PANEL --- */
         #nav {
-            position: fixed; top: 0; right: 0; bottom: 0; width: 320px; /* Breiter für Settings */
+            position: fixed; top: 0; right: 0; bottom: 0; width: 340px; /* Breit genug für Settings */
             background: #0a0a0a; border-left: 1px solid #333;
             transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 9000; padding: 60px 0 0 0; /* Padding oben für Close Button */
+            z-index: 9000; padding: 60px 0 0 0;
             display: flex; flex-direction: column; 
             box-shadow: -10px 0 50px rgba(0,0,0,0.8);
         }
         #nav.open { transform: translateX(0); }
         
-        /* Menu Tabs */
         .menu-tabs { display: flex; border-bottom: 1px solid #333; }
         .tab-btn { flex: 1; padding: 15px; background: #111; border: none; color: #888; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #1a1a1a; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        /* Menu Content Area */
         .menu-content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
         .menu-content.active { display: block; }
 
-        /* Navigation Buttons */
-        .nav-item {
-            padding: 15px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer;
-            border: 1px solid transparent; transition: 0.2s; margin-bottom: 8px;
-        }
+        /* Nav Buttons */
+        .nav-item { padding: 15px; background: #1a1a1a; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; border: 1px solid transparent; margin-bottom: 8px; }
         .nav-item:hover { border-color: #555; }
         .nav-item.active { background: var(--primary); color: white; border-color: var(--primary); }
         .nav-item.exit { background: #300; border: 1px solid var(--danger); color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* SETTINGS ROW DESIGN */
-        .set-row {
-            background: #141414; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333;
-        }
-        .set-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .slot-label { font-size: 0.8rem; font-weight: bold; color: #666; }
-        
-        .set-input { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; font-size: 0.9rem; }
-        
-        .set-actions { display: flex; gap: 5px; margin-top: 8px; }
-        .set-btn { flex: 1; padding: 6px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc; cursor: pointer; font-size: 0.8rem; }
+        /* Settings Rows Styles */
+        .set-row { background: #141414; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333; }
+        .set-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; color: #888; font-weight: bold; }
+        .set-input { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; margin-bottom: 5px; }
+        .set-select { width: 100%; background: #222; color: white; border: 1px solid #444; padding: 6px; border-radius: 4px; margin-bottom: 5px; }
+        .set-actions { display: flex; gap: 5px; }
+        .set-btn { flex: 1; padding: 8px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
         .set-btn.act { background: var(--primary); color: white; border-color: var(--primary); }
-        .set-btn.danger { background: #300; color: #f88; border-color: #500; }
+        .set-btn.danger { background: #300; color: #fcc; border-color: #500; }
 
-        /* Split Position Dropdown in Settings */
-        .set-select { background: #222; color: white; border: 1px solid #444; border-radius: 4px; padding: 6px; width: 100%; margin-top: 5px; }
-
-        /* --- STAGE (RASTER) --- */
+        /* --- STAGE --- */
         #stage {
             flex: 1; margin-top: 50px; 
             overflow-y: auto; overflow-x: hidden; 
@@ -104,11 +81,10 @@
         }
         body.is-fullscreen #stage { margin-top: 0; padding: 0; overflow: hidden; }
 
-        /* GRID MODUS */
+        /* LAYOUTS */
         @media (min-width: 700px) { #stage.mode-grid { grid-template-columns: 1fr 1fr; } }
         @media (min-width: 1100px) { #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; grid-auto-rows: 50vh; } }
 
-        /* SPLIT MODUS */
         .mode-split .slot { display: none; }
         .mode-split {
             grid-template-columns: 1fr; grid-template-rows: 50vh 30vh 30vh;
@@ -120,19 +96,18 @@
                 grid-template-areas: "main side1" "main side2";
             }
         }
-        /* Positions-Logik */
+        /* CSS Positioning Logic */
         .mode-split .slot.p-main { display: flex; grid-area: main; border: 2px solid var(--primary); z-index: 10; }
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
-        /* FULLSCREEN MODUS */
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { 
             display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
             background: #000;
         }
 
-        /* --- SLOT KOMPONENTE --- */
+        /* --- SLOT --- */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
             min-height: 280px; border-radius: 4px; overflow: hidden; contain: content;
@@ -149,7 +124,6 @@
         .slot:hover .ui-bar, .slot.active-touch .ui-bar, .slot.chat-on .ui-bar { opacity: 1; pointer-events: auto; }
 
         .lbl { font-size: 0.75rem; font-weight: bold; background: var(--primary); padding: 2px 6px; border-radius: 3px; max-width: 90px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        
         .tools { display: flex; gap: 4px; }
         .btn {
             width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.6); color: #ccc;
@@ -160,28 +134,38 @@
         .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
         .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
 
-        /* Content (Video/Chat) */
+        /* Pos Dropdown (Slot View) */
+        .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
+        .mode-split .pos-sel { display: block; pointer-events: auto; }
+
+        /* --- CONTENT AREA (CHAT FIX) --- */
         .content { flex: 1; display: flex; width: 100%; height: 100%; position: relative; }
         .vid { flex: 1; background: #000; width: 100%; height: 100%; }
         
         .chat-wrap { 
-            width: 0; background: #111; transition: width 0.3s ease, height 0.3s ease; 
-            border-left: 1px solid #333; position: relative; overflow: hidden;
+            width: 0; background: #111; 
+            transition: width 0.3s ease, height 0.3s ease; 
+            border-left: 1px solid #333; position: relative;
+            /* Scrollbar aktivieren! */
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
         .slot.chat-on .chat-wrap { width: 320px; }
         
+        /* Mobile Layout: Chat Unten, Groß genug für Cookie Banner */
         @media (max-width: 650px) {
             .slot.chat-on .content { flex-direction: column; }
             .slot.chat-on .chat-wrap { 
-                width: 100% !important; height: 45%; 
+                width: 100% !important; 
+                height: 70%; /* 70% Höhe für Chat auf Mobile -> Genug Platz für Banner */
                 border-left: none; border-top: 1px solid #333; 
             }
         }
 
-        /* Iframe Zoom Fix */
+        /* Iframe Zoom */
         .chat-frame {
             width: 125%; height: 125%; border: none;
             transform-origin: top left; transform: scale(0.8);
+            pointer-events: auto;
         }
 
         /* Empty State */
@@ -206,51 +190,35 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 8</div>
+        <div class="brand">STREAM COMMAND 10</div>
     </header>
 
-    <!-- Floating Menu Toggle -->
     <div class="float-btn" onclick="toggleNav()">☰</div>
 
-    <!-- Navigation & Settings Menu -->
     <div id="nav">
-        <!-- Tabs -->
         <div class="menu-tabs">
             <button class="tab-btn active" onclick="switchTab('view')">ANSICHT</button>
             <button class="tab-btn" onclick="switchTab('settings')">EINSTELLUNGEN</button>
         </div>
 
-        <!-- Tab 1: Ansicht -->
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD VERLASSEN</div>
             <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (1+2)</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
-            
-            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-            <div style="text-align:center; font-size:0.8rem; color:#666;">
-                Status: <span id="sys-status">Optimal</span>
-            </div>
+            <div style="margin-top:20px; color:#555; text-align:center; font-size:0.7rem;">Fixed Chat + Central Settings</div>
         </div>
 
-        <!-- Tab 2: Einstellungen (Das neue Control Center) -->
         <div id="tab-settings" class="menu-content">
-            <div style="font-size:0.8rem; color:#888; margin-bottom:15px; text-align:center;">
-                Verwalte alle 6 Slots zentral.
-            </div>
-            <div id="settings-list">
-                <!-- Wird via JS gefüllt -->
-            </div>
+            <div id="settings-list"></div>
         </div>
     </div>
 
-    <!-- Das Raster -->
     <div id="stage" class="mode-grid"></div>
 
-    <!-- Modal Dialog -->
     <dialog id="modal">
         <h3 id="modalTitle">Stream hinzufügen</h3>
-        <input type="text" id="inp" placeholder="z.B. elotrix">
+        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/trymacs">
         <div class="row-btn">
             <button class="b-no" onclick="modal.close()">Abbruch</button>
             <button class="b-ok" onclick="save()">Speichern</button>
@@ -278,9 +246,7 @@
         const body = document.getElementById('body');
         const settingsList = document.getElementById('settings-list');
 
-        // --- INIT ---
         function init() {
-            // Gerüst bauen
             stage.innerHTML = '';
             for(let i=0; i<6; i++) {
                 const el = document.createElement('div');
@@ -289,16 +255,12 @@
                 el.onclick = () => { el.classList.add('active-touch'); setTimeout(()=>el.classList.remove('active-touch'), 3000); };
                 stage.appendChild(el);
             }
-
             loadStorage();
-
-            // Initiale Leere Slots
             for(let i=0; i<6; i++) {
                 if(!state.slots[i]) updateSlotHTML(i, null);
             }
-            
             setupScroll();
-            renderSettingsPanel(); // Settings Panel initial befüllen
+            renderSettingsPanel();
         }
 
         function setupScroll() {
@@ -311,30 +273,37 @@
             });
         }
 
-        // --- CORE: SLOT UPDATE ---
+        // --- CORE UPDATE LOGIC ---
         function updateSlotHTML(i, channel) {
             const el = document.getElementById('s-'+i);
             
-            // Cleanup Player
             if(state.players[i]) {
                 try { state.players[i].setMuted(true); } catch(e){}
                 state.players[i] = null;
                 el.innerHTML = ''; 
             }
 
-            // Case: Empty
             if(!channel) {
                 el.innerHTML = `<div class="empty" onclick="openModal(${i})"><span>+</span></div>`;
                 el.classList.remove('chat-on');
-                renderSettingsPanel(); // Settings updaten
+                renderSettingsPanel();
                 return;
             }
 
-            // Case: Active
+            const isM = state.pos.main === i;
+            const isS1 = state.pos.s1 === i;
+            const isS2 = state.pos.s2 === i;
+
             el.innerHTML = `
                 <div class="ui-bar" onclick="event.stopPropagation()">
                     <div style="display:flex; align-items:center;">
                         <span class="lbl">${channel}</span>
+                        <select class="pos-sel" onchange="swapPos(${i}, this.value)">
+                            <option value="main" ${isM?'selected':''}>Main</option>
+                            <option value="s1" ${isS1?'selected':''}>Side 1</option>
+                            <option value="s2" ${isS2?'selected':''}>Side 2</option>
+                            <option value="x" disabled>---</option>
+                        </select>
                     </div>
                     <div class="tools">
                         <button class="btn" onclick="toggleAudio(${i}, this)" title="Audio">🔊</button>
@@ -377,44 +346,35 @@
             }, 50);
             
             updateSlotClasses(i);
-            renderSettingsPanel(); // Settings updaten wenn sich was ändert
+            renderSettingsPanel();
         }
 
-        // --- SETTINGS PANEL LOGIK ---
+        // --- SETTINGS PANEL ---
         function renderSettingsPanel() {
             settingsList.innerHTML = '';
-            
             for(let i=0; i<6; i++) {
                 const ch = state.slots[i] || "";
                 const row = document.createElement('div');
                 row.className = 'set-row';
-
-                // Check Split Position
+                
                 const isMain = state.pos.main === i;
                 const isS1 = state.pos.s1 === i;
                 const isS2 = state.pos.s2 === i;
                 const isUnassigned = !isMain && !isS1 && !isS2;
-
                 const chatActive = document.getElementById('s-'+i)?.classList.contains('chat-on');
 
                 row.innerHTML = `
-                    <div class="set-row-header">
-                        <span class="slot-label">SLOT ${i+1}</span>
-                        ${ch ? `<span style="font-size:0.7rem; color:${chatActive ? 'var(--primary)' : '#555'}">●</span>` : ''}
+                    <div class="set-header">
+                        <span>SLOT ${i+1}</span>
+                        <span>${isMain?'MAIN':isS1?'SIDE 1':isS2?'SIDE 2':''}</span>
                     </div>
-                    
-                    <!-- Eingabefeld für direkten Wechsel -->
                     <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
-
-                    <!-- Positions Dropdown -->
                     <select class="set-select" onchange="swapPos(${i}, this.value)">
-                        <option value="main" ${isMain?'selected':''}>Position: MAIN (Groß)</option>
-                        <option value="s1" ${isS1?'selected':''}>Position: SIDE 1 (Oben)</option>
-                        <option value="s2" ${isS2?'selected':''}>Position: SIDE 2 (Unten)</option>
+                        <option value="main" ${isMain?'selected':''}>Position: Main</option>
+                        <option value="s1" ${isS1?'selected':''}>Position: Side 1</option>
+                        <option value="s2" ${isS2?'selected':''}>Position: Side 2</option>
                         <option value="x" ${isUnassigned?'selected':''}>Position: ---</option>
                     </select>
-
-                    <!-- Aktionen -->
                     <div class="set-actions">
                         <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, this)">Chat</button>
                         <button class="set-btn danger" onclick="delStream(${i})">Leeren</button>
@@ -435,7 +395,6 @@
             }
         }
 
-        // --- HELPERS ---
         function cleanUrl(v) {
             if(!v) return "";
             v = v.trim().replace(/.*\/\//, '');
@@ -446,7 +405,7 @@
 
         function openModal(i) {
             state.editIndex = i;
-            document.getElementById('modalTitle').innerText = state.slots[i] ? "Stream ändern" : "Stream hinzufügen";
+            document.getElementById('modalTitle').innerText = state.slots[i] ? "Ändern" : "Hinzufügen";
             inp.value = state.slots[i] || '';
             modal.showModal();
             setTimeout(() => inp.focus(), 100);
@@ -489,11 +448,9 @@
             const el = document.getElementById('s-'+i);
             if(el) {
                 el.classList.toggle('chat-on');
-                // Button im Grid updaten
                 const gridBtn = el.querySelector('.btn[onclick^="toggleChat"]');
                 if(gridBtn) gridBtn.classList.toggle('act');
-                // Button im Settings Menu updaten (re-render simple)
-                renderSettingsPanel(); 
+                renderSettingsPanel();
             }
         }
 
@@ -504,23 +461,18 @@
 
         function exitFullscreen() { setMode('mode-grid'); }
 
-        // --- LAYOUT ---
         function setMode(m) {
             state.mode = m;
             stage.className = m;
-            
             if(m === 'mode-full') body.classList.add('is-fullscreen');
             else body.classList.remove('is-fullscreen');
-
             const items = document.querySelectorAll('.nav-item');
             items.forEach(el => el.classList.remove('active'));
             if(m === 'mode-grid') items[1].classList.add('active');
             if(m === 'mode-split') items[2].classList.add('active');
             if(m === 'mode-full') items[3].classList.add('active');
-
             nav.classList.remove('open');
             refreshAllClasses();
-            
             if(m !== 'mode-full' && state.players[state.focus]) {
                  const btn = document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);
                  if(btn) btn.innerText = '⛶';
@@ -533,18 +485,16 @@
             if(state.pos.main == idx) currentRole = 'main';
             if(state.pos.s1 == idx) currentRole = 's1';
             if(state.pos.s2 == idx) currentRole = 's2';
-            
             state.pos[role] = idx;
             if(currentRole) state.pos[currentRole] = oldOwner;
-            
             refreshAllClasses();
-            renderSettingsPanel(); // Update Dropdowns
+            syncDropdowns();
+            renderSettingsPanel();
         }
 
         function updateSlotClasses(i) {
             const el = document.getElementById('s-'+i);
             el.classList.remove('p-main', 'p-side1', 'p-side2', 'is-focus');
-            
             if(state.mode === 'mode-split') {
                 if(state.pos.main == i) el.classList.add('p-main');
                 if(state.pos.s1 == i) el.classList.add('p-side1');
@@ -556,37 +506,41 @@
         }
 
         function refreshAllClasses() { for(let i=0; i<6; i++) updateSlotClasses(i); }
+        
+        function syncDropdowns() {
+            state.slots.forEach((_, i) => {
+                const sel = document.querySelector(`#s-${i} .pos-sel`);
+                if(sel) {
+                    if(state.pos.main == i) sel.value = 'main';
+                    else if(state.pos.s1 == i) sel.value = 's1';
+                    else if(state.pos.s2 == i) sel.value = 's2';
+                    else sel.value = 'x';
+                }
+            });
+        }
 
         function toggleNav() { nav.classList.toggle('open'); }
         
-        // Tab Switcher
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.menu-content').forEach(c => c.classList.remove('active'));
-            
             if(tabName === 'view') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
                 document.getElementById('tab-view').classList.add('active');
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('tab-settings').classList.add('active');
-                renderSettingsPanel(); // Refresh beim Öffnen
+                renderSettingsPanel();
             }
         }
 
-        // --- STORAGE ---
-        function persist() { localStorage.setItem('sc-v8-control', JSON.stringify(state.slots)); }
+        function persist() { localStorage.setItem('sc-final-10', JSON.stringify(state.slots)); }
         function loadStorage() {
-            const d = localStorage.getItem('sc-v8-control');
+            const d = localStorage.getItem('sc-final-10');
             if(d) {
                 try {
                     const arr = JSON.parse(d);
-                    arr.forEach((n, i) => { 
-                        if(n) { 
-                            state.slots[i] = n; 
-                            updateSlotHTML(i, n); 
-                        } 
-                    });
+                    arr.forEach((n, i) => { if(n) { state.slots[i] = n; updateSlotHTML(i, n); } });
                 } catch(e) {}
             }
         }
