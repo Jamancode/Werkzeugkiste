@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 13 (Ultimate)</title>
-    <!-- Twitch Embed API -->
+    <title>Stream Command 15 (Final Fixed)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
@@ -31,7 +30,7 @@
         header.hide { transform: translateY(-100%); }
         .brand { font-weight: 800; font-size: 1rem; color: var(--primary); letter-spacing: 1px; }
 
-        /* --- MENU BTN --- */
+        /* --- MENU BUTTON --- */
         .float-btn {
             position: fixed; top: 7px; right: 10px; width: 38px; height: 38px;
             background: #111; border: 1px solid #444; border-radius: 6px;
@@ -68,14 +67,11 @@
         .nav-item.exit { background: #300; border: 1px solid var(--danger); color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* --- SETTINGS ROW DESIGN --- */
+        /* Settings Rows */
         .set-row { background: #141414; padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #333; }
         .set-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #888; font-weight: bold; }
-        
-        /* Inputs stacked for mobile friendliness */
         .set-input { width: 100%; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; margin-bottom: 8px; font-family: monospace; }
         .set-select { width: 100%; background: #222; color: white; border: 1px solid #444; padding: 8px; border-radius: 4px; margin-bottom: 8px; cursor: pointer; }
-        
         .set-actions { display: flex; gap: 5px; margin-top: 5px; }
         .set-btn { flex: 1; padding: 8px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
         .set-btn.act { background: var(--primary); color: white; border-color: var(--primary); }
@@ -119,6 +115,7 @@
         }
         @media(min-width: 1100px) { .slot { min-height: 0; } }
 
+        /* Toolbar */
         .ui-bar {
             position: absolute; top: 0; left: 0; right: 0; height: 38px;
             background: rgba(0,0,0,0.9); backdrop-filter: blur(4px);
@@ -134,29 +131,43 @@
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
         .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
         .btn.del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
-
-        /* Position Select (In-Video) */
         .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
         .mode-split .pos-sel { display: block; pointer-events: auto; }
 
-        /* --- CONTENT --- */
-        .content { flex: 1; display: flex; width: 100%; height: 100%; position: relative; }
-        .vid { flex: 1; background: #000; width: 100%; height: 100%; }
-        
-        /* CHAT CONTAINER MIT SCROLL FIX */
-        .chat-wrap { 
-            width: 0; background: #111; transition: width 0.3s ease, height 0.3s ease; 
-            border-left: 1px solid #333; position: relative;
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding-bottom: 250px; /* Extremes Padding für Cookie Banner Erreichbarkeit */
+        /* --- CONTENT AREA (FIXED SIDE-BY-SIDE) --- */
+        .content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: row !important; /* Zwingt nebeneinander */
+            flex-wrap: nowrap !important; /* Kein Umbruch erlaubt! */
+            width: 100%; height: 100%; position: relative; 
         }
+        
+        .vid { flex: 1; background: #000; height: 100%; min-width: 0; }
+        
+        .chat-wrap { 
+            width: 0; background: #111; 
+            transition: width 0.3s ease; 
+            border-left: 1px solid #333; position: relative;
+            /* Scrollbar aktivieren und riesiges Padding für Cookie Banner */
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: 300px; 
+        }
+        
+        /* Desktop Width */
         .slot.chat-on .chat-wrap { width: 340px; }
         
+        /* Mobile Width Override: Nebeneinander bleiben! */
         @media (max-width: 650px) {
-            .slot.chat-on .content { flex-direction: column; }
-            .slot.chat-on .chat-wrap { width: 100% !important; height: 60%; border-left: none; border-top: 1px solid #333; }
+            .slot.chat-on .chat-wrap { 
+                width: 45%; /* Etwas weniger als die Hälfte */
+                height: 100%; /* Volle Höhe */
+                border-left: 1px solid #333; 
+                /* Kein border-top, da wir links/rechts sind */
+            }
         }
 
+        /* Iframe Zoom */
         .chat-frame {
             width: 125%; height: 125%; border: none;
             transform-origin: top left; transform: scale(0.8);
@@ -179,7 +190,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 13</div>
+        <div class="brand">STREAM COMMAND 15</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -196,7 +207,7 @@
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
             <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
-                Central Control & Quality Management
+                Forced Side-by-Side • Audio in Settings
             </div>
         </div>
 
@@ -209,7 +220,7 @@
 
     <dialog id="modal">
         <h3 id="modalTitle">Stream hinzufügen</h3>
-        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/shroud">
+        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/mowky">
         <div class="row-btn">
             <button class="b-no" onclick="modal.close()">Abbruch</button>
             <button class="b-ok" onclick="save()">Speichern</button>
@@ -224,8 +235,7 @@
             mode: 'mode-grid',
             slots: Array(6).fill(null),
             players: Array(6).fill(null),
-            // NEU: Qualität pro Slot speichern
-            qualities: Array(6).fill('360p'), 
+            qualities: Array(6).fill('360p'),
             pos: { main: 0, s1: 1, s2: 2 },
             focus: 0,
             editIndex: -1
@@ -266,7 +276,6 @@
             });
         }
 
-        // --- CORE LOGIC ---
         function updateSlotHTML(i, channel) {
             const el = document.getElementById('s-'+i);
             
@@ -321,7 +330,6 @@
                     
                     p.addEventListener(Twitch.Player.READY, () => {
                         p.setVolume(0.5);
-                        // Apply stored quality preference
                         applyQuality(p, state.qualities[i]);
                     });
                     state.players[i] = p;
@@ -339,30 +347,18 @@
             renderSettingsPanel();
         }
 
-        // Helper to apply quality safely
         function applyQuality(player, qualityName) {
             if(!player) return;
-            // Warte kurz auf Qualitäten
             setTimeout(() => {
                 const quals = player.getQualities();
                 if(!quals || quals.length === 0) return;
-
                 let target = null;
-                if(qualityName === 'auto') {
-                    target = quals.find(q => q.group === 'auto');
-                } else {
-                    // Versuche exakten Match oder Contains (z.B. "360p" in "360p30")
-                    target = quals.find(q => q.name.includes(qualityName));
-                }
-
-                if(target) {
-                    console.log(`Setting Quality to ${target.name}`);
-                    player.setQuality(target.group);
-                }
+                if(qualityName === 'auto') target = quals.find(q => q.group === 'auto');
+                else target = quals.find(q => q.name.includes(qualityName));
+                if(target) player.setQuality(target.group);
             }, 1500);
         }
 
-        // --- SETTINGS PANEL (MIT QUALITÄT) ---
         function renderSettingsPanel() {
             settingsList.innerHTML = '';
             for(let i=0; i<6; i++) {
@@ -374,7 +370,11 @@
                 const isS1 = state.pos.s1 === i;
                 const isS2 = state.pos.s2 === i;
                 const isUnassigned = !isMain && !isS1 && !isS2;
+                
                 const chatActive = document.getElementById('s-'+i)?.classList.contains('chat-on');
+                // Check if audio is unmuted (approximate check via internal mute state if available, else visual only)
+                const player = state.players[i];
+                const audioActive = player && !player.getMuted();
                 const currQ = state.qualities[i];
 
                 row.innerHTML = `
@@ -382,40 +382,33 @@
                         <span>SLOT ${i+1}</span>
                         <span>${isMain?'MAIN':isS1?'SIDE 1':isS2?'SIDE 2':''}</span>
                     </div>
+                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" onchange="settingsUpdateName(${i}, this.value)">
                     
-                    <!-- NAME -->
-                    <input class="set-input" type="text" placeholder="Leer" value="${ch}" 
-                        onchange="settingsUpdateName(${i}, this.value)">
-                    
-                    <!-- POSITION -->
                     <select class="set-select" onchange="swapPos(${i}, this.value)">
-                        <option value="main" ${isMain?'selected':''}>Position: MAIN (Groß)</option>
-                        <option value="s1" ${isS1?'selected':''}>Position: SIDE 1 (Oben)</option>
-                        <option value="s2" ${isS2?'selected':''}>Position: SIDE 2 (Unten)</option>
-                        <option value="x" ${isUnassigned?'selected':''}>Position: ---</option>
+                        <option value="main" ${isMain?'selected':''}>Pos: Main</option>
+                        <option value="s1" ${isS1?'selected':''}>Pos: Side 1</option>
+                        <option value="s2" ${isS2?'selected':''}>Pos: Side 2</option>
+                        <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
                     </select>
 
-                    <!-- QUALITÄT (NEU) -->
                     <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
-                        <option value="auto" ${currQ==='auto'?'selected':''}>Qualität: Auto</option>
-                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Qualität: 1080p (Source)</option>
-                        <option value="720p" ${currQ==='720p'?'selected':''}>Qualität: 720p</option>
-                        <option value="480p" ${currQ==='480p'?'selected':''}>Qualität: 480p</option>
-                        <option value="360p" ${currQ==='360p'?'selected':''}>Qualität: 360p (Default)</option>
-                        <option value="160p" ${currQ==='160p'?'selected':''}>Qualität: 160p</option>
+                        <option value="auto" ${currQ==='auto'?'selected':''}>Q: Auto</option>
+                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Q: 1080p</option>
+                        <option value="720p" ${currQ==='720p'?'selected':''}>Q: 720p</option>
+                        <option value="480p" ${currQ==='480p'?'selected':''}>Q: 480p</option>
+                        <option value="360p" ${currQ==='360p'?'selected':''}>Q: 360p</option>
+                        <option value="160p" ${currQ==='160p'?'selected':''}>Q: 160p</option>
                     </select>
                     
-                    <!-- ACTIONS -->
                     <div class="set-actions">
-                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, this)">Chat</button>
+                        <button class="set-btn ${audioActive?'act':''}" onclick="toggleAudio(${i}, null)">Audio</button>
+                        <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat</button>
                         <button class="set-btn danger" onclick="delStream(${i})">Leeren</button>
                     </div>
                 `;
                 settingsList.appendChild(row);
             }
         }
-
-        // --- UPDATER FUNKTIONEN ---
 
         function settingsUpdateName(i, val) {
             val = cleanUrl(val);
@@ -430,10 +423,7 @@
 
         function settingsUpdateQuality(i, val) {
             state.qualities[i] = val;
-            // Direkt anwenden wenn Player läuft
-            if(state.players[i]) {
-                applyQuality(state.players[i], val);
-            }
+            if(state.players[i]) applyQuality(state.players[i], val);
             persist();
         }
 
@@ -479,11 +469,14 @@
                         if(btn) btn.classList.toggle('act', m);
                     } else {
                         p.setMuted(true);
+                        // UI update for others
                         const b = document.querySelector(`#s-${i} .btn[onclick^="toggleAudio"]`);
                         if(b) b.classList.remove('act');
                     }
                 }
             });
+            // Update settings panel explicitly to reflect audio changes
+            renderSettingsPanel();
         }
 
         function toggleChat(i, btn) {
@@ -563,27 +556,16 @@
         }
 
         function persist() { 
-            // Speichere Slots UND Qualitäten
-            const data = {
-                slots: state.slots,
-                qualities: state.qualities
-            };
-            localStorage.setItem('sc-v13', JSON.stringify(data)); 
+            const data = { slots: state.slots, qualities: state.qualities };
+            localStorage.setItem('sc-v15', JSON.stringify(data)); 
         }
-        
         function loadStorage() {
-            const d = localStorage.getItem('sc-v13');
+            const d = localStorage.getItem('sc-v15');
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
-                    // Support für alte Struktur (Array) oder neue Struktur (Object)
-                    if(Array.isArray(parsed)) {
-                        state.slots = parsed;
-                    } else {
-                        state.slots = parsed.slots || Array(6).fill(null);
-                        state.qualities = parsed.qualities || Array(6).fill('360p');
-                    }
-                    
+                    if(Array.isArray(parsed)) { state.slots = parsed; } 
+                    else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('360p'); }
                     state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
                 } catch(e) {}
             }
