@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stream Command Cloud</title>
+    <!-- Twitch Embed API -->
+    <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
+    <style>
+        :root {
+            --bg: #0e0e10;
+            --panel: #18181b;
+            --primary: #9146FF;
+            --text: #fff;
+            --danger: #ff5555;
+            --header-h: 55px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #000; border-bottom: 1px solid #333;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+            z-index: 100;
+        }
+        .brand { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
+        .brand span { color: var(--primary); }
+        
+        .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+        /* OVERLAY MENU */
+        .nav {
+            position: fixed; top: var(--header-h); right: 0; bottom: 0; width: 260px;
+            background: rgba(20, 20, 25, 0.98); backdrop-filter: blur(10px);
+            border-left: 1px solid #333; transform: translateX(100%); transition: transform 0.3s ease;
+            z-index: 99; display: flex; flex-direction: column; padding: 20px;
+        }
+        .nav.open { transform: translateX(0); }
+        .nav-item {
+            padding: 15px; font-weight: 600; cursor: pointer; border-radius: 8px; margin-bottom: 8px;
+            transition: 0.2s; border: 1px solid transparent;
+        }
+        .nav-item:hover { background: #333; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(145, 70, 255, 0.3); }
+
+        /* GRID STAGE */
+        #stage { flex: 1; display: grid; gap: 4px; padding: 4px; overflow: hidden; position: relative; }
+
+        /* MODES */
+        /* 1. Grid (Mobile First) */
+        .mode-grid { grid-template-columns: 1fr; grid-template-rows: repeat(6, 1fr); }
+        @media (min-width: 768px) { .mode-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); } }
+        @media (min-width: 1200px) { .mode-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; } }
+
+        /* 2. Split */
+        .mode-split .slot { display: none; }
+        .mode-split { 
+            grid-template-areas: "main" "side1" "side2"; 
+            grid-template-columns: 1fr; grid-template-rows: 50% 25% 25%; 
+        }
+        @media (min-width: 1024px) {
+            .mode-split {
+                grid-template-areas: "main side1" "main side2";
+                grid-template-columns: 3fr 1fr; grid-template-rows: 1fr 1fr;
+            }
+        }
+        /* Logic for split positioning */
+        .mode-split .slot[data-pos="main"] { display: flex; grid-area: main; border: 2px solid var(--primary); }
+        .mode-split .slot[data-pos="side1"] { display: flex; grid-area: side1; }
+        .mode-split .slot[data-pos="side2"] { display: flex; grid-area: side2; }
+
+        /* 3. Fullscreen */
+        .mode-full .slot { display: none; }
+        .mode-full .slot.is-fullscreen { display: flex; width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 50; }
+
+
+        /* SLOT COMPONENT */
+        .slot { background: var(--panel); position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: 4px; }
+        
+        .empty-state {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #555; cursor: pointer; transition: 0.2s;
+        }
+        .empty-state:hover { color: var(--primary); background: #222; }
+        .icon-plus { font-size: 2.5rem; margin-bottom: 10px; }
+
+        /* Video Area */
+        .content-area { flex: 1; display: flex; position: relative; width: 100%; height: 100%; }
+        .video-embed { flex: 1; background: black; }
+        .chat-embed { width: 0; background: #0e0e10; border-left: 1px solid #333; transition: width 0.3s ease; }
+        
+        /* Chat Open State */
+        .slot.chat-on .chat-embed { width: 340px; }
+        @media (max-width: 600px) {
+            .slot.chat-on .content-area { flex-direction: column; }
+            .slot.chat-on .chat-embed { width: 100%; height: 50%; border-left: none; border-top: 1px solid #333; }
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute; top: 0; left: 0; right: 0; height: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 10px;
+            opacity: 0; transition: opacity 0.2s; z-index: 20;
+        }
+        /* Show controls on hover OR if chat/audio is active on mobile to give feedback */
+        .slot:hover .controls, .slot.active-ui .controls { opacity: 1; }
+
+        .tag { background: var(--primary); font-size: 0.75rem; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+        
+        .actions button {
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); 
+            color: #ccc; width: 32px; height: 32px; border-radius: 4px; margin-left: 5px; cursor: pointer;
+        }
+        .actions button.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .actions button.delete:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+        /* SPLIT SELECTOR (Only in split mode) */
+        .pos-select {
+            position: absolute; bottom: 10px; right: 10px; z-index: 30;
+            background: #000; color: white; border: 1px solid #444; padding: 5px; font-size: 0.8rem;
+            display: none;
+        }
+        .mode-split .slot .pos-select { display: block; }
+
+        /* DIALOG */
+        dialog {
+            background: #18181b; color: white; border: 1px solid #333; border-radius: 12px;
+            padding: 24px; width: 90%; max-width: 400px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        dialog::backdrop { background: rgba(0,0,0,0.8); }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #333; color: white; border-radius: 6px; }
+        .btn-load { background: var(--primary); width: 100%; padding: 12px; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">STREAM<span>COMMAND</span></div>
+        <button class="menu-btn" onclick="toggleNav()">☰</button>
+    </header>
+
+    <div class="nav" id="nav">
+        <div class="nav-item active" onclick="setMode('grid')">GRID (6)</div>
+        <div class="nav-item" onclick="setMode('split')">SPLIT (1+2)</div>
+        <div class="nav-item" onclick="setMode('full')">VOLLBILD</div>
+    </div>
+
+    <div id="stage" class="mode-grid">
+        <!-- JS generates slots here -->
+    </div>
+
+    <dialog id="modal">
+        <h3>Stream hinzufügen</h3>
+        <p style="color: #888; font-size: 0.9rem;">Twitch Link oder Name</p>
+        <input type="text" id="inp" placeholder="z.B. https://twitch.tv/elotrix">
+        <button class="btn-load" onclick="addStream()">Laden</button>
+    </dialog>
+
+    <script>
+        // Automatische Erkennung der Domain für Twitch Parent Policy
+        // Das funktioniert auf GitHub Pages, Vercel, Netlify oder Localhost automatisch!
+        const HOST = window.location.hostname || "localhost";
+        
+        const state = {
+            slots: Array(6).fill(null), // { name, playerObj }
+            mode: 'grid',
+            editIndex: -1,
+            // Mapping für Split View (Standard-Zuordnung)
+            posMap: { main: 0, side1: 1, side2: 2 },
+            fullscreenIndex: 0
+        };
+
+        const stage = document.getElementById('stage');
+        const dialog = document.getElementById('modal');
+        const inp = document.getElementById('inp');
+
+        function init() {
+            renderSlots();
+        }
+
+        function renderSlots() {
+            stage.innerHTML = '';
+            
+            state.slots.forEach((s, i) => {
+                const el = document.createElement('div');
+                el.className = 'slot';
+                el.id = `slot-${i}`;
+                
+                // Position Attributes for CSS Grid Logic
+                if(state.posMap.main === i) el.setAttribute('data-pos', 'main');
+                else if(state.posMap.side1 === i) el.setAttribute('data-pos', 'side1');
+                else if(state.posMap.side2 === i) el.setAttribute('data-pos', 'side2');
+                
+                if(state.fullscreenIndex === i) el.classList.add('is-fullscreen');
+
+                if(!s) {
+                    el.innerHTML = `
+                        <div class="empty-state" onclick="openModal(${i})">
+                            <div class="icon-plus">+</div>
+                            <div>Slot ${i+1}</div>
+                        </div>`;
+                } else {
+                    el.innerHTML = `
+                        <div class="controls">
+                            <span class="tag">${s.name}</span>
+                            
+                            <!-- Dropdown für Split Position -->
+                            <select class="pos-select" onchange="changePos(${i}, this.value)">
+                                <option value="main" ${state.posMap.main === i ? 'selected':''}>Haupt</option>
+                                <option value="side1" ${state.posMap.side1 === i ? 'selected':''}>Seite 1</option>
+                                <option value="side2" ${state.posMap.side2 === i ? 'selected':''}>Seite 2</option>
+                                <option value="none" disabled>---</option>
+                            </select>
+
+                            <div class="actions">
+                                <button onclick="toggleAudio(${i}, this)" title="Audio">🔊</button>
+                                <button onclick="toggleChat(${i}, this)" title="Chat">💬</button>
+                                <button onclick="setFull(${i})" title="Vollbild">⛶</button>
+                                <button class="delete" onclick="clearSlot(${i})">✕</button>
+                            </div>
+                        </div>
+                        <div class="content-area">
+                            <div class="video-embed" id="embed-${i}"></div>
+                            <div class="chat-embed" id="chat-${i}"></div>
+                        </div>
+                    `;
+                    // Wait for DOM
+                    setTimeout(() => loadTwitch(i, s.name), 50);
+                }
+                stage.appendChild(el);
+            });
+        }
+
+        // --- TWITCH LOGIC ---
+        function loadTwitch(i, name) {
+            // Video
+            const options = {
+                width: '100%', height: '100%',
+                channel: name,
+                parent: [HOST, "twitch.tv"], // WICHTIG: Erlaubt GitHub Pages
+                layout: 'video',
+                autoplay: true,
+                muted: true
+            };
+            const player = new Twitch.Player(`embed-${i}`, options);
+            player.setVolume(0.5);
+            state.slots[i].playerObj = player;
+
+            // Chat (Iframe manuell, da API oft zickt bei Layouts)
+            const chatFrame = document.createElement('iframe');
+            chatFrame.src = `https://www.twitch.tv/embed/${name}/chat?parent=${HOST}&parent=twitch.tv&darkpopout`;
+            chatFrame.style.width = "100%";
+            chatFrame.style.height = "100%";
+            chatFrame.style.border = "none";
+            document.getElementById(`chat-${i}`).appendChild(chatFrame);
+        }
+
+        // --- ACTIONS ---
+        function openModal(i) {
+            state.editIndex = i;
+            inp.value = '';
+            dialog.showModal();
+        }
+
+        function addStream() {
+            let val = inp.value.trim();
+            if(!val) return;
+            // Clean URL
+            if(val.includes('twitch.tv/')) val = val.split('twitch.tv/')[1].split('/')[0].split('?')[0];
+            
+            state.slots[state.editIndex] = { name: val, playerObj: null };
+            renderSlots();
+            dialog.close();
+        }
+
+        function clearSlot(i) {
+            state.slots[i] = null;
+            renderSlots();
+        }
+
+        function toggleAudio(idx, btn) {
+            // Mute all others
+            state.slots.forEach((s, i) => {
+                if(s && s.playerObj) {
+                    if(i === idx) {
+                        const isMuted = s.playerObj.getMuted();
+                        s.playerObj.setMuted(!isMuted);
+                        btn.classList.toggle('active', isMuted); // Visual Toggle
+                        document.getElementById(`slot-${i}`).classList.toggle('active-ui', isMuted);
+                    } else {
+                        s.playerObj.setMuted(true);
+                        // Reset other buttons visual
+                        const otherBtn = document.querySelector(`#slot-${i} .actions button[title="Audio"]`);
+                        if(otherBtn) otherBtn.classList.remove('active');
+                        document.getElementById(`slot-${i}`).classList.remove('active-ui');
+                    }
+                }
+            });
+        }
+
+        function toggleChat(i, btn) {
+            const slot = document.getElementById(`slot-${i}`);
+            slot.classList.toggle('chat-on');
+            btn.classList.toggle('active');
+        }
+
+        function setFull(i) {
+            state.fullscreenIndex = i;
+            setMode('full');
+        }
+
+        // --- LAYOUT LOGIC ---
+        function setMode(m) {
+            state.mode = m;
+            stage.className = `mode-${m}`;
+            
+            // Nav Update
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(m==='grid') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if(m==='split') document.querySelectorAll('.nav-item')[1].classList.add('active');
+            if(m==='full') document.querySelectorAll('.nav-item')[2].classList.add('active');
+            
+            toggleNav();
+        }
+
+        function changePos(slotIndex, role) {
+            // Find who has this role currently
+            let oldOwner = -1;
+            if(state.posMap.main === slotIndex) oldOwner = slotIndex; // Self check
+            
+            // Swap Logic: Find current role of slotIndex
+            let currentRole = null;
+            if(state.posMap.main === slotIndex) currentRole = 'main';
+            else if(state.posMap.side1 === slotIndex) currentRole = 'side1';
+            else if(state.posMap.side2 === slotIndex) currentRole = 'side2';
+
+            const occupantOfTarget = state.posMap[role]; // Who is currently in the target role?
+
+            // SWAP
+            state.posMap[role] = slotIndex;
+            if(currentRole && occupantOfTarget !== undefined) {
+                state.posMap[currentRole] = occupantOfTarget;
+            }
+
+            // Re-render to update attributes and dropdowns
+            // (Um iframes nicht neu zu laden, machen wir hier DOM Manipulation statt renderSlots)
+            updatePosAttributes();
+        }
+
+        function updatePosAttributes() {
+            // Update DOM attributes without reloading iframes
+            state.slots.forEach((_, i) => {
+                const el = document.getElementById(`slot-${i}`);
+                el.removeAttribute('data-pos');
+                
+                if(state.posMap.main === i) el.setAttribute('data-pos', 'main');
+                else if(state.posMap.side1 === i) el.setAttribute('data-pos', 'side1');
+                else if(state.posMap.side2 === i) el.setAttribute('data-pos', 'side2');
+
+                // Update Select Values
+                const sel = el.querySelector('.pos-select');
+                if(sel) {
+                    if(state.posMap.main === i) sel.value = 'main';
+                    else if(state.posMap.side1 === i) sel.value = 'side1';
+                    else if(state.posMap.side2 === i) sel.value = 'side2';
+                    else sel.value = 'none';
+                }
+            });
+        }
+
+        function toggleNav() {
+            document.getElementById('nav').classList.toggle('open');
+        }
+
+        init();
+    </script>
+</body>
+</html>
