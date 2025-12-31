@@ -1,10 +1,10 @@
-<!-- START OF FILE stream_command_30_exact_grid.html -->
+<!-- START OF FILE stream_command_31_scrollable_grid.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 30 (Fixed 2:1 Layout)</title>
+    <title>Stream Command 31 (Scroll Grid)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
@@ -77,56 +77,78 @@
         .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #151515; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333;}
         .toggle-lbl { font-weight: bold; font-size: 0.85rem; }
 
-        /* STAGE */
+        /* --- STAGE (SCROLL AREA) --- */
         #stage {
-            flex: 1; overflow: hidden;
-            display: grid; padding: 0; gap: 1px;
+            flex: 1; 
+            overflow-y: auto; /* Scrollen erlaubt! */
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch; /* Weiches Scrollen auf iOS */
             background: #000;
+            display: block; /* Standard Block für Grid */
+            padding-bottom: 40px; /* Platz unten zum Scrollen */
         }
-
-        /* === SPLIT MODE 2:1 LOGIK === */
         
-        /* Das CSS Grid sorgt dafür, dass sich alles perfekt aufteilt */
-        .mode-split {
-            /* Zeilen: Oben 2 Teile (2fr), Unten 1 Teil (1fr) -> Oben ist doppelt so hoch */
+        /* === SPLIT MODE (FIXED DASHBOARD) === */
+        /* Im Split Mode schalten wir Scrollen aus und nutzen Grid, um den Screen zu füllen */
+        #stage.mode-split {
+            display: grid;
+            overflow: hidden; /* Fixiert auf Screen */
+            padding: 0;
+            gap: 1px;
+            /* Layout: Oben 2 Teile, Unten 1 Teil */
             grid-template-rows: 2fr 1fr; 
-            /* Spalten: 50% / 50% */
             grid-template-columns: 1fr 1fr; 
-            /* Layout Map */
-            grid-template-areas: 
-                "main main" 
-                "side1 side2";
-            height: 100%; width: 100%;
+            grid-template-areas: "main main" "side1 side2";
         }
-
-        /* Desktop Anpassung */
+        
         @media (min-width: 1024px) {
-            .mode-split {
+            #stage.mode-split {
                 grid-template-columns: 3fr 1fr; grid-template-rows: 1fr 1fr;
                 grid-template-areas: "main side1" "main side2";
             }
         }
 
-        /* Slot Zuweisung */
-        .mode-split .slot { display: none; }
+        .mode-split .slot { display: none; height: 100%; }
         .mode-split .slot.p-main { display: flex; grid-area: main; border-bottom: 1px solid #333; }
         .mode-split .slot.p-side1 { display: flex; grid-area: side1; border-right: 1px solid #333; }
         .mode-split .slot.p-side2 { display: flex; grid-area: side2; }
 
-        /* Andere Modi */
-        .mode-grid { grid-template-columns: 1fr; grid-auto-rows: 50%; padding: 0 !important; overflow-y: auto; }
-        @media (min-width: 700px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+        /* === GRID MODE (SCROLL LISTE) === */
+        #stage.mode-grid {
+            display: block; /* Einfache Liste auf Mobile */
+            padding: 2px;
+        }
         
+        /* Grid Mode Slot Design (Scrollbar) */
+        .mode-grid .slot {
+            display: flex;
+            height: 280px; /* Feste Höhe pro Stream -> Erzwingt Scrollen */
+            margin-bottom: 4px;
+            border-radius: 4px;
+            border: 1px solid #222;
+        }
+
+        /* Desktop Grid (Nebeneinander) */
+        @media (min-width: 700px) { 
+            #stage.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; }
+            .mode-grid .slot { height: 350px; margin-bottom: 0; }
+        }
+        @media (min-width: 1100px) { 
+            #stage.mode-grid { grid-template-columns: 1fr 1fr 1fr; } 
+        }
+
+        /* FULLSCREEN */
+        #stage.mode-full { display: block; overflow: hidden; padding: 0; }
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* SLOT STYLE */
+        /* SLOT CONTENT */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
-            overflow: hidden; width: 100%; height: 100%;
+            overflow: hidden; width: 100%;
         }
 
-        /* UI BAR (Hover) */
+        /* UI BAR */
         .ui-bar {
             position: absolute; top: 0; left: 0; right: 0; height: 28px;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(2px);
@@ -141,16 +163,15 @@
         .pos-sel { display: none; background: #222; color: #fff; border: 1px solid #555; padding: 0 2px; font-size: 0.6rem; margin-left: 5px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT: VIDEO LINKS | CHAT RECHTS --- */
+        /* --- SMART CONTENT LAYOUT --- */
         .content { 
-            flex: 1; display: flex; 
-            flex-direction: row; /* Zwingend nebeneinander */
-            width: 100%; height: 100%; position: relative; overflow: hidden;
+            flex: 1; display: flex; width: 100%; height: 100%; position: relative; 
+            flex-direction: row; /* Zwingend nebeneinander (65/35) */
+            overflow: hidden;
         }
         
         .vid { 
-            flex: 1; /* Video nimmt allen Platz */
-            background: #000; height: 100%; min-width: 0;
+            flex: 1; background: #000; height: 100%; min-width: 0;
             transition: width 0.3s ease;
         }
         
@@ -161,16 +182,15 @@
             transition: width 0.3s ease;
         }
         
-        /* WENN CHAT AKTIV */
-        /* Standard: 65% Video, 35% Chat */
+        /* 65% Video / 35% Chat */
         .slot.chat-on .vid { width: 65% !important; flex: none; }
         .slot.chat-on .chat-wrap { width: 35% !important; flex: none; }
 
-        /* LONG CHAT MODE: 55% Video, 45% Chat (via JS Klasse) */
+        /* Long Chat Mode: 55% Video / 45% Chat */
         body.long-chat .slot.chat-on .vid { width: 55% !important; }
         body.long-chat .slot.chat-on .chat-wrap { width: 45% !important; }
 
-        /* CHAT ZOOM (Lesbarkeit in der schmalen Spalte) */
+        /* CHAT ZOOM */
         .chat-frame {
             width: 165%; height: 165%; border: none; display: block;
             transform-origin: top left; transform: scale(0.6); 
@@ -192,7 +212,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 30</div>
+        <div class="brand">STREAM COMMAND 31</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -204,11 +224,11 @@
         </div>
         <div id="tab-view" class="menu-content active">
             <div class="nav-item exit" onclick="exitFullscreen()">⚠️ VOLLBILD ENDE</div>
-            <div class="nav-item active" onclick="setMode('mode-grid')">GRID ÜBERSICHT</div>
-            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (2:1 FIXED)</div>
+            <div class="nav-item active" onclick="setMode('mode-grid')">GRID LISTE (SCROLL)</div>
+            <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW (FIXED)</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
             <div style="margin-top:20px; text-align:center; font-size:0.75rem; color:#555;">
-                Top: Main (2/3 Height)<br>Bottom: Sides (1/3 Height)<br>Side-by-Side Content
+                Grid = Scrollable<br>Split = Dashboard (2:1)
             </div>
         </div>
         <div id="tab-settings" class="menu-content">
@@ -401,12 +421,12 @@
                         <option value="x" ${isUnassigned?'selected':''}>Pos: ---</option>
                     </select>
                     <select class="set-select" onchange="settingsUpdateQuality(${i}, this.value)">
-                        <option value="auto" ${currQ==='auto'?'selected':''}>Qualität: Auto</option>
-                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Qualität: 1080p</option>
-                        <option value="720p" ${currQ==='720p'?'selected':''}>Qualität: 720p</option>
-                        <option value="480p" ${currQ==='480p'?'selected':''}>Qualität: 480p</option>
-                        <option value="360p" ${currQ==='360p'?'selected':''}>Qualität: 360p</option>
-                        <option value="160p" ${currQ==='160p'?'selected':''}>Qualität: 160p</option>
+                        <option value="auto" ${currQ==='auto'?'selected':''}>Q: Auto</option>
+                        <option value="1080p" ${currQ==='1080p'?'selected':''}>Q: 1080p</option>
+                        <option value="720p" ${currQ==='720p'?'selected':''}>Q: 720p</option>
+                        <option value="480p" ${currQ==='480p'?'selected':''}>Q: 480p</option>
+                        <option value="360p" ${currQ==='360p'?'selected':''}>Q: 360p</option>
+                        <option value="160p" ${currQ==='160p'?'selected':''}>Q: 160p</option>
                     </select>
                     <div class="set-actions">
                         <button class="set-btn ${chatActive?'act':''}" onclick="toggleChat(${i}, null)">Chat</button>
@@ -562,12 +582,12 @@
 
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities, longChat: state.longChat };
-            localStorage.setItem('sc-v30', JSON.stringify(data)); 
+            localStorage.setItem('sc-v31', JSON.stringify(data)); 
         }
         function loadStorage() {
-            let d = localStorage.getItem('sc-v30');
+            let d = localStorage.getItem('sc-v31');
+            if(!d) d = localStorage.getItem('sc-v30');
             if(!d) d = localStorage.getItem('sc-v29');
-            if(!d) d = localStorage.getItem('sc-v27');
 
             if(d) {
                 try {
