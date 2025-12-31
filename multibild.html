@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stream Command 18 (Compact Chat)</title>
+    <title>Stream Command 19 (Native Fix)</title>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
     <style>
         :root {
-            --bg: #000; --panel: #0a0a0a; --primary: #9146FF; --active: #00ffcc;
+            --bg: #000; --panel: #111; --primary: #9146FF; --active: #00ffcc;
             --danger: #ff4444; --edit: #ffaa00; --text: #eee; --safe-z: 10000;
         }
 
+        /* RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -20,10 +21,10 @@
             height: 100dvh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; 
         }
 
-        /* --- MINI HEADER --- */
+        /* --- HEADER --- */
         header {
-            position: fixed; top: 0; left: 0; width: 100%; height: 40px; /* Kleiner */
-            background: rgba(10,10,10,0.95); border-bottom: 1px solid #222;
+            position: fixed; top: 0; left: 0; width: 100%; height: 40px;
+            background: rgba(10,10,10,0.95); border-bottom: 1px solid #333;
             display: flex; align-items: center; padding: 0 10px;
             transition: transform 0.3s ease; z-index: 500;
         }
@@ -33,11 +34,11 @@
         /* --- MENU BTN --- */
         .float-btn {
             position: fixed; top: 2px; right: 5px; width: 36px; height: 36px;
-            background: transparent; border: none; color: white; font-size: 1.4rem; cursor: pointer; z-index: var(--safe-z);
+            background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; z-index: var(--safe-z);
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* --- NAVIGATION --- */
+        /* --- NAV --- */
         #nav {
             position: fixed; top: 0; right: 0; bottom: 0; width: 320px;
             background: #080808; border-left: 1px solid #222;
@@ -62,7 +63,7 @@
         .nav-item.exit { background: #300; border-color: var(--danger); display: none; }
         body.is-fullscreen .nav-item.exit { display: block; }
 
-        /* Settings CSS */
+        /* SETTINGS */
         .set-row { background: #111; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #222; }
         .set-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.75rem; color: #888; font-weight: bold; }
         .set-input { width: 100%; background: #000; border: 1px solid #333; color: #ccc; padding: 6px; border-radius: 3px; margin-bottom: 5px; font-size: 0.85rem; }
@@ -87,7 +88,7 @@
 
         .mode-split .slot { display: none; }
         .mode-split {
-            grid-template-columns: 1fr; grid-template-rows: 60vh 40vh 40vh; /* Mehr Platz für Main */
+            grid-template-columns: 1fr; grid-template-rows: 60vh 40vh 40vh;
             grid-template-areas: "main" "side1" "side2"; height: calc(100vh - 40px);
         }
         @media (min-width: 1024px) {
@@ -103,16 +104,16 @@
         .mode-full .slot { display: none; }
         .mode-full .slot.is-focus { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; background: #000; }
 
-        /* --- SLOT --- */
+        /* SLOT */
         .slot {
             background: var(--panel); position: relative; display: flex; flex-direction: column;
             min-height: 250px; border-radius: 3px; overflow: hidden; contain: content;
         }
         @media(min-width: 1100px) { .slot { min-height: 0; } }
 
-        /* --- MINI UI BAR (Ganz klein wie gewünscht) --- */
+        /* UI BAR */
         .ui-bar {
-            position: absolute; top: 0; left: 0; right: 0; height: 26px; /* Sehr flach */
+            position: absolute; top: 0; left: 0; right: 0; height: 28px;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(2px);
             display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
             opacity: 0; transition: opacity 0.2s; z-index: 20; pointer-events: none;
@@ -121,8 +122,7 @@
 
         .lbl { font-size: 0.65rem; font-weight: bold; background: var(--primary); color: white; padding: 1px 4px; border-radius: 2px; max-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .tools { display: flex; gap: 3px; }
-        /* Winzige Buttons */
-        .btn { width: 22px; height: 22px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); color: #ccc; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .btn { width: 24px; height: 24px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); color: #ccc; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
         .btn:hover { background: var(--primary); color: #fff; }
         .btn.act { background: var(--active); color: #000; border-color: var(--active); }
         .btn.edit:hover { background: var(--edit); border-color: var(--edit); color: #000; }
@@ -131,7 +131,7 @@
         .pos-sel { display: none; background: #111; color: #ccc; border: 1px solid #333; font-size: 0.6rem; padding: 0 4px; height: 20px; border-radius: 2px; margin-left: 5px; cursor: pointer; pointer-events: auto; }
         .mode-split .pos-sel { display: block; }
 
-        /* --- CONTENT & CHAT OPTIMIERUNG --- */
+        /* --- CONTENT & CHAT (NATIVE FIX) --- */
         .content { 
             flex: 1; display: flex; flex-direction: row !important; /* Immer nebeneinander */
             width: 100%; height: 100%; position: relative; overflow: hidden;
@@ -143,27 +143,28 @@
             width: 0; background: #0e0e0e; 
             transition: width 0.2s ease; 
             border-left: 1px solid #222; position: relative;
-            /* Scrollbar für Banner */
+            /* Scrollbar für Banner - WICHTIG */
             overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding-bottom: 250px; /* Platz für Cookie Banner Buttons */
+            /* Platz unten für "Akzeptieren" Button */
+            padding-bottom: 150px; 
         }
         .slot.chat-on .chat-wrap { width: 320px; }
         
-        /* Mobile Chat Breite */
+        /* Mobile Chat: Native Breite lassen */
         @media (max-width: 650px) {
-            .slot.chat-on .chat-wrap { width: 45%; border-left: 1px solid #222; }
+            .slot.chat-on .chat-wrap { 
+                width: 45%; /* Relativ zum Video */
+                min-width: 160px; /* Mindestbreite damit Text lesbar ist */
+                border-left: 1px solid #222; 
+            }
         }
 
-        /* --- CHAT SCALING TRICK (Repariert) --- */
-        /* Wir skalieren den Inhalt auf 85% runter, damit die Elemente (Input Bar) kleiner wirken.
-           Die Breite und Höhe werden auf 117.65% gesetzt (100 / 0.85), um den Zoom auszugleichen. */
+        /* --- IFRAME (KEIN ZOOM MEHR!) --- */
+        /* Wir stellen es auf 100% ohne Hacks. Twitch macht den Rest. */
         .chat-frame {
-            width: 117.65%; 
-            height: 117.65%; 
+            width: 100%; 
+            height: 100%; 
             border: none;
-            transform-origin: top left; 
-            transform: scale(0.85); 
-            pointer-events: auto;
             display: block;
         }
 
@@ -183,7 +184,7 @@
 <body id="body">
 
     <header id="header">
-        <div class="brand">STREAM COMMAND 18</div>
+        <div class="brand">STREAM COMMAND 19</div>
     </header>
 
     <div class="float-btn" onclick="toggleNav()">☰</div>
@@ -200,7 +201,7 @@
             <div class="nav-item" onclick="setMode('mode-split')">SPLIT VIEW</div>
             <div class="nav-item" onclick="setMode('mode-full')">VOLLBILD</div>
             <div style="margin-top:20px; text-align:center; font-size:0.7rem; color:#555;">
-                Compact UI • Scaled Chat
+                Native Chat Rendering
             </div>
         </div>
 
@@ -221,6 +222,7 @@
     </dialog>
 
     <script>
+        // DOMAIN FIX
         const HOST = window.location.hostname || "localhost";
         const PARENTS = [HOST, "localhost", "127.0.0.1", "twitch.tv"];
         if(HOST && !PARENTS.includes(HOST)) PARENTS.push(HOST);
@@ -289,7 +291,6 @@
             const isS1 = state.pos.s1 === i;
             const isS2 = state.pos.s2 === i;
 
-            // Mini UI Construction
             el.innerHTML = `
                 <div class="ui-bar" onclick="event.stopPropagation()">
                     <div style="display:flex; align-items:center;">
@@ -330,7 +331,7 @@
 
                     const cDiv = document.getElementById('c-'+i);
                     const ifr = document.createElement('iframe');
-                    // Add all parents
+                    // Native Embed URL (Kein Zoom Hack)
                     const pParams = PARENTS.map(d => `parent=${d}`).join('&');
                     ifr.src = `https://www.twitch.tv/embed/${channel}/chat?${pParams}&darkpopout`;
                     ifr.className = 'chat-frame';
@@ -498,7 +499,7 @@
             if(m === 'mode-grid') items[1].classList.add('active');
             if(m === 'mode-split') items[2].classList.add('active');
             if(m === 'mode-full') items[3].classList.add('active');
-            document.getElementById('nav').classList.remove('open');
+            nav.classList.remove('open');
             refreshAllClasses();
             if(m !== 'mode-full' && state.players[state.focus]) {
                  const btn = document.querySelector(`#s-${state.focus} .btn[onclick^="toggleFull"]`);
@@ -532,7 +533,7 @@
         }
 
         function refreshAllClasses() { for(let i=0; i<6; i++) updateSlotClasses(i); }
-        function toggleNav() { document.getElementById('nav').classList.toggle('open'); }
+        function toggleNav() { nav.classList.toggle('open'); }
         
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -549,21 +550,13 @@
 
         function persist() { 
             const data = { slots: state.slots, qualities: state.qualities };
-            localStorage.setItem('sc-v18', JSON.stringify(data)); 
+            localStorage.setItem('sc-v19', JSON.stringify(data)); 
         }
         function loadStorage() {
-            const d = localStorage.getItem('sc-v18');
+            const d = localStorage.getItem('sc-v19');
             if(d) {
                 try {
                     const parsed = JSON.parse(d);
                     if(Array.isArray(parsed)) { state.slots = parsed; } 
                     else { state.slots = parsed.slots || Array(6).fill(null); state.qualities = parsed.qualities || Array(6).fill('360p'); }
-                    state.slots.forEach((n, i) => { if(n) { updateSlotHTML(i, n); } });
-                } catch(e) {}
-            }
-        }
-
-        init();
-    </script>
-</body>
-</html>
+                    state.slots.forEach((n, i) => { if(n) { updateSlotHTML(
