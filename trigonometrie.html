@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Trigonometrie Masterclass - Vollständig</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #121827;
+            --bg-tertiary: #1a2332;
+            --color-sin: #ff2d95;
+            --color-cos: #00d9ff;
+            --color-tan: #ffaa00;
+            --color-hypo: #a855f7;
+            --color-gegen: #22d3ee;
+            --color-ankat: #4ade80;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-display);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 45, 149, 0.03), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 217, 255, 0.03), transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        header {
+            padding: clamp(2rem, 5vw, 4rem) 1rem clamp(1.5rem, 4vw, 3rem);
+            text-align: center;
+            background: linear-gradient(135deg, rgba(18, 24, 39, 0.9), rgba(10, 14, 26, 0.9));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-sin), var(--color-cos), var(--color-tan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        nav {
+            background: rgba(18, 24, 39, 0.95);
+            padding: 0.7rem 0.5rem;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        nav.hidden { transform: translateY(-100%); }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover, .nav-btn:active {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+
+        section {
+            margin: clamp(2rem, 4vw, 4rem) 0;
+            padding: clamp(1.5rem, 3vw, 3rem);
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--color-sin), var(--color-cos), var(--color-tan));
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        h3 {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 600;
+            margin: clamp(1.5rem, 3vw, 2rem) 0 clamp(0.8rem, 2vw, 1rem);
+            color: var(--accent);
+        }
+
+        p {
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .rap-container {
+            font-family: var(--font-mono);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            background: rgba(0,0,0,0.4);
+            padding: clamp(1rem, 3vw, 2rem);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            margin: 2rem 0;
+        }
+        
+        .rap-line {
+            margin-bottom: 0.8rem;
+            opacity: 0.85;
+            transition: all 0.3s;
+            line-height: 1.6;
+        }
+        
+        .rap-line:hover {
+            opacity: 1;
+            transform: translateX(8px);
+            color: #fff;
+        }
+
+        .cheat-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .cheat-cell {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 900;
+            transition: all 0.3s;
+        }
+        
+        .cheat-cell:active { 
+            transform: scale(1.05); 
+            background: rgba(255,255,255,0.1); 
+        }
+        
+        .c-sin { border-bottom: 4px solid var(--color-sin); }
+        .c-cos { border-bottom: 4px solid var(--color-cos); }
+        .c-tan { border-bottom: 4px solid var(--color-tan); }
+
+        .canvas-container {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: clamp(0.5rem, 2vw, 1.5rem);
+            margin: clamp(1rem, 2vw, 2rem) 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            background: #000;
+            display: block;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: clamp(0.8rem, 2vw, 1.2rem);
+            margin: clamp(1rem, 2vw, 2rem) 0;
+        }
+
+        .control-group {
+            background: var(--bg-tertiary);
+            padding: clamp(0.8rem, 2vw, 1.2rem);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .control-label {
+            display: block;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px; height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px; height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: none;
+        }
+
+        .value-display {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            font-weight: 800;
+            font-family: var(--font-mono);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: clamp(0.8rem, 2vw, 1.2rem);
+            margin: clamp(1rem, 2vw, 2rem) 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(255, 45, 149, 0.05), rgba(0, 217, 255, 0.05));
+            padding: clamp(1rem, 3vw, 1.8rem);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .info-card:active {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .formula-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: clamp(1rem, 3vw, 1.8rem);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            margin: clamp(1rem, 2vw, 1.5rem) 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        .warning-box, .success-box, .info-box {
+            border-radius: 10px;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            margin: clamp(1rem, 2vw, 2rem) 0;
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            align-items: start;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1));
+            border: 2px solid var(--warning);
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 211, 238, 0.1));
+            border: 2px solid var(--success);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px solid #3b82f6;
+        }
+
+        .warning-box::before { content: '⚠️'; font-size: 2rem; flex-shrink: 0; }
+        .success-box::before { content: '✓'; font-size: 2rem; color: var(--success); font-weight: 800; flex-shrink: 0; }
+        .info-box::before { content: 'ℹ️'; font-size: 2rem; flex-shrink: 0; }
+
+        .hl-sin { color: var(--color-sin); font-weight: 700; }
+        .hl-cos { color: var(--color-cos); font-weight: 700; }
+        .hl-tan { color: var(--color-tan); font-weight: 700; }
+
+        ul { list-style: none; padding: 0; }
+        li { margin: 0.5rem 0; padding-left: 1.5rem; position: relative; }
+        li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+        @media (max-width: 768px) {
+            nav { padding: 0.5rem 0.3rem; }
+            .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
+            canvas { min-height: 350px !important; }
+            .controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎓 Trigonometrie Masterclass</h1>
+        <p class="subtitle">Die ultimative Anleitung mit Rap, Eselsbrücken und perfekten Animationen</p>
+    </header>
+
+    <nav id="mainNav">
+        <div class="nav-content">
+            <a href="#rap" class="nav-btn">🎤 Rap</a>
+            <a href="#merkspruch" class="nav-btn">🧠 Eselsbrücken</a>
+            <a href="#einheitskreis" class="nav-btn">⭕ Einheitskreis</a>
+            <a href="#funktionen" class="nav-btn">📊 Funktionen</a>
+            <a href="#dreieck" class="nav-btn">△ Dreieck</a>
+            <a href="#anwendung" class="nav-btn">🎯 Anwendung</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <section id="rap">
+            <h2>🎤 Der Trigonometrie-Rap</h2>
+            <p>Lerne die Grundlagen mit unserem Merkvers! Bewege die Maus über die Zeilen:</p>
+            
+            <div class="rap-container">
+                <div class="rap-line">Yo, Trigonometrie, das ist kein Hexenwerk,</div>
+                <div class="rap-line">Sinus, Cosinus, Tangens - merk!</div>
+                <div class="rap-line">Im rechten Winkel, da steht ein Dreieck,</div>
+                <div class="rap-line">Die Hypotenuse, die ist lang und steil.</div>
+                <div class="rap-line"></div>
+                <div class="rap-line"><span class="hl-sin">Sinus</span> ist die Gegenkathete, durch die Hypotenuse geteilt,</div>
+                <div class="rap-line"><span class="hl-cos">Cosinus</span> nimmt die Ankathete, das Verhältnis ist verteilt.</div>
+                <div class="rap-line"><span class="hl-tan">Tangens</span> ist Gegenkathete durch Ankathete klar,</div>
+                <div class="rap-line">GAGA hilft dir weiter - das ist wunderbar!</div>
+                <div class="rap-line"></div>
+                <div class="rap-line">Bei 30 Grad ist Sinus 0,5 - merk dir das genau,</div>
+                <div class="rap-line">Bei 45 Grad sind beide gleich - wie wunderbar und schlau!</div>
+                <div class="rap-line">Bei 90 Grad ist Sinus eins, Cosinus wird zu null,</div>
+                <div class="rap-line">Einheitskreis und Winkelfunktion - Mathe ist so cool!</div>
+            </div>
+        </section>
+
+        <section id="merkspruch">
+            <h2>🧠 Eselsbrücken & Merksprüche</h2>
+            <p>Diese Merksprüche helfen dir, die Formeln niemals zu vergessen!</p>
+
+            <h3>1. Die GAGA-Regel (Der Klassiker!)</h3>
+            <p>Die einfachste und bekannteste Methode:</p>
+            
+            <table class="cheat-table">
+                <tr>
+                    <td class="cheat-cell c-sin">
+                        sin = <strong>G</strong> / H<br>
+                        <small style="font-size: 0.6em; opacity: 0.7;">Gegenkathete / Hypotenuse</small>
+                    </td>
+                    <td class="cheat-cell c-cos">
+                        cos = <strong>A</strong> / H<br>
+                        <small style="font-size: 0.6em; opacity: 0.7;">Ankathete / Hypotenuse</small>
+                    </td>
+                    <td class="cheat-cell c-tan">
+                        tan = <strong>G</strong> / <strong>A</strong><br>
+                        <small style="font-size: 0.6em; opacity: 0.7;">Gegenkathete / Ankathete</small>
+                    </td>
+                </tr>
+            </table>
+
+            <h3>2. SOHCAHTOA (Englisch, International)</h3>
+            <div class="info-card">
+                <p style="font-size: 1.3rem; text-align: center; font-weight: 700; margin-bottom: 1rem;">
+                    <span class="hl-sin">SOH</span> - 
+                    <span class="hl-cos">CAH</span> - 
+                    <span class="hl-tan">TOA</span>
+                </p>
+                <ul>
+                    <li><strong>S</strong>ine = <strong>O</strong>pposite / <strong>H</strong>ypotenuse</li>
+                    <li><strong>C</strong>osine = <strong>A</strong>djacent / <strong>H</strong>ypotenuse</li>
+                    <li><strong>T</strong>angent = <strong>O</strong>pposite / <strong>A</strong>djacent</li>
+                </ul>
+            </div>
+
+            <h3>3. "Geh' Alte, Hier Sind Orangen" (Deutsch)</h3>
+            <div class="info-card">
+                <ul>
+                    <li><strong>G</strong>egenkathete / <strong>H</strong>ypotenuse = <strong>S</strong>inus</li>
+                    <li><strong>A</strong>nkathete / <strong>H</strong>ypotenuse = C<strong>o</strong>sinus</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <div>
+                    <strong>Pro-Tipp:</strong> Wähle die Methode, die dir am besten liegt! Alle führen zum gleichen Ziel.
+                    Die GAGA-Regel ist am beliebtesten im deutschsprachigen Raum.
+                </div>
+            </div>
+        </section>
+
+        <section id="einheitskreis">
+            <h2>⭕ Der Einheitskreis</h2>
+            <p>
+                Der <strong>Einheitskreis</strong> ist ein Kreis mit <strong>Radius r = 1</strong>, zentriert im Ursprung.
+                Er ist die geometrische Grundlage aller trigonometrischen Funktionen!
+            </p>
+
+            <div class="canvas-container">
+                <canvas id="unitCircle" width="1000" height="1000"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Winkel θ (Grad)</label>
+                    <input type="range" id="angleSlider" min="0" max="360" value="45" step="1">
+                    <div class="value-display"><span id="angleValue">45</span>°</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Bogenmaß [rad]</label>
+                    <div class="value-display"><span id="radianValue">0.79</span> rad</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">sin(θ) = y</label>
+                    <div class="value-display" style="color: var(--color-sin)"><span id="sinValue">0.707</span></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">cos(θ) = x</label>
+                    <div class="value-display" style="color: var(--color-cos)"><span id="cosValue">0.707</span></div>
+                </div>
+            </div>
+
+            <h3>Was zeigt der Einheitskreis?</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4 class="hl-cos">Cosinus (x-Koordinate)</h4>
+                    <p>Die <strong>horizontale</strong> Position des Punktes auf dem Kreis.</p>
+                    <div class="formula-box">$$ \cos(\theta) = x $$</div>
+                    <p><strong>Wertebereich:</strong> [-1, 1]</p>
+                </div>
+                <div class="info-card">
+                    <h4 class="hl-sin">Sinus (y-Koordinate)</h4>
+                    <p>Die <strong>vertikale</strong> Position des Punktes auf dem Kreis.</p>
+                    <div class="formula-box">$$ \sin(\theta) = y $$</div>
+                    <p><strong>Wertebereich:</strong> [-1, 1]</p>
+                </div>
+                <div class="info-card">
+                    <h4 class="hl-tan">Tangens (Steigung)</h4>
+                    <p>Das <strong>Verhältnis</strong> von y zu x (Steigung).</p>
+                    <div class="formula-box">$$ \tan(\theta) = \frac{y}{x} = \frac{\sin(\theta)}{\cos(\theta)} $$</div>
+                    <p><strong>Wertebereich:</strong> (-∞, +∞)</p>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <div>
+                    <strong>Pythagoreische Identität:</strong> Für jeden Punkt auf dem Einheitskreis gilt:
+                    <div class="formula-box">$$ \sin^2(\theta) + \cos^2(\theta) = 1 $$</div>
+                    Dies folgt direkt aus dem Satz des Pythagoras!
+                </div>
+            </div>
+        </section>
+
+        <section id="funktionen">
+            <h2>📊 Trigonometrische Funktionen</h2>
+            <p>
+                Sinus, Cosinus und Tangens beschreiben <strong>periodische Schwingungen</strong>.
+                Sie wiederholen sich in regelmäßigen Abständen.
+            </p>
+
+            <div class="canvas-container">
+                <canvas id="functionGraph" width="1000" height="600"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Amplitude (A)</label>
+                    <input type="range" id="amplitudeSlider" min="0.1" max="3" value="1" step="0.1">
+                    <div class="value-display"><span id="amplitudeValue">1.0</span></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Frequenz (ω)</label>
+                    <input type="range" id="frequencySlider" min="0.1" max="3" value="1" step="0.1">
+                    <div class="value-display"><span id="frequencyValue">1.0</span></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Phase (φ) [rad]</label>
+                    <input type="range" id="phaseSlider" min="0" max="6.28" value="0" step="0.1">
+                    <div class="value-display"><span id="phaseValue">0.0</span> rad</div>
+                </div>
+            </div>
+
+            <h3>Die allgemeine Form</h3>
+            <div class="formula-box">
+                $$ f(x) = A \cdot \sin(\omega x + \varphi) $$
+            </div>
+            <ul>
+                <li><strong>A</strong> (Amplitude): Maximale Höhe/Tiefe der Welle</li>
+                <li><strong>ω</strong> (Kreisfrequenz): Wie schnell die Funktion oszilliert</li>
+                <li><strong>φ</strong> (Phasenverschiebung): Horizontale Verschiebung</li>
+            </ul>
+
+            <div class="info-box">
+                <div>
+                    <strong>Wichtig:</strong> Sinus und Cosinus haben beide die Periode 2π (360°).
+                    Der Tangens hat die Periode π (180°) - er wiederholt sich doppelt so schnell!
+                </div>
+            </div>
+        </section>
+
+        <section id="dreieck">
+            <h2>△ Das rechtwinklige Dreieck</h2>
+            <p>
+                Im <strong>rechtwinkligen Dreieck</strong> (ein Winkel = 90°) definieren die trigonometrischen Funktionen
+                das Verhältnis zwischen Seitenlängen und Winkeln.
+            </p>
+
+            <div class="canvas-container">
+                <canvas id="triangleCanvas" width="800" height="600"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Winkel α [°]</label>
+                    <input type="range" id="triangleAngle" min="5" max="85" value="30" step="1">
+                    <div class="value-display"><span id="triangleAngleValue">30</span>°</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Hypotenuse (c)</label>
+                    <div class="value-display" style="color: var(--color-hypo)"><span id="hypotenuseValue">5.00</span></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Gegenkathete (a)</label>
+                    <div class="value-display" style="color: var(--color-gegen)"><span id="oppositeValue">2.50</span></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Ankathete (b)</label>
+                    <div class="value-display" style="color: var(--color-ankat)"><span id="adjacentValue">4.33</span></div>
+                </div>
+            </div>
+
+            <h3>Die Definitionen</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4 class="hl-sin">Sinus</h4>
+                    <div class="formula-box">$$ \sin(\alpha) = \frac{a}{c} = \frac{\text{Gegenkathete}}{\text{Hypotenuse}} $$</div>
+                    <p>Die Seite <strong>gegenüber</strong> dem Winkel geteilt durch die längste Seite.</p>
+                </div>
+                <div class="info-card">
+                    <h4 class="hl-cos">Cosinus</h4>
+                    <div class="formula-box">$$ \cos(\alpha) = \frac{b}{c} = \frac{\text{Ankathete}}{\text{Hypotenuse}} $$</div>
+                    <p>Die Seite <strong>anliegend</strong> am Winkel geteilt durch die längste Seite.</p>
+                </div>
+                <div class="info-card">
+                    <h4 class="hl-tan">Tangens</h4>
+                    <div class="formula-box">$$ \tan(\alpha) = \frac{a}{b} = \frac{\text{Gegenkathete}}{\text{Ankathete}} $$</div>
+                    <p>Das Verhältnis der beiden <strong>Katheten</strong>.</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div>
+                    <strong>WICHTIG:</strong> Gegenkathete und Ankathete sind <strong>relativ zum betrachteten Winkel</strong>!
+                    Was für Winkel α die Gegenkathete ist, ist für Winkel β die Ankathete (und umgekehrt).
+                </div>
+            </div>
+        </section>
+
+        <section id="anwendung">
+            <h2>🎯 Praxisbeispiel: Baumhöhe berechnen</h2>
+            <p>
+                <strong>Problem:</strong> Du möchtest die Höhe eines Baums bestimmen, ohne hinaufzuklettern.<br>
+                <strong>Werkzeuge:</strong> Maßband und Smartphone mit Neigungsmesser-App
+            </p>
+
+            <div class="canvas-container">
+                <canvas id="practicalExample" width="800" height="500"></canvas>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Abstand [m]</label>
+                    <input type="range" id="distanceSlider" min="5" max="50" value="20" step="1">
+                    <div class="value-display"><span id="distanceValue">20</span> m</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Elevationswinkel [°]</label>
+                    <input type="range" id="elevationSlider" min="10" max="80" value="45" step="1">
+                    <div class="value-display"><span id="elevationValue">45</span>°</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Augenhöhe [m]</label>
+                    <input type="range" id="eyeHeightSlider" min="1.5" max="2" value="1.65" step="0.01">
+                    <div class="value-display"><span id="eyeHeightValue">1.65</span> m</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Baumhöhe [m]</label>
+                    <div class="value-display" style="color: var(--accent)"><span id="treeHeight">21.65</span> m</div>
+                </div>
+            </div>
+
+            <h3>Die Berechnung Schritt für Schritt</h3>
+            <div class="info-card">
+                <p><strong>Schritt 1:</strong> Messe den horizontalen Abstand zum Baum (d = 20 m)</p>
+                <p><strong>Schritt 2:</strong> Messe den Winkel von deiner Augenhöhe zur Baumspitze (α = 45°)</p>
+                <p><strong>Schritt 3:</strong> Berechne die Höhe über deinen Augen:</p>
+                <div class="formula-box">$$ h_1 = d \times \tan(\alpha) = 20 \times \tan(45°) = 20 \times 1 = 20 \text{ m} $$</div>
+                <p><strong>Schritt 4:</strong> Addiere deine Augenhöhe (h₀ = 1,65 m):</p>
+                <div class="formula-box">$$ H_{\text{Baum}} = h_1 + h_0 = 20 + 1,65 = 21,65 \text{ m} $$</div>
+            </div>
+
+            <div class="warning-box">
+                <div>
+                    <strong>Praktische Fehlerquellen:</strong>
+                    <ul>
+                        <li>Geneigtes Gelände: Benötigt Korrektur</li>
+                        <li>Ungenaue Winkelmessung: ±1° Fehler → ±0,35m Höhenfehler</li>
+                        <li>Vergessene Augenhöhe: Systematischer Fehler von ~1,65m!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        let lastScrollTop = 0;
+        const nav = document.getElementById('mainNav');
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (Math.abs(scrollTop - lastScrollTop) < 50) return;
+            if (scrollTop > lastScrollTop && scrollTop > 150) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            lastScrollTop = scrollTop;
+        }, { passive: true });
+
+        const unitCanvas = document.getElementById('unitCircle');
+        const unitCtx = unitCanvas.getContext('2d');
+        const angleSlider = document.getElementById('angleSlider');
+
+        function drawUnitCircle() {
+            const angle = parseFloat(angleSlider.value);
+            const rad = angle * Math.PI / 180;
+            
+            unitCtx.clearRect(0, 0, 1000, 1000);
+            
+            const cx = 500, cy = 500, r = 350;
+            
+            unitCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+            unitCtx.lineWidth = 1;
+            for (let i = -r; i <= r; i += 50) {
+                unitCtx.beginPath();
+                unitCtx.moveTo(cx + i, cy - r - 30);
+                unitCtx.lineTo(cx + i, cy + r + 30);
+                unitCtx.stroke();
+                unitCtx.beginPath();
+                unitCtx.moveTo(cx - r - 30, cy + i);
+                unitCtx.lineTo(cx + r + 30, cy + i);
+                unitCtx.stroke();
+            }
+            
+            unitCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+            unitCtx.lineWidth = 3;
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx - r - 50, cy);
+            unitCtx.lineTo(cx + r + 50, cy);
+            unitCtx.moveTo(cx, cy - r - 50);
+            unitCtx.lineTo(cx, cy + r + 50);
+            unitCtx.stroke();
+            
+            unitCtx.fillStyle = 'rgba(255,255,255,0.4)';
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx + r + 50, cy);
+            unitCtx.lineTo(cx + r + 35, cy - 7);
+            unitCtx.lineTo(cx + r + 35, cy + 7);
+            unitCtx.closePath();
+            unitCtx.fill();
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, cy - r - 50);
+            unitCtx.lineTo(cx - 7, cy - r - 35);
+            unitCtx.lineTo(cx + 7, cy - r - 35);
+            unitCtx.closePath();
+            unitCtx.fill();
+            
+            unitCtx.strokeStyle = 'rgba(255,255,255,0.6)';
+            unitCtx.lineWidth = 4;
+            unitCtx.beginPath();
+            unitCtx.arc(cx, cy, r, 0, Math.PI * 2);
+            unitCtx.stroke();
+            
+            const px = cx + r * Math.cos(rad);
+            const py = cy - r * Math.sin(rad);
+            
+            unitCtx.strokeStyle = '#a855f7';
+            unitCtx.lineWidth = 6;
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, cy);
+            unitCtx.lineTo(px, py);
+            unitCtx.stroke();
+            
+            unitCtx.strokeStyle = '#00d9ff';
+            unitCtx.lineWidth = 6;
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, cy);
+            unitCtx.lineTo(px, cy);
+            unitCtx.stroke();
+            
+            unitCtx.strokeStyle = '#ff2d95';
+            unitCtx.lineWidth = 6;
+            unitCtx.beginPath();
+            unitCtx.moveTo(px, cy);
+            unitCtx.lineTo(px, py);
+            unitCtx.stroke();
+            
+            const size = 30;
+            unitCtx.strokeStyle = 'rgba(255,255,255,0.7)';
+            unitCtx.lineWidth = 3;
+            unitCtx.beginPath();
+            unitCtx.moveTo(px - size, cy);
+            unitCtx.lineTo(px - size, cy - size);
+            unitCtx.lineTo(px, cy - size);
+            unitCtx.stroke();
+            
+            unitCtx.strokeStyle = '#fbbf24';
+            unitCtx.lineWidth = 5;
+            unitCtx.beginPath();
+            unitCtx.arc(cx, cy, 70, 0, -rad, true);
+            unitCtx.stroke();
+            
+            unitCtx.fillStyle = '#fbbf24';
+            unitCtx.beginPath();
+            unitCtx.arc(px, py, 14, 0, Math.PI * 2);
+            unitCtx.fill();
+            unitCtx.strokeStyle = '#000';
+            unitCtx.lineWidth = 3;
+            unitCtx.stroke();
+            
+            const fontSize = 28;
+            unitCtx.font = `bold ${fontSize}px Outfit`;
+            
+            const cosText = `cos(${angle}°) = ${Math.cos(rad).toFixed(3)}`;
+            const cosX = cx + (px - cx) / 2 - unitCtx.measureText(cosText).width / 2;
+            const cosY = cy + 55;
+            unitCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            unitCtx.fillRect(cosX - 10, cosY - fontSize - 4, unitCtx.measureText(cosText).width + 20, fontSize + 14);
+            unitCtx.fillStyle = '#00d9ff';
+            unitCtx.fillText(cosText, cosX, cosY);
+            
+            const sinText = `sin(${angle}°) = ${Math.sin(rad).toFixed(3)}`;
+            const sinX = px + 30;
+            const sinY = cy - (cy - py) / 2;
+            unitCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            unitCtx.fillRect(sinX - 10, sinY - fontSize - 4, unitCtx.measureText(sinText).width + 20, fontSize + 14);
+            unitCtx.fillStyle = '#ff2d95';
+            unitCtx.fillText(sinText, sinX, sinY);
+            
+            const radText = 'r = 1';
+            const radX = cx + (px - cx) / 2 - 60;
+            const radY = cy - (cy - py) / 2 - 30;
+            unitCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            unitCtx.fillRect(radX - 10, radY - fontSize - 4, unitCtx.measureText(radText).width + 20, fontSize + 14);
+            unitCtx.fillStyle = '#a855f7';
+            unitCtx.fillText(radText, radX, radY);
+            
+            unitCtx.fillStyle = '#fbbf24';
+            unitCtx.fillText(`θ = ${angle}°`, cx + 85, cy - 20);
+            
+            unitCtx.fillStyle = 'rgba(255,255,255,0.8)';
+            unitCtx.font = 'bold 24px Outfit';
+            unitCtx.fillText('+1', cx + r + 15, cy - 15);
+            unitCtx.fillText('-1', cx - r - 50, cy - 15);
+            unitCtx.fillText('+1', cx + 15, cy - r - 15);
+            unitCtx.fillText('-1', cx + 15, cy + r + 35);
+            unitCtx.fillText('x', cx + r + 60, cy + 30);
+            unitCtx.fillText('y', cx + 15, cy - r - 60);
+            
+            unitCtx.font = 'bold 22px JetBrains Mono';
+            const coordText = `P = (${Math.cos(rad).toFixed(4)}, ${Math.sin(rad).toFixed(4)})`;
+            unitCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            unitCtx.fillRect(cx - 220, cy - r - 140, unitCtx.measureText(coordText).width + 25, 42);
+            unitCtx.strokeStyle = '#fbbf24';
+            unitCtx.lineWidth = 2;
+            unitCtx.strokeRect(cx - 220, cy - r - 140, unitCtx.measureText(coordText).width + 25, 42);
+            unitCtx.fillStyle = '#fff';
+            unitCtx.fillText(coordText, cx - 210, cy - r - 110);
+            
+            document.getElementById('angleValue').textContent = angle;
+            document.getElementById('radianValue').textContent = rad.toFixed(4);
+            document.getElementById('sinValue').textContent = Math.sin(rad).toFixed(4);
+            document.getElementById('cosValue').textContent = Math.cos(rad).toFixed(4);
+        }
+
+        angleSlider.addEventListener('input', drawUnitCircle);
+        window.addEventListener('resize', drawUnitCircle);
+        drawUnitCircle();
+
+        const funcCanvas = document.getElementById('functionGraph');
+        const funcCtx = funcCanvas.getContext('2d');
+        const amplitudeSlider = document.getElementById('amplitudeSlider');
+        const frequencySlider = document.getElementById('frequencySlider');
+        const phaseSlider = document.getElementById('phaseSlider');
+
+        function drawFunctionGraph() {
+            const A = parseFloat(amplitudeSlider.value);
+            const omega = parseFloat(frequencySlider.value);
+            const phi = parseFloat(phaseSlider.value);
+            
+            funcCtx.clearRect(0, 0, 1000, 600);
+            
+            const centerY = 300;
+            const scaleX = 80;
+            const scaleY = 100;
+            
+            funcCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+            funcCtx.lineWidth = 1;
+            for (let x = 0; x < 1000; x += 40) {
+                funcCtx.beginPath();
+                funcCtx.moveTo(x, 0);
+                funcCtx.lineTo(x, 600);
+                funcCtx.stroke();
+            }
+            for (let y = 0; y < 600; y += 40) {
+                funcCtx.beginPath();
+                funcCtx.moveTo(0, y);
+                funcCtx.lineTo(1000, y);
+                funcCtx.stroke();
+            }
+            
+            funcCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+            funcCtx.lineWidth = 2;
+            funcCtx.beginPath();
+            funcCtx.moveTo(0, centerY);
+            funcCtx.lineTo(1000, centerY);
+            funcCtx.moveTo(50, 0);
+            funcCtx.lineTo(50, 600);
+            funcCtx.stroke();
+            
+            funcCtx.fillStyle = 'rgba(255,255,255,0.6)';
+            funcCtx.font = 'bold 14px JetBrains Mono';
+            for (let i = 0; i <= 10; i++) {
+                const x = 50 + i * scaleX;
+                if (x > 950) break;
+                funcCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+                funcCtx.lineWidth = 2;
+                funcCtx.beginPath();
+                funcCtx.moveTo(x, centerY - 6);
+                funcCtx.lineTo(x, centerY + 6);
+                funcCtx.stroke();
+                if (i > 0) funcCtx.fillText(`${i}π`, x - 14, centerY + 22);
+                else funcCtx.fillText('0', x - 6, centerY + 22);
+            }
+            
+            for (let i = -2; i <= 2; i++) {
+                if (i === 0) continue;
+                const y = centerY - i * 100;
+                funcCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+                funcCtx.beginPath();
+                funcCtx.moveTo(44, y);
+                funcCtx.lineTo(56, y);
+                funcCtx.stroke();
+                funcCtx.fillStyle = 'rgba(255,255,255,0.6)';
+                funcCtx.fillText(i > 0 ? `+${i}` : `${i}`, 12, y + 5);
+            }
+            
+            funcCtx.font = 'bold 18px Outfit';
+            funcCtx.fillStyle = 'rgba(255,255,255,0.7)';
+            funcCtx.fillText('x [rad]', 920, centerY + 25);
+            funcCtx.fillText('y', 20, 30);
+            
+            funcCtx.strokeStyle = '#ff2d95';
+            funcCtx.lineWidth = 4;
+            funcCtx.beginPath();
+            for (let px = 0; px < 1000; px++) {
+                const x = (px - 50) / scaleX * Math.PI;
+                const y = centerY - A * Math.sin(omega * x + phi) * scaleY;
+                if (px === 0) funcCtx.moveTo(px, y);
+                else funcCtx.lineTo(px, y);
+            }
+            funcCtx.stroke();
+            
+            funcCtx.strokeStyle = '#00d9ff';
+            funcCtx.lineWidth = 4;
+            funcCtx.beginPath();
+            for (let px = 0; px < 1000; px++) {
+                const x = (px - 50) / scaleX * Math.PI;
+                const y = centerY - A * Math.cos(omega * x + phi) * scaleY;
+                if (px === 0) funcCtx.moveTo(px, y);
+                else funcCtx.lineTo(px, y);
+            }
+            funcCtx.stroke();
+            
+            funcCtx.strokeStyle = '#ffaa00';
+            funcCtx.lineWidth = 3;
+            funcCtx.beginPath();
+            let prevY = null;
+            for (let px = 0; px < 1000; px++) {
+                const x = (px - 50) / scaleX * Math.PI;
+                const tanValue = Math.tan(omega * x + phi);
+                if (Math.abs(tanValue) < 15) {
+                    const y = centerY - A * tanValue * 20;
+                    if (y >= -50 && y <= 650) {
+                        if (prevY !== null && Math.abs(y - prevY) < 150) {
+                            funcCtx.lineTo(px, y);
+                        } else {
+                            funcCtx.moveTo(px, y);
+                        }
+                        prevY = y;
+                    }
+                } else {
+                    prevY = null;
+                }
+            }
+            funcCtx.stroke();
+            
+            const legendX = 800;
+            const legendY = 25;
+            funcCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            funcCtx.fillRect(legendX - 12, legendY - 8, 185, 110);
+            funcCtx.strokeStyle = '#fbbf24';
+            funcCtx.lineWidth = 2;
+            funcCtx.strokeRect(legendX - 12, legendY - 8, 185, 110);
+            funcCtx.font = 'bold 22px Outfit';
+            funcCtx.fillStyle = '#ff2d95';
+            funcCtx.fillText('sin(x)', legendX, legendY + 20);
+            funcCtx.fillStyle = '#00d9ff';
+            funcCtx.fillText('cos(x)', legendX, legendY + 50);
+            funcCtx.fillStyle = '#ffaa00';
+            funcCtx.fillText('tan(x)', legendX, legendY + 80);
+            
+            funcCtx.font = 'bold 17px JetBrains Mono';
+            const formula = `f(x) = ${A.toFixed(1)} · sin(${omega.toFixed(1)}x + ${phi.toFixed(2)})`;
+            funcCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            funcCtx.fillRect(48, 15, funcCtx.measureText(formula).width + 20, 35);
+            funcCtx.fillStyle = '#fbbf24';
+            funcCtx.fillText(formula, 58, 38);
+            
+            document.getElementById('amplitudeValue').textContent = A.toFixed(1);
+            document.getElementById('frequencyValue').textContent = omega.toFixed(1);
+            document.getElementById('phaseValue').textContent = phi.toFixed(2);
+        }
+
+        amplitudeSlider.addEventListener('input', drawFunctionGraph);
+        frequencySlider.addEventListener('input', drawFunctionGraph);
+        phaseSlider.addEventListener('input', drawFunctionGraph);
+        window.addEventListener('resize', drawFunctionGraph);
+        drawFunctionGraph();
+
+        const triCanvas = document.getElementById('triangleCanvas');
+        const triCtx = triCanvas.getContext('2d');
+        const triAngleSlider = document.getElementById('triangleAngle');
+
+        function drawTriangle() {
+            const angle = parseFloat(triAngleSlider.value);
+            const rad = angle * Math.PI / 180;
+            const hyp = 5, scale = 70;
+            const opp = hyp * Math.sin(rad), adj = hyp * Math.cos(rad);
+            
+            triCtx.clearRect(0, 0, 800, 600);
+            const x1 = 120, y1 = 500, x2 = x1 + adj * scale, y2 = y1, x3 = x2, y3 = y1 - opp * scale;
+            
+            triCtx.fillStyle = 'rgba(168, 85, 247, 0.06)';
+            triCtx.beginPath();
+            triCtx.moveTo(x1, y1);
+            triCtx.lineTo(x2, y2);
+            triCtx.lineTo(x3, y3);
+            triCtx.closePath();
+            triCtx.fill();
+            
+            triCtx.strokeStyle = '#4ade80';
+            triCtx.lineWidth = 8;
+            triCtx.beginPath();
+            triCtx.moveTo(x1, y1);
+            triCtx.lineTo(x2, y2);
+            triCtx.stroke();
+            
+            triCtx.strokeStyle = '#22d3ee';
+            triCtx.beginPath();
+            triCtx.moveTo(x2, y2);
+            triCtx.lineTo(x3, y3);
+            triCtx.stroke();
+            
+            triCtx.strokeStyle = '#a855f7';
+            triCtx.beginPath();
+            triCtx.moveTo(x1, y1);
+            triCtx.lineTo(x3, y3);
+            triCtx.stroke();
+            
+            const size = 30;
+            triCtx.strokeStyle = '#fff';
+            triCtx.lineWidth = 3;
+            triCtx.beginPath();
+            triCtx.moveTo(x2 - size, y2);
+            triCtx.lineTo(x2 - size, y2 - size);
+            triCtx.lineTo(x2, y2 - size);
+            triCtx.stroke();
+            triCtx.fillStyle = '#fff';
+            triCtx.font = 'bold 22px Outfit';
+            triCtx.fillText('90°', x2 - size - 48, y2 - size / 2 + 5);
+            
+            triCtx.strokeStyle = '#fbbf24';
+            triCtx.lineWidth = 4;
+            triCtx.beginPath();
+            triCtx.arc(x1, y1, 55, 0, -rad, true);
+            triCtx.stroke();
+            
+            triCtx.font = 'bold 26px Outfit';
+            const hypText = `c = ${hyp.toFixed(2)}`;
+            triCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            triCtx.fillRect((x1 + x3) / 2 - 98, (y1 + y3) / 2 - 56, 140, 36);
+            triCtx.fillStyle = '#a855f7';
+            triCtx.fillText(hypText, (x1 + x3) / 2 - 90, (y1 + y3) / 2 - 30);
+            
+            triCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            triCtx.fillRect((x1 + x2) / 2 - 55, y1 + 19, 110, 36);
+            triCtx.fillStyle = '#4ade80';
+            triCtx.fillText(`b = ${adj.toFixed(2)}`, (x1 + x2) / 2 - 47, y1 + 45);
+            
+            triCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            triCtx.fillRect(x2 + 22, (y2 + y3) / 2 - 16, 120, 36);
+            triCtx.fillStyle = '#22d3ee';
+            triCtx.fillText(`a = ${opp.toFixed(2)}`, x2 + 30, (y2 + y3) / 2 + 10);
+            
+            triCtx.fillStyle = '#fbbf24';
+            triCtx.fillText(`α = ${angle}°`, x1 + 70, y1 - 18);
+            
+            triCtx.font = 'bold 22px Outfit';
+            triCtx.fillText(`β = ${(90 - angle).toFixed(1)}°`, x3 - 90, y3 + 28);
+            
+            triCtx.font = 'bold 17px JetBrains Mono';
+            triCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+            triCtx.fillRect(18, 18, 360, 160);
+            triCtx.strokeStyle = '#fbbf24';
+            triCtx.lineWidth = 2;
+            triCtx.strokeRect(18, 18, 360, 160);
+            triCtx.fillStyle = '#fbbf24';
+            triCtx.fillText('Trigonometrische Verhältnisse:', 28, 45);
+            triCtx.fillStyle = '#ff2d95';
+            triCtx.fillText(`sin(${angle}°) = a/c = ${Math.sin(rad).toFixed(4)}`, 28, 75);
+            triCtx.fillStyle = '#00d9ff';
+            triCtx.fillText(`cos(${angle}°) = b/c = ${Math.cos(rad).toFixed(4)}`, 28, 105);
+            triCtx.fillStyle = '#ffaa00';
+            triCtx.fillText(`tan(${angle}°) = a/b = ${Math.tan(rad).toFixed(4)}`, 28, 135);
+            triCtx.fillStyle = '#4ade80';
+            triCtx.font = 'bold 15px JetBrains Mono';
+            triCtx.fillText(`Pythagoras: a² + b² = c²`, 28, 162);
+            
+            document.getElementById('triangleAngleValue').textContent = angle;
+            document.getElementById('hypotenuseValue').textContent = hyp.toFixed(2);
+            document.getElementById('oppositeValue').textContent = opp.toFixed(2);
+            document.getElementById('adjacentValue').textContent = adj.toFixed(2);
+        }
+
+        triAngleSlider.addEventListener('input', drawTriangle);
+        window.addEventListener('resize', drawTriangle);
+        drawTriangle();
+
+        const practicalCanvas = document.getElementById('practicalExample');
+        const practicalCtx = practicalCanvas.getContext('2d');
+        const distanceSlider = document.getElementById('distanceSlider');
+        const elevationSlider = document.getElementById('elevationSlider');
+        const eyeHeightSlider = document.getElementById('eyeHeightSlider');
+
+        function drawPracticalExample() {
+            const distance = parseFloat(distanceSlider.value);
+            const elevation = parseFloat(elevationSlider.value);
+            const eyeHeight = parseFloat(eyeHeightSlider.value);
+            const rad = elevation * Math.PI / 180;
+            const heightAboveEye = distance * Math.tan(rad);
+            const totalHeight = heightAboveEye + eyeHeight;
+            
+            practicalCtx.clearRect(0, 0, 800, 500);
+            
+            const gradient = practicalCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, '#1a2332');
+            gradient.addColorStop(1, '#0a0e1a');
+            practicalCtx.fillStyle = gradient;
+            practicalCtx.fillRect(0, 0, 800, 300);
+            
+            practicalCtx.fillStyle = 'rgba(74, 222, 128, 0.12)';
+            practicalCtx.fillRect(0, 400, 800, 100);
+            
+            const treeX = 650, treeBottom = 400, scale = 6;
+            const treeTop = treeBottom - totalHeight * scale;
+            
+            const trunkWidth = 28;
+            practicalCtx.fillStyle = '#6b4423';
+            practicalCtx.fillRect(treeX - trunkWidth/2, treeTop + heightAboveEye * scale, trunkWidth, (totalHeight - heightAboveEye) * scale);
+            
+            practicalCtx.fillStyle = '#2d5016';
+            for (let i = 0; i < 3; i++) {
+                practicalCtx.beginPath();
+                practicalCtx.moveTo(treeX, treeTop - 45 + i * 28);
+                practicalCtx.lineTo(treeX - 75 + i * 16, treeTop + 55 + i * 28);
+                practicalCtx.lineTo(treeX + 75 - i * 16, treeTop + 55 + i * 28);
+                practicalCtx.closePath();
+                practicalCtx.fill();
+            }
+            
+            const personX = 120, personBottom = 400;
+            const eyeY = personBottom - eyeHeight * scale;
+            
+            practicalCtx.fillStyle = '#3b82f6';
+            practicalCtx.fillRect(personX - 14, eyeY - 35, 28, 45);
+            practicalCtx.fillStyle = '#fbbf24';
+            practicalCtx.beginPath();
+            practicalCtx.arc(personX, eyeY - 45, 20, 0, Math.PI * 2);
+            practicalCtx.fill();
+            
+            practicalCtx.strokeStyle = '#fbbf24';
+            practicalCtx.lineWidth = 3;
+            practicalCtx.setLineDash([12, 8]);
+            practicalCtx.beginPath();
+            practicalCtx.moveTo(personX, eyeY);
+            practicalCtx.lineTo(treeX, treeTop);
+            practicalCtx.stroke();
+            practicalCtx.setLineDash([]);
+            
+            practicalCtx.strokeStyle = '#00d9ff';
+            practicalCtx.lineWidth = 5;
+            practicalCtx.beginPath();
+            practicalCtx.moveTo(personX, eyeY);
+            practicalCtx.lineTo(treeX, eyeY);
+            practicalCtx.stroke();
+            
+            practicalCtx.strokeStyle = '#ff2d95';
+            practicalCtx.beginPath();
+            practicalCtx.moveTo(treeX, eyeY);
+            practicalCtx.lineTo(treeX, treeTop);
+            practicalCtx.stroke();
+            
+            practicalCtx.strokeStyle = '#4ade80';
+            practicalCtx.lineWidth = 4;
+            practicalCtx.setLineDash([6, 6]);
+            practicalCtx.beginPath();
+            practicalCtx.moveTo(treeX, treeBottom);
+            practicalCtx.lineTo(treeX, eyeY);
+            practicalCtx.stroke();
+            practicalCtx.setLineDash([]);
+            
+            practicalCtx.strokeStyle = '#fbbf24';
+            practicalCtx.lineWidth = 4;
+            practicalCtx.beginPath();
+            practicalCtx.arc(personX, eyeY, 65, 0, -rad, true);
+            practicalCtx.stroke();
+            
+            practicalCtx.font = 'bold 22px Outfit';
+            const distText = `d = ${distance} m`;
+            practicalCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+            practicalCtx.fillRect((personX + treeX) / 2 - 55, eyeY + 8, 110, 35);
+            practicalCtx.fillStyle = '#00d9ff';
+            practicalCtx.fillText(distText, (personX + treeX) / 2 - 47, eyeY + 32);
+            
+            const hText = `h₁ = ${heightAboveEye.toFixed(2)} m`;
+            practicalCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+            practicalCtx.fillRect(treeX + 18, (eyeY + treeTop) / 2 - 16, 140, 35);
+            practicalCtx.fillStyle = '#ff2d95';
+            practicalCtx.fillText(hText, treeX + 26, (eyeY + treeTop) / 2 + 8);
+            
+            practicalCtx.font = 'bold 30px Outfit';
+            const totalText = `H = ${totalHeight.toFixed(2)} m`;
+            practicalCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+            practicalCtx.fillRect(treeX - 160, treeTop - 50, 220, 40);
+            practicalCtx.strokeStyle = '#fbbf24';
+            practicalCtx.lineWidth = 2;
+            practicalCtx.strokeRect(treeX - 160, treeTop - 50, 220, 40);
+            practicalCtx.fillStyle = '#fbbf24';
+            practicalCtx.fillText(totalText, treeX - 150, treeTop - 20);
+            
+            practicalCtx.font = 'bold 24px Outfit';
+            practicalCtx.fillStyle = '#fbbf24';
+            practicalCtx.fillText(`α = ${elevation}°`, personX + 80, eyeY - 35);
+            
+            practicalCtx.font = 'bold 20px Outfit';
+            practicalCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+            practicalCtx.fillRect(treeX - 125, (eyeY + treeBottom) / 2 - 16, 120, 32);
+            practicalCtx.fillStyle = '#4ade80';
+            practicalCtx.fillText(`h₀ = ${eyeHeight.toFixed(2)} m`, treeX - 118, (eyeY + treeBottom) / 2 + 6);
+            
+            practicalCtx.font = 'bold 16px JetBrains Mono';
+            practicalCtx.fillStyle = 'rgba(0, 0, 0, 0.94)';
+            practicalCtx.fillRect(13, 13, 400, 115);
+            practicalCtx.strokeStyle = '#fbbf24';
+            practicalCtx.lineWidth = 2;
+            practicalCtx.strokeRect(13, 13, 400, 115);
+            practicalCtx.fillStyle = '#fbbf24';
+            practicalCtx.fillText('Berechnung:', 23, 36);
+            practicalCtx.fillStyle = '#fff';
+            practicalCtx.fillText(`h₁ = d · tan(α)`, 23, 60);
+            practicalCtx.fillText(`   = ${distance} m · tan(${elevation}°)`, 23, 80);
+            practicalCtx.fillText(`   = ${heightAboveEye.toFixed(2)} m`, 23, 100);
+            practicalCtx.fillStyle = '#4ade80';
+            practicalCtx.fillText(`H = h₁ + h₀ = ${totalHeight.toFixed(2)} m`, 23, 120);
+            
+            document.getElementById('distanceValue').textContent = distance;
+            document.getElementById('elevationValue').textContent = elevation;
+            document.getElementById('eyeHeightValue').textContent = eyeHeight.toFixed(2);
+            document.getElementById('treeHeight').textContent = totalHeight.toFixed(2);
+        }
+
+        distanceSlider.addEventListener('input', drawPracticalExample);
+        elevationSlider.addEventListener('input', drawPracticalExample);
+        eyeHeightSlider.addEventListener('input', drawPracticalExample);
+        window.addEventListener('resize', drawPracticalExample);
+        drawPracticalExample();
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = nav.offsetHeight;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                }
+            });
+        });
+
+        window.addEventListener('load', function() {
+            if (window.MathJax) {
+                MathJax.typesetPromise().catch((err) => console.log('MathJax Fehler:', err));
+            }
+        });
+    </script>
+</body>
+</html>
