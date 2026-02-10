@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦄 Unicycle Convention Planer 2026</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border: #475569;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: calc(100vh - 60px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 60px);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .filter-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .filter-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+        
+        .filter-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        
+        .filter-label {
+            font-size: 0.85rem;
+            flex: 1;
+        }
+        
+        .filter-count {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 10px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .quick-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 1rem 1.5rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 60px);
+        }
+        
+        /* Day Navigation */
+        .day-nav {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .day-btn {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+        
+        .day-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .day-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .day-btn .day-name {
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .day-btn .day-date {
+            font-size: 0.65rem;
+            opacity: 0.8;
+        }
+        
+        .day-btn.special {
+            border: 1px dashed var(--warning);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stat-card.warning {
+            border-left: 3px solid var(--warning);
+        }
+        
+        .stat-card.danger {
+            border-left: 3px solid var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Event List */
+        .events-container {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .events-header {
+            display: grid;
+            grid-template-columns: 100px 1fr 150px 120px 80px;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .event-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 150px 120px 80px;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .event-item:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        
+        .event-item.collision {
+            background: rgba(239, 68, 68, 0.15);
+            border-left: 3px solid var(--danger);
+        }
+        
+        .event-time {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .time-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 70px;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .event-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .event-color-bar {
+            width: 4px;
+            height: 30px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        
+        .event-name {
+            font-weight: 500;
+        }
+        
+        .event-name-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            width: 100%;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+        
+        .event-name-input:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .event-name-input:focus {
+            outline: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent);
+        }
+        
+        .event-location {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .event-discipline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .discipline-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+        
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Collision Alert */
+        .collision-alert {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collision-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--danger);
+            font-size: 0.85rem;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.1rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        /* Free Slots Panel */
+        .free-slots-panel {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .free-slots-panel h4 {
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            color: var(--success);
+        }
+        
+        .slot-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .slot-time {
+            font-weight: 500;
+        }
+        
+        .slot-duration {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Discipline Overview */
+        .discipline-overview {
+            margin-top: 1rem;
+        }
+        
+        .discipline-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .discipline-header {
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .discipline-header:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .discipline-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .discipline-events {
+            padding: 0 1rem 1rem;
+            display: none;
+        }
+        
+        .discipline-events.expanded {
+            display: block;
+        }
+        
+        .mini-event {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 2000;
+        }
+        
+        .toast {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-tertiary);
+            padding: 0.25rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .view-toggle button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .view-toggle button.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Location Select */
+        .location-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: 140px;
+        }
+        
+        /* Discipline Select with Color */
+        .discipline-select-wrapper {
+            position: relative;
+        }
+        
+        .discipline-select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            padding-left: 2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .discipline-color-preview {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar, .header-actions, .action-btn, .day-nav { display: none !important; }
+            .main-container { grid-template-columns: 1fr !important; }
+            body { background: white; color: black; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .events-header, .event-item {
+                grid-template-columns: 80px 1fr 100px 60px;
+            }
+            .event-location {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🦄 Unicycle Convention Planer 2026</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="importJSON()" title="JSON Import">📂 Import</button>
+            <button class="btn btn-secondary" onclick="exportJSON()" title="JSON Export">💾 Backup</button>
+            <button class="btn btn-secondary" onclick="exportCSV()">📄 CSV</button>
+            <button class="btn btn-primary" onclick="exportExcel()">📊 Excel</button>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Quick Actions -->
+            <div class="sidebar-section">
+                <h3>Aktionen</h3>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="openAddEventModal()">➕ Neues Event</button>
+                    <button class="btn btn-secondary" onclick="openDisciplineManager()">🎨 Disziplinen</button>
+                    <button class="btn btn-secondary" onclick="showDisciplineOverview()">📋 Übersicht</button>
+                </div>
+            </div>
+            
+            <!-- Filter by Discipline -->
+            <div class="sidebar-section">
+                <h3>Filter: Disziplinen</h3>
+                <div class="filter-actions" style="margin-bottom: 0.75rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="selectAllFilters()" style="flex:1; font-size: 0.75rem;">Alle</button>
+                    <button class="btn btn-secondary" onclick="deselectAllFilters()" style="flex:1; font-size: 0.75rem;">Keine</button>
+                </div>
+                <div class="filter-group" id="disciplineFilters"></div>
+            </div>
+            
+            <!-- Filter by Location -->
+            <div class="sidebar-section">
+                <h3>Filter: Locations</h3>
+                <div class="filter-group" id="locationFilters"></div>
+            </div>
+            
+            <!-- Info -->
+            <div class="sidebar-section">
+                <h3>Info</h3>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    <p>📅 24.07. - 08.08.2026</p>
+                    <p style="margin-top: 0.5rem;">💾 Auto-Save aktiv</p>
+                    <p style="margin-top: 0.25rem; font-size: 0.7rem;" id="lastSaveInfo"></p>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Content -->
+        <main class="content">
+            <!-- Day Navigation -->
+            <nav class="day-nav" id="dayNav"></nav>
+            
+            <!-- Stats -->
+            <div class="stats-bar" id="statsBar"></div>
+            
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="active" data-view="timeline" onclick="setView('timeline')">📋 Timeline</button>
+                <button data-view="discipline" onclick="setView('discipline')">🏷️ Nach Disziplin</button>
+                <button data-view="location" onclick="setView('location')">📍 Nach Location</button>
+            </div>
+            
+            <!-- Events Container -->
+            <div id="eventsContainer"></div>
+        </main>
+    </div>
+    
+    <!-- Modal: Add/Edit Event -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="eventModalTitle">Neues Event</h2>
+                <button class="modal-close" onclick="closeModal('eventModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editEventId">
+                <div class="form-group">
+                    <label>Event Name *</label>
+                    <input type="text" class="form-control" id="eventName" placeholder="z.B. Freestyle Final">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Startzeit *</label>
+                        <input type="time" class="form-control" id="eventStart">
+                    </div>
+                    <div class="form-group">
+                        <label>Endzeit *</label>
+                        <input type="time" class="form-control" id="eventEnd">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Disziplin *</label>
+                        <select class="form-control" id="eventDiscipline"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select class="form-control" id="eventLocation"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notizen</label>
+                    <textarea class="form-control" id="eventNotes" rows="2" placeholder="Zusätzliche Informationen..."></textarea>
+                </div>
+                
+                <!-- Free Slots Suggestion -->
+                <div class="free-slots-panel" id="freeSlotsPanel" style="display: none;">
+                    <h4>💡 Freie Zeitslots an diesem Tag</h4>
+                    <div id="freeSlotsList"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('eventModal')">Abbrechen</button>
+                <button class="btn btn-primary" onclick="saveEvent()">Speichern</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Discipline Manager -->
+    <div class="modal-overlay" id="disciplineModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🎨 Disziplinen verwalten</h2>
+                <button class="modal-close" onclick="closeModal('disciplineModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row" style="margin-bottom: 1rem;">
+                    <input type="text" class="form-control" id="newDisciplineName" placeholder="Neue Disziplin...">
+                    <input type="color" id="newDisciplineColor" value="#3b82f6" style="width: 50px; height: 38px;">
+                    <button class="btn btn-primary" onclick="addDiscipline()">➕</button>
+                </div>
+                <div id="disciplineList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('disciplineModal')">Schließen</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Discipline Overview -->
+    <div class="modal-overlay" id="overviewModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📋 Disziplin-Übersicht</h2>
+                <button class="modal-close" onclick="closeModal('overviewModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Disziplin auswählen</label>
+                    <select class="form-control" id="overviewDiscipline" onchange="updateOverview()">
+                        <option value="">Alle Disziplinen</option>
+                    </select>
+                </div>
+                <div id="overviewContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('overviewModal')">Schließen</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Collision Resolver -->
+    <div class="modal-overlay" id="collisionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>⚠️ Kollision lösen</h2>
+                <button class="modal-close" onclick="closeModal('collisionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="collisionDetails"></div>
+                <div class="free-slots-panel">
+                    <h4>💡 Alternative Zeitslots</h4>
+                    <div id="alternativeSlots"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('collisionModal')">Schließen</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+    
+    <script>
+        // ========================================
+        // DATA STRUCTURES
+        // ========================================
+        
+        const DAYS = [
+            { date: '2026-07-24', label: 'Aufbau', dayNum: 0, special: true },
+            { date: '2026-07-25', label: 'Tag 1', dayNum: 1 },
+            { date: '2026-07-26', label: 'Tag 2', dayNum: 2 },
+            { date: '2026-07-27', label: 'Tag 3', dayNum: 3 },
+            { date: '2026-07-28', label: 'Tag 4', dayNum: 4 },
+            { date: '2026-07-29', label: 'Tag 5', dayNum: 5 },
+            { date: '2026-07-30', label: 'Tag 6', dayNum: 6 },
+            { date: '2026-07-31', label: 'Tag 7', dayNum: 7 },
+            { date: '2026-08-01', label: 'Tag 8', dayNum: 8 },
+            { date: '2026-08-02', label: 'Tag 9', dayNum: 9 },
+            { date: '2026-08-03', label: 'Tag 10', dayNum: 10 },
+            { date: '2026-08-04', label: 'Tag 11', dayNum: 11 },
+            { date: '2026-08-05', label: 'Tag 12', dayNum: 12 },
+            { date: '2026-08-06', label: 'Tag 13', dayNum: 13 },
+            { date: '2026-08-07', label: 'Tag 14', dayNum: 14 },
+            { date: '2026-08-08', label: 'Abbau', dayNum: 15, special: true }
+        ];
+        
+        const DEFAULT_DISCIPLINES = {
+            'Hockey': '#ef4444',
+            'Basketball': '#f97316',
+            'Freestyle': '#8b5cf6',
+            'Flatland': '#ec4899',
+            'Trial': '#14b8a6',
+            'Street': '#f59e0b',
+            'Track': '#3b82f6',
+            'Muni': '#22c55e',
+            'Convention': '#06b6d4',
+            'Workshop': '#a855f7',
+            'XC': '#84cc16',
+            'DH': '#ea580c',
+            'UH': '#0ea5e9',
+            'Jumps': '#fbbf24',
+            'Awards': '#fcd34d',
+            'Party': '#f472b6',
+            'Setup': '#64748b',
+            'Other': '#94a3b8'
+        };
+        
+        const DEFAULT_LOCATIONS = [
+            'Icehall', 'ATV Hall', 'HTL Hall', 'City Hall', 
+            'Track', 'Straße', 'Wurbauerkogel', 'Other'
+        ];
+        
+        // ========================================
+        // STATE
+        // ========================================
+        
+        let state = {
+            currentDay: '2026-07-25',
+            currentView: 'timeline',
+            events: [],
+            disciplines: { ...DEFAULT_DISCIPLINES },
+            locations: [...DEFAULT_LOCATIONS],
+            filters: {
+                disciplines: {},
+                locations: {}
+            }
+        };
+        
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        
+        function init() {
+            loadFromStorage();
+            initFilters();
+            renderDayNav();
+            renderFilters();
+            renderContent();
+            updateStats();
+            
+            // Auto-save every 30 seconds
+            setInterval(saveToStorage, 30000);
+        }
+        
+        function loadFromStorage() {
+            const saved = localStorage.getItem('unicyclePlanner2026');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.events = data.events || [];
+                    state.disciplines = data.disciplines || { ...DEFAULT_DISCIPLINES };
+                    state.locations = data.locations || [...DEFAULT_LOCATIONS];
+                    state.currentDay = data.currentDay || '2026-07-25';
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                    loadSampleData();
+                }
+            } else {
+                loadSampleData();
+            }
+        }
+        
+        function loadSampleData() {
+            // Sample events from the Excel data
+            state.events = [
+                { id: 1, date: '2026-07-24', start: '08:00', end: '18:00', name: 'Trials build', discipline: 'Setup', location: 'Icehall', notes: 'Trial und Street Build' },
+                { id: 2, date: '2026-07-25', start: '08:00', end: '12:00', name: 'Registration', discipline: 'Convention', location: 'City Hall' },
+                { id: 3, date: '2026-07-25', start: '16:00', end: '18:00', name: 'Opening Ceremony & Parade', discipline: 'Convention', location: 'City Hall' },
+                { id: 4, date: '2026-07-26', start: '08:00', end: '12:00', name: 'Basket A', discipline: 'Basketball', location: 'City Hall' },
+                { id: 5, date: '2026-07-26', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 6, date: '2026-07-26', start: '09:30', end: '16:45', name: 'Trial Heats', discipline: 'Trial', location: 'Icehall', notes: '3 heats: 09h30-11h15, 12h30-14h15, 15h00-16h45' },
+                { id: 7, date: '2026-07-26', start: '08:00', end: '12:00', name: 'Street Practise', discipline: 'Street', location: 'Straße' },
+                { id: 8, date: '2026-07-26', start: '15:30', end: '17:00', name: 'Criterium', discipline: 'Track', location: 'Straße' },
+                { id: 9, date: '2026-07-27', start: '08:00', end: '12:00', name: 'Hockey Women', discipline: 'Hockey', location: 'City Hall' },
+                { id: 10, date: '2026-07-27', start: '08:00', end: '17:00', name: 'Convention', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 11, date: '2026-07-27', start: '07:00', end: '10:00', name: 'Muni Practise', discipline: 'Muni', location: 'Wurbauerkogel' },
+                { id: 12, date: '2026-07-27', start: '08:00', end: '12:00', name: 'Jumps on Track Qualification', discipline: 'Jumps', location: 'Track' },
+                { id: 13, date: '2026-07-27', start: '19:00', end: '21:00', name: 'Awards 10K', discipline: 'Awards', location: 'Icehall' },
+                { id: 14, date: '2026-07-27', start: '19:30', end: '23:00', name: 'Trial Final', discipline: 'Trial', location: 'Icehall', notes: 'Juniors: 19h30-20h15, Female: 20h30-21h30, Male: 21h45-22h45' },
+                { id: 15, date: '2026-07-28', start: '08:00', end: '12:00', name: 'Hockey Junior', discipline: 'Hockey', location: 'City Hall' },
+                { id: 16, date: '2026-07-28', start: '08:00', end: '12:00', name: 'Street Practise', discipline: 'Street', location: 'Straße' },
+                { id: 17, date: '2026-07-28', start: '08:00', end: '12:00', name: '10K Race', discipline: 'Track', location: 'Track' },
+                { id: 18, date: '2026-07-28', start: '19:00', end: '21:00', name: 'Jumps Final on Track', discipline: 'Jumps', location: 'Track' },
+                { id: 19, date: '2026-07-29', start: '08:00', end: '12:00', name: 'Hockey A', discipline: 'Hockey', location: 'City Hall' },
+                { id: 20, date: '2026-07-29', start: '08:00', end: '12:00', name: 'Speed Trial', discipline: 'Trial', location: 'Icehall' },
+                { id: 21, date: '2026-07-29', start: '18:30', end: '20:00', name: 'Basket A Final', discipline: 'Basketball', location: 'City Hall' },
+                { id: 22, date: '2026-07-30', start: '08:00', end: '12:00', name: 'Hockey A', discipline: 'Hockey', location: 'City Hall' },
+                { id: 23, date: '2026-07-30', start: '08:00', end: '10:30', name: 'X-Style', discipline: 'Freestyle', location: 'ATV Hall' },
+                { id: 24, date: '2026-07-30', start: '08:00', end: '12:00', name: 'Jumps on Platform Qualification', discipline: 'Jumps', location: 'Icehall' },
+                { id: 25, date: '2026-07-30', start: '08:30', end: '11:00', name: 'Shuttle', discipline: 'Other', location: 'Wurbauerkogel' },
+                { id: 26, date: '2026-07-30', start: '10:30', end: '12:00', name: 'Expert XC', discipline: 'XC', location: 'Wurbauerkogel' },
+                { id: 27, date: '2026-07-30', start: '13:30', end: '15:00', name: 'Beginner XC', discipline: 'XC', location: 'Wurbauerkogel' },
+                { id: 28, date: '2026-07-30', start: '18:00', end: '19:30', name: 'X-Style Final', discipline: 'Freestyle', location: 'City Hall' },
+                { id: 29, date: '2026-07-30', start: '19:30', end: '21:00', name: 'Speedtrial Final', discipline: 'Trial', location: 'Icehall' },
+                { id: 30, date: '2026-07-31', start: '08:00', end: '12:00', name: 'Hockey A', discipline: 'Hockey', location: 'City Hall' },
+                { id: 31, date: '2026-07-31', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 32, date: '2026-07-31', start: '07:00', end: '08:00', name: 'Shuttle', discipline: 'Other', location: 'Wurbauerkogel' },
+                { id: 33, date: '2026-07-31', start: '09:00', end: '11:00', name: 'UH Beginner', discipline: 'UH', location: 'Wurbauerkogel' },
+                { id: 34, date: '2026-07-31', start: '11:00', end: '13:00', name: 'UH Expert', discipline: 'UH', location: 'Wurbauerkogel' },
+                { id: 35, date: '2026-07-31', start: '13:00', end: '15:00', name: 'DH Beginner', discipline: 'DH', location: 'Wurbauerkogel' },
+                { id: 36, date: '2026-07-31', start: '20:30', end: '22:00', name: 'Jumps on Platform Final', discipline: 'Jumps', location: 'Icehall' },
+                { id: 37, date: '2026-08-01', start: '08:00', end: '12:00', name: 'Basket B', discipline: 'Basketball', location: 'City Hall' },
+                { id: 38, date: '2026-08-01', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 39, date: '2026-08-01', start: '09:00', end: '11:00', name: 'DH Expert Quali', discipline: 'DH', location: 'Wurbauerkogel' },
+                { id: 40, date: '2026-08-01', start: '12:00', end: '14:00', name: 'DH Final 1-3', discipline: 'DH', location: 'Wurbauerkogel' },
+                { id: 41, date: '2026-08-01', start: '16:00', end: '18:00', name: 'Flatland Qualification', discipline: 'Flatland', location: 'City Hall' },
+                { id: 42, date: '2026-08-01', start: '17:00', end: '18:30', name: 'Hockey A Final', discipline: 'Hockey', location: 'City Hall' },
+                { id: 43, date: '2026-08-01', start: '20:00', end: '23:00', name: 'Halftime Party & Movie Night', discipline: 'Party', location: 'Icehall' },
+                { id: 44, date: '2026-08-02', start: '08:00', end: '12:00', name: 'Basket B', discipline: 'Basketball', location: 'City Hall' },
+                { id: 45, date: '2026-08-02', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 46, date: '2026-08-02', start: '08:00', end: '11:00', name: 'Flatland Lower Rounds', discipline: 'Flatland', location: 'Icehall' },
+                { id: 47, date: '2026-08-02', start: '08:00', end: '10:00', name: 'IUF Slalom', discipline: 'Track', location: 'Track' },
+                { id: 48, date: '2026-08-02', start: '08:00', end: '10:00', name: '42K Marathon', discipline: 'Track', location: 'Straße' },
+                { id: 49, date: '2026-08-02', start: '09:00', end: '10:00', name: 'Coasting', discipline: 'Freestyle', location: 'Track' },
+                { id: 50, date: '2026-08-02', start: '08:00', end: '14:00', name: 'Freestyle Convention Individual U15 & Pair U15', discipline: 'Freestyle', location: 'HTL Hall', notes: 'etwa 32 plus Einfahrzeiten' },
+                { id: 51, date: '2026-08-03', start: '08:00', end: '12:00', name: 'Hockey B', discipline: 'Hockey', location: 'City Hall' },
+                { id: 52, date: '2026-08-03', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 53, date: '2026-08-03', start: '08:00', end: '10:00', name: '800m Qualification', discipline: 'Track', location: 'Track' },
+                { id: 54, date: '2026-08-03', start: '06:30', end: '08:00', name: 'Hockey Take Down', discipline: 'Setup', location: 'Icehall' },
+                { id: 55, date: '2026-08-03', start: '08:30', end: '14:00', name: 'Freestyle Convention Individual 15+', discipline: 'Freestyle', location: 'Icehall', notes: 'etwa 48 plus Einfahrzeiten' },
+                { id: 56, date: '2026-08-03', start: '14:30', end: '16:00', name: 'Freestyle Individual Junior', discipline: 'Freestyle', location: 'Icehall', notes: 'etwa 19' },
+                { id: 57, date: '2026-08-03', start: '15:00', end: '16:00', name: '800m Final', discipline: 'Track', location: 'Track' },
+                { id: 58, date: '2026-08-03', start: '16:00', end: '17:00', name: 'WW Qualification', discipline: 'Track', location: 'Track' },
+                { id: 59, date: '2026-08-03', start: '18:00', end: '19:30', name: 'IUF Slalom Final', discipline: 'Track', location: 'Track', notes: 'if less than 600 participants' },
+                { id: 60, date: '2026-08-03', start: '18:30', end: '20:00', name: 'Junior Flatland Finals', discipline: 'Flatland', location: 'Icehall' },
+                { id: 61, date: '2026-08-03', start: '19:30', end: '20:30', name: 'Podium Junior Flatland', discipline: 'Awards', location: 'Icehall' },
+                { id: 62, date: '2026-08-03', start: '19:30', end: '20:30', name: 'WW Final', discipline: 'Track', location: 'Track' },
+                { id: 63, date: '2026-08-03', start: '20:00', end: '22:30', name: 'Expert Flatland Finals', discipline: 'Flatland', location: 'Icehall' },
+                { id: 64, date: '2026-08-04', start: '08:00', end: '12:00', name: 'Hockey B', discipline: 'Hockey', location: 'City Hall' },
+                { id: 65, date: '2026-08-04', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 66, date: '2026-08-04', start: '08:00', end: '12:00', name: '50m Einbein Qualification', discipline: 'Track', location: 'Track' },
+                { id: 67, date: '2026-08-04', start: '12:00', end: '13:00', name: '50m Einbein Final', discipline: 'Track', location: 'Track' },
+                { id: 68, date: '2026-08-04', start: '13:00', end: '15:00', name: '100m Qualification', discipline: 'Track', location: 'Track' },
+                { id: 69, date: '2026-08-04', start: '17:30', end: '18:30', name: '100m Final', discipline: 'Track', location: 'Track' },
+                { id: 70, date: '2026-08-04', start: '18:00', end: '20:00', name: 'Freestyle Individual Expert', discipline: 'Freestyle', location: 'Icehall', notes: 'etwa 19' },
+                { id: 71, date: '2026-08-05', start: '08:00', end: '12:00', name: 'Hockey B', discipline: 'Hockey', location: 'City Hall' },
+                { id: 72, date: '2026-08-05', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 73, date: '2026-08-05', start: '08:00', end: '12:00', name: '400m Qualification', discipline: 'Track', location: 'Track' },
+                { id: 74, date: '2026-08-05', start: '10:30', end: '14:00', name: 'Freestyle Convention Pairs 15+', discipline: 'Freestyle', location: 'Icehall', notes: 'etwa 42 plus Einfahrzeiten' },
+                { id: 75, date: '2026-08-05', start: '14:30', end: '15:30', name: '400m Final', discipline: 'Track', location: 'Track' },
+                { id: 76, date: '2026-08-05', start: '18:00', end: '20:00', name: 'Freestyle Pairs Jr & Expert', discipline: 'Freestyle', location: 'Icehall', notes: 'etwa 19' },
+                { id: 77, date: '2026-08-06', start: '08:00', end: '12:00', name: 'Hockey B', discipline: 'Hockey', location: 'City Hall' },
+                { id: 78, date: '2026-08-06', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 79, date: '2026-08-06', start: '15:30', end: '17:00', name: '4x100m Qualification', discipline: 'Track', location: 'Track' },
+                { id: 80, date: '2026-08-06', start: '19:00', end: '20:00', name: '4x100m Final', discipline: 'Track', location: 'Track' },
+                { id: 81, date: '2026-08-06', start: '15:00', end: '18:00', name: 'Freestyle Expert Groups', discipline: 'Freestyle', location: 'Icehall', notes: 'small group Jr (5), small group Ex (10), large group Jr (4), large group Ex (10)' },
+                { id: 82, date: '2026-08-06', start: '19:00', end: '21:00', name: 'Freestyle Expert', discipline: 'Freestyle', location: 'Icehall' },
+                { id: 83, date: '2026-08-06', start: '10:30', end: '14:00', name: 'Street Preliminaries', discipline: 'Street', location: 'Icehall' },
+                { id: 84, date: '2026-08-07', start: '08:00', end: '12:00', name: 'Hockey B (if many teams)', discipline: 'Hockey', location: 'City Hall' },
+                { id: 85, date: '2026-08-07', start: '08:00', end: '17:00', name: 'Convention Time', discipline: 'Convention', location: 'ATV Hall' },
+                { id: 86, date: '2026-08-07', start: '08:00', end: '12:00', name: 'IUF Final', discipline: 'Track', location: 'Track', notes: 'if not possible on 03.08' },
+                { id: 87, date: '2026-08-07', start: '08:00', end: '10:00', name: 'Cyclocross', discipline: 'XC', location: 'Straße' },
+                { id: 88, date: '2026-08-07', start: '14:00', end: '15:30', name: 'Junior Street Finals (0-14)', discipline: 'Street', location: 'Icehall' },
+                { id: 89, date: '2026-08-07', start: '15:00', end: '16:00', name: 'Awards Junior Street', discipline: 'Awards', location: 'Icehall' },
+                { id: 90, date: '2026-08-07', start: '16:00', end: '18:00', name: 'Expert Street Finals (15+)', discipline: 'Street', location: 'Icehall' },
+                { id: 91, date: '2026-08-07', start: '18:00', end: '19:30', name: 'Awards (100m, WW, 4x100m, Expert Street)', discipline: 'Awards', location: 'Icehall' },
+                { id: 92, date: '2026-08-07', start: '19:30', end: '23:00', name: 'Final Party', discipline: 'Party', location: 'Icehall' }
+            ];
+            saveToStorage();
+        }
+        
+        function initFilters() {
+            // Initialize discipline filters
+            for (const disc of Object.keys(state.disciplines)) {
+                state.filters.disciplines[disc] = true;
+            }
+            // Initialize location filters
+            for (const loc of state.locations) {
+                state.filters.locations[loc] = true;
+            }
+        }
+        
+        function saveToStorage() {
+            const data = {
+                events: state.events,
+                disciplines: state.disciplines,
+                locations: state.locations,
+                currentDay: state.currentDay,
+                lastSaved: new Date().toISOString()
+            };
+            localStorage.setItem('unicyclePlanner2026', JSON.stringify(data));
+            document.getElementById('lastSaveInfo').textContent = `Zuletzt: ${new Date().toLocaleTimeString('de-DE')}`;
+        }
+        
+        // ========================================
+        // RENDERING
+        // ========================================
+        
+        function renderDayNav() {
+            const nav = document.getElementById('dayNav');
+            nav.innerHTML = DAYS.map(day => {
+                const dateObj = new Date(day.date);
+                const weekday = dateObj.toLocaleDateString('de-DE', { weekday: 'short' });
+                const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                return `
+                    <button class="day-btn ${day.date === state.currentDay ? 'active' : ''} ${day.special ? 'special' : ''}"
+                            onclick="selectDay('${day.date}')">
+                        <span class="day-name">${day.label}</span>
+                        <span class="day-date">${weekday} ${dateStr}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+        
+        function renderFilters() {
+            // Discipline filters
+            const discFilters = document.getElementById('disciplineFilters');
+            discFilters.innerHTML = Object.entries(state.disciplines).map(([name, color]) => {
+                const count = state.events.filter(e => e.discipline === name && e.date === state.currentDay).length;
+                return `
+                    <label class="filter-item">
+                        <input type="checkbox" ${state.filters.disciplines[name] ? 'checked' : ''} 
+                               onchange="toggleDisciplineFilter('${name}')">
+                        <span class="filter-color" style="background: ${color}"></span>
+                        <span class="filter-label">${name}</span>
+                        ${count > 0 ? `<span class="filter-count">${count}</span>` : ''}
+                    </label>
+                `;
+            }).join('');
+            
+            // Location filters
+            const locFilters = document.getElementById('locationFilters');
+            locFilters.innerHTML = state.locations.map(loc => {
+                const count = state.events.filter(e => e.location === loc && e.date === state.currentDay).length;
+                return `
+                    <label class="filter-item">
+                        <input type="checkbox" ${state.filters.locations[loc] ? 'checked' : ''} 
+                               onchange="toggleLocationFilter('${loc}')">
+                        <span class="filter-label">${loc}</span>
+                        ${count > 0 ? `<span class="filter-count">${count}</span>` : ''}
+                    </label>
+                `;
+            }).join('');
+        }
+        
+        function renderContent() {
+            const container = document.getElementById('eventsContainer');
+            const events = getFilteredEvents();
+            
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Keine Events für diesen Tag</p>
+                        <button class="btn btn-primary" onclick="openAddEventModal()" style="margin-top: 1rem;">
+                            ➕ Event hinzufügen
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by start time
+            events.sort((a, b) => a.start.localeCompare(b.start));
+            
+            // Detect collisions
+            const collisions = detectCollisions(events);
+            
+            container.innerHTML = `
+                <div class="events-container">
+                    <div class="events-header">
+                        <div>Zeit</div>
+                        <div>Event</div>
+                        <div>Location</div>
+                        <div>Disziplin</div>
+                        <div>Aktionen</div>
+                    </div>
+                    ${events.map(event => {
+                        const hasCollision = collisions.includes(event.id);
+                        const color = state.disciplines[event.discipline] || '#94a3b8';
+                        return `
+                            <div class="event-item ${hasCollision ? 'collision' : ''}" data-id="${event.id}">
+                                <div class="event-time">
+                                    <input type="time" class="time-input" value="${event.start}" 
+                                           onchange="updateEventTime(${event.id}, 'start', this.value)">
+                                    <input type="time" class="time-input" value="${event.end}"
+                                           onchange="updateEventTime(${event.id}, 'end', this.value)">
+                                </div>
+                                <div class="event-title">
+                                    <div class="event-color-bar" style="background: ${color}"></div>
+                                    <input type="text" class="event-name-input" value="${escapeHtml(event.name)}"
+                                           onchange="updateEventName(${event.id}, this.value)">
+                                </div>
+                                <div class="event-location">
+                                    <select class="location-select" onchange="updateEventLocation(${event.id}, this.value)">
+                                        ${state.locations.map(loc => 
+                                            `<option value="${loc}" ${event.location === loc ? 'selected' : ''}>${loc}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                <div class="event-discipline">
+                                    <span class="discipline-badge" style="background: ${color}20; color: ${color}">
+                                        ${event.discipline}
+                                    </span>
+                                </div>
+                                <div class="event-actions">
+                                    ${hasCollision ? `<button class="action-btn" onclick="resolveCollision(${event.id})" title="Kollision lösen">⚠️</button>` : ''}
+                                    <button class="action-btn" onclick="editEvent(${event.id})" title="Bearbeiten">✏️</button>
+                                    <button class="action-btn delete" onclick="deleteEvent(${event.id})" title="Löschen">🗑️</button>
+                                </div>
+                            </div>
+                            ${hasCollision ? `
+                                <div class="collision-alert">
+                                    <span class="collision-text">⚠️ Zeitüberschneidung erkannt</span>
+                                    <button class="btn btn-secondary" onclick="resolveCollision(${event.id})">Lösung finden</button>
+                                </div>
+                            ` : ''}
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        function updateStats() {
+            const dayEvents = state.events.filter(e => e.date === state.currentDay);
+            const filteredEvents = getFilteredEvents();
+            const collisions = detectCollisions(filteredEvents);
+            
+            const stats = document.getElementById('statsBar');
+            stats.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${dayEvents.length}</div>
+                    <div class="stat-label">Events gesamt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${filteredEvents.length}</div>
+                    <div class="stat-label">Gefiltert</div>
+                </div>
+                <div class="stat-card ${collisions.length > 0 ? 'danger' : ''}">
+                    <div class="stat-value">${collisions.length}</div>
+                    <div class="stat-label">Kollisionen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${new Set(dayEvents.map(e => e.discipline)).size}</div>
+                    <div class="stat-label">Disziplinen</div>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // FILTERING
+        // ========================================
+        
+        function getFilteredEvents() {
+            return state.events.filter(event => {
+                if (event.date !== state.currentDay) return false;
+                if (!state.filters.disciplines[event.discipline]) return false;
+                if (!state.filters.locations[event.location]) return false;
+                return true;
+            });
+        }
+        
+        function toggleDisciplineFilter(disc) {
+            state.filters.disciplines[disc] = !state.filters.disciplines[disc];
+            renderContent();
+            updateStats();
+        }
+        
+        function toggleLocationFilter(loc) {
+            state.filters.locations[loc] = !state.filters.locations[loc];
+            renderContent();
+            updateStats();
+        }
+        
+        function selectAllFilters() {
+            for (const disc of Object.keys(state.disciplines)) {
+                state.filters.disciplines[disc] = true;
+            }
+            renderFilters();
+            renderContent();
+            updateStats();
+        }
+        
+        function deselectAllFilters() {
+            for (const disc of Object.keys(state.disciplines)) {
+                state.filters.disciplines[disc] = false;
+            }
+            renderFilters();
+            renderContent();
+            updateStats();
+        }
+        
+        // ========================================
+        // COLLISION DETECTION
+        // ========================================
+        
+        function detectCollisions(events) {
+            const collisions = [];
+            
+            // Group events by location
+            const byLocation = {};
+            for (const event of events) {
+                if (!byLocation[event.location]) byLocation[event.location] = [];
+                byLocation[event.location].push(event);
+            }
+            
+            // Check for overlaps within each location
+            for (const location in byLocation) {
+                const locEvents = byLocation[location].sort((a, b) => a.start.localeCompare(b.start));
+                
+                for (let i = 0; i < locEvents.length; i++) {
+                    for (let j = i + 1; j < locEvents.length; j++) {
+                        if (timesOverlap(locEvents[i], locEvents[j])) {
+                            if (!collisions.includes(locEvents[i].id)) collisions.push(locEvents[i].id);
+                            if (!collisions.includes(locEvents[j].id)) collisions.push(locEvents[j].id);
+                        }
+                    }
+                }
+            }
+            
+            return collisions;
+        }
+        
+        function timesOverlap(event1, event2) {
+            return event1.start < event2.end && event2.start < event1.end;
+        }
+        
+        function findFreeSlots(date, location, duration = 60) {
+            const dayEvents = state.events
+                .filter(e => e.date === date && e.location === location)
+                .sort((a, b) => a.start.localeCompare(b.start));
+            
+            const slots = [];
+            let currentTime = '06:00';
+            const endOfDay = '22:00';
+            
+            for (const event of dayEvents) {
+                if (currentTime < event.start) {
+                    const slotDuration = timeToMinutes(event.start) - timeToMinutes(currentTime);
+                    if (slotDuration >= duration) {
+                        slots.push({
+                            start: currentTime,
+                            end: event.start,
+                            duration: slotDuration
+                        });
+                    }
+                }
+                if (event.end > currentTime) {
+                    currentTime = event.end;
+                }
+            }
+            
+            if (currentTime < endOfDay) {
+                const slotDuration = timeToMinutes(endOfDay) - timeToMinutes(currentTime);
+                if (slotDuration >= duration) {
+                    slots.push({
+                        start: currentTime,
+                        end: endOfDay,
+                        duration: slotDuration
+                    });
+                }
+            }
+            
+            return slots;
+        }
+        
+        function timeToMinutes(time) {
+            const [h, m] = time.split(':').map(Number);
+            return h * 60 + m;
+        }
+        
+        function minutesToTime(mins) {
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        }
+        
+        // ========================================
+        // EVENT MANAGEMENT
+        // ========================================
+        
+        function selectDay(date) {
+            state.currentDay = date;
+            renderDayNav();
+            renderFilters();
+            renderContent();
+            updateStats();
+            saveToStorage();
+        }
+        
+        function setView(view) {
+            state.currentView = view;
+            document.querySelectorAll('.view-toggle button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+            renderContent();
+        }
+        
+        function openAddEventModal() {
+            document.getElementById('editEventId').value = '';
+            document.getElementById('eventModalTitle').textContent = 'Neues Event';
+            document.getElementById('eventName').value = '';
+            document.getElementById('eventStart').value = '08:00';
+            document.getElementById('eventEnd').value = '10:00';
+            document.getElementById('eventNotes').value = '';
+            
+            // Populate discipline select
+            const discSelect = document.getElementById('eventDiscipline');
+            discSelect.innerHTML = Object.keys(state.disciplines).map(d => 
+                `<option value="${d}">${d}</option>`
+            ).join('');
+            
+            // Populate location select
+            const locSelect = document.getElementById('eventLocation');
+            locSelect.innerHTML = state.locations.map(l => 
+                `<option value="${l}">${l}</option>`
+            ).join('');
+            
+            // Show free slots
+            showFreeSlotsPanel();
+            
+            openModal('eventModal');
+        }
+        
+        function editEvent(id) {
+            const event = state.events.find(e => e.id === id);
+            if (!event) return;
+            
+            document.getElementById('editEventId').value = id;
+            document.getElementById('eventModalTitle').textContent = 'Event bearbeiten';
+            document.getElementById('eventName').value = event.name;
+            document.getElementById('eventStart').value = event.start;
+            document.getElementById('eventEnd').value = event.end;
+            document.getElementById('eventNotes').value = event.notes || '';
+            
+            // Populate selects
+            const discSelect = document.getElementById('eventDiscipline');
+            discSelect.innerHTML = Object.keys(state.disciplines).map(d => 
+                `<option value="${d}" ${d === event.discipline ? 'selected' : ''}>${d}</option>`
+            ).join('');
+            
+            const locSelect = document.getElementById('eventLocation');
+            locSelect.innerHTML = state.locations.map(l => 
+                `<option value="${l}" ${l === event.location ? 'selected' : ''}>${l}</option>`
+            ).join('');
+            
+            showFreeSlotsPanel();
+            openModal('eventModal');
+        }
+        
+        function saveEvent() {
+            const id = document.getElementById('editEventId').value;
+            const name = document.getElementById('eventName').value.trim();
+            const start = document.getElementById('eventStart').value;
+            const end = document.getElementById('eventEnd').value;
+            const discipline = document.getElementById('eventDiscipline').value;
+            const location = document.getElementById('eventLocation').value;
+            const notes = document.getElementById('eventNotes').value.trim();
+            
+            if (!name || !start || !end) {
+                showToast('Bitte alle Pflichtfelder ausfüllen', 'error');
+                return;
+            }
+            
+            if (start >= end) {
+                showToast('Endzeit muss nach Startzeit sein', 'error');
+                return;
+            }
+            
+            if (id) {
+                // Update existing
+                const event = state.events.find(e => e.id === parseInt(id));
+                if (event) {
+                    event.name = name;
+                    event.start = start;
+                    event.end = end;
+                    event.discipline = discipline;
+                    event.location = location;
+                    event.notes = notes;
+                }
+            } else {
+                // Create new
+                const newId = Math.max(0, ...state.events.map(e => e.id)) + 1;
+                state.events.push({
+                    id: newId,
+                    date: state.currentDay,
+                    name,
+                    start,
+                    end,
+                    discipline,
+                    location,
+                    notes
+                });
+            }
+            
+            saveToStorage();
+            closeModal('eventModal');
+            renderFilters();
+            renderContent();
+            updateStats();
+            showToast('Event gespeichert', 'success');
+        }
+        
+        function deleteEvent(id) {
+            if (!confirm('Event wirklich löschen?')) return;
+            
+            state.events = state.events.filter(e => e.id !== id);
+            saveToStorage();
+            renderFilters();
+            renderContent();
+            updateStats();
+            showToast('Event gelöscht', 'success');
+        }
+        
+        function updateEventTime(id, field, value) {
+            const event = state.events.find(e => e.id === id);
+            if (event) {
+                event[field] = value;
+                saveToStorage();
+                renderContent();
+                updateStats();
+            }
+        }
+        
+        function updateEventName(id, value) {
+            const event = state.events.find(e => e.id === id);
+            if (event) {
+                event.name = value;
+                saveToStorage();
+            }
+        }
+        
+        function updateEventLocation(id, value) {
+            const event = state.events.find(e => e.id === id);
+            if (event) {
+                event.location = value;
+                saveToStorage();
+                renderContent();
+                updateStats();
+            }
+        }
+        
+        function showFreeSlotsPanel() {
+            const location = document.getElementById('eventLocation').value;
+            const slots = findFreeSlots(state.currentDay, location);
+            
+            if (slots.length > 0) {
+                document.getElementById('freeSlotsPanel').style.display = 'block';
+                document.getElementById('freeSlotsList').innerHTML = slots.slice(0, 5).map(slot => `
+                    <div class="slot-item">
+                        <span class="slot-time">${slot.start} - ${slot.end}</span>
+                        <span class="slot-duration">${slot.duration} min</span>
+                        <button class="btn btn-secondary" onclick="useSlot('${slot.start}', '${slot.end}')" style="padding: 0.25rem 0.5rem;">
+                            Verwenden
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('freeSlotsPanel').style.display = 'none';
+            }
+        }
+        
+        function useSlot(start, end) {
+            document.getElementById('eventStart').value = start;
+            document.getElementById('eventEnd').value = end;
+        }
+        
+        function resolveCollision(eventId) {
+            const event = state.events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            const duration = timeToMinutes(event.end) - timeToMinutes(event.start);
+            const slots = findFreeSlots(event.date, event.location, duration);
+            
+            // Also find slots at other locations
+            const otherSlots = [];
+            for (const loc of state.locations) {
+                if (loc !== event.location) {
+                    const locSlots = findFreeSlots(event.date, loc, duration);
+                    for (const slot of locSlots) {
+                        otherSlots.push({ ...slot, location: loc });
+                    }
+                }
+            }
+            
+            document.getElementById('collisionDetails').innerHTML = `
+                <p><strong>${event.name}</strong></p>
+                <p>Aktuell: ${event.start} - ${event.end} @ ${event.location}</p>
+                <p style="margin-top: 0.5rem; color: var(--text-secondary);">Benötigte Dauer: ${duration} Minuten</p>
+            `;
+            
+            document.getElementById('alternativeSlots').innerHTML = `
+                <h5 style="margin-bottom: 0.5rem;">Gleiche Location (${event.location}):</h5>
+                ${slots.length > 0 ? slots.slice(0, 3).map(slot => `
+                    <div class="slot-item">
+                        <span class="slot-time">${slot.start} - ${slot.end}</span>
+                        <button class="btn btn-success" onclick="moveEvent(${event.id}, '${slot.start}', '${slot.end}', '${event.location}')" style="padding: 0.25rem 0.5rem;">
+                            Hierher
+                        </button>
+                    </div>
+                `).join('') : '<p style="color: var(--text-secondary); font-size: 0.85rem;">Keine freien Slots</p>'}
+                
+                <h5 style="margin: 1rem 0 0.5rem;">Andere Locations:</h5>
+                ${otherSlots.slice(0, 5).map(slot => `
+                    <div class="slot-item">
+                        <span class="slot-time">${slot.start} - ${slot.end}</span>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">${slot.location}</span>
+                        <button class="btn btn-success" onclick="moveEvent(${event.id}, '${slot.start}', '${slot.end}', '${slot.location}')" style="padding: 0.25rem 0.5rem;">
+                            Hierher
+                        </button>
+                    </div>
+                `).join('')}
+            `;
+            
+            openModal('collisionModal');
+        }
+        
+        function moveEvent(id, start, end, location) {
+            const event = state.events.find(e => e.id === id);
+            if (event) {
+                event.start = start;
+                event.end = end;
+                event.location = location;
+                saveToStorage();
+                closeModal('collisionModal');
+                renderContent();
+                updateStats();
+                showToast('Event verschoben', 'success');
+            }
+        }
+        
+        // ========================================
+        // DISCIPLINE MANAGEMENT
+        // ========================================
+        
+        function openDisciplineManager() {
+            renderDisciplineList();
+            openModal('disciplineModal');
+        }
+        
+        function renderDisciplineList() {
+            const list = document.getElementById('disciplineList');
+            list.innerHTML = Object.entries(state.disciplines).map(([name, color]) => {
+                const count = state.events.filter(e => e.discipline === name).length;
+                return `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <input type="color" value="${color}" onchange="updateDisciplineColor('${name}', this.value)" style="width: 30px; height: 30px; border: none; cursor: pointer;">
+                        <span style="flex: 1;">${name}</span>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">${count} Events</span>
+                        ${count === 0 ? `<button class="action-btn delete" onclick="deleteDiscipline('${name}')" title="Löschen">🗑️</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function addDiscipline() {
+            const name = document.getElementById('newDisciplineName').value.trim();
+            const color = document.getElementById('newDisciplineColor').value;
+            
+            if (!name) {
+                showToast('Name eingeben', 'error');
+                return;
+            }
+            
+            if (state.disciplines[name]) {
+                showToast('Disziplin existiert bereits', 'error');
+                return;
+            }
+            
+            state.disciplines[name] = color;
+            state.filters.disciplines[name] = true;
+            document.getElementById('newDisciplineName').value = '';
+            
+            saveToStorage();
+            renderDisciplineList();
+            renderFilters();
+            showToast('Disziplin hinzugefügt', 'success');
+        }
+        
+        function updateDisciplineColor(name, color) {
+            state.disciplines[name] = color;
+            saveToStorage();
+            renderFilters();
+            renderContent();
+        }
+        
+        function deleteDiscipline(name) {
+            if (!confirm(`Disziplin "${name}" wirklich löschen?`)) return;
+            
+            delete state.disciplines[name];
+            delete state.filters.disciplines[name];
+            
+            saveToStorage();
+            renderDisciplineList();
+            renderFilters();
+            showToast('Disziplin gelöscht', 'success');
+        }
+        
+        // ========================================
+        // OVERVIEW
+        // ========================================
+        
+        function showDisciplineOverview() {
+            const select = document.getElementById('overviewDiscipline');
+            select.innerHTML = `<option value="">Alle Disziplinen</option>` +
+                Object.keys(state.disciplines).map(d => `<option value="${d}">${d}</option>`).join('');
+            
+            updateOverview();
+            openModal('overviewModal');
+        }
+        
+        function updateOverview() {
+            const selectedDisc = document.getElementById('overviewDiscipline').value;
+            const content = document.getElementById('overviewContent');
+            
+            let events = state.events;
+            if (selectedDisc) {
+                events = events.filter(e => e.discipline === selectedDisc);
+            }
+            
+            // Group by day
+            const byDay = {};
+            for (const day of DAYS) {
+                const dayEvents = events.filter(e => e.date === day.date).sort((a, b) => a.start.localeCompare(b.start));
+                if (dayEvents.length > 0) {
+                    byDay[day.date] = { label: day.label, events: dayEvents };
+                }
+            }
+            
+            content.innerHTML = Object.entries(byDay).map(([date, data]) => `
+                <div class="discipline-card">
+                    <div class="discipline-header" onclick="this.nextElementSibling.classList.toggle('expanded')">
+                        <div class="discipline-header-left">
+                            <strong>${data.label}</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.85rem;">${new Date(date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</span>
+                        </div>
+                        <span style="color: var(--text-secondary);">${data.events.length} Events ▼</span>
+                    </div>
+                    <div class="discipline-events">
+                        ${data.events.map(e => `
+                            <div class="mini-event">
+                                <span><strong>${e.start}-${e.end}</strong> ${e.name}</span>
+                                <span style="color: var(--text-secondary);">${e.location}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('') || '<p style="color: var(--text-secondary); text-align: center;">Keine Events gefunden</p>';
+        }
+        
+        // ========================================
+        // EXPORT / IMPORT
+        // ========================================
+        
+        function exportJSON() {
+            const data = {
+                events: state.events,
+                disciplines: state.disciplines,
+                locations: state.locations,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            downloadBlob(blob, `unicycle-planner-backup-${new Date().toISOString().split('T')[0]}.json`);
+            showToast('Backup erstellt', 'success');
+        }
+        
+        function importJSON() {
+            document.getElementById('fileInput').click();
+        }
+        
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.events) {
+                        state.events = data.events;
+                        state.disciplines = data.disciplines || state.disciplines;
+                        state.locations = data.locations || state.locations;
+                        
+                        initFilters();
+                        saveToStorage();
+                        renderDayNav();
+                        renderFilters();
+                        renderContent();
+                        updateStats();
+                        
+                        showToast('Daten importiert', 'success');
+                    } else {
+                        showToast('Ungültiges Format', 'error');
+                    }
+                } catch (err) {
+                    showToast('Fehler beim Import', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        function exportCSV() {
+            let csv = 'Datum,Tag,Start,Ende,Event,Disziplin,Location,Notizen\n';
+            
+            const sortedEvents = [...state.events].sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return a.start.localeCompare(b.start);
+            });
+            
+            for (const event of sortedEvents) {
+                const day = DAYS.find(d => d.date === event.date);
+                csv += `${event.date},${day ? day.label : ''},${event.start},${event.end},"${event.name}",${event.discipline},"${event.location}","${event.notes || ''}"\n`;
+            }
+            
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+            downloadBlob(blob, `unicycle-schedule-${new Date().toISOString().split('T')[0]}.csv`);
+            showToast('CSV exportiert', 'success');
+        }
+        
+        function exportExcel() {
+            // Create HTML-based Excel file with colors
+            let html = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        table { border-collapse: collapse; }
+                        th, td { border: 1px solid #000; padding: 8px; }
+                        th { background-color: #333; color: white; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <table>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Tag</th>
+                            <th>Start</th>
+                            <th>Ende</th>
+                            <th>Event</th>
+                            <th>Disziplin</th>
+                            <th>Location</th>
+                            <th>Notizen</th>
+                        </tr>
+            `;
+            
+            const sortedEvents = [...state.events].sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return a.start.localeCompare(b.start);
+            });
+            
+            for (const event of sortedEvents) {
+                const day = DAYS.find(d => d.date === event.date);
+                const color = state.disciplines[event.discipline] || '#94a3b8';
+                
+                html += `
+                    <tr>
+                        <td>${event.date}</td>
+                        <td>${day ? day.label : ''}</td>
+                        <td>${event.start}</td>
+                        <td>${event.end}</td>
+                        <td style="background-color: ${color}20;">${escapeHtml(event.name)}</td>
+                        <td style="background-color: ${color}; color: white;">${event.discipline}</td>
+                        <td>${event.location}</td>
+                        <td>${escapeHtml(event.notes || '')}</td>
+                    </tr>
+                `;
+            }
+            
+            html += '</table></body></html>';
+            
+            const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+            downloadBlob(blob, `unicycle-schedule-${new Date().toISOString().split('T')[0]}.xls`);
+            showToast('Excel exportiert', 'success');
+        }
+        
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // ========================================
+        // UTILITIES
+        // ========================================
+        
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveToStorage();
+                showToast('Gespeichert', 'success');
+            }
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                openAddEventModal();
+            }
+        });
+    </script>
+</body>
+</html>
